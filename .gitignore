@@ -1,0 +1,6 @@
+Logs/
+__pycache__/
+.DS_Store
+notes.txt
+todo.txt
+revision_history.txt
