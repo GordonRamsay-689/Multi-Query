@@ -11,7 +11,7 @@ class Session:
     def __init__(self, client_name):
         self._stop_event = threading.Event()
         self.name = client_name
-        self.type = ENGINE_TO_TYPE[self.name]
+        self.type = ENGINE_TO_TYPE[self.name] # CHANGE ENGINE_TO_TYPE to NAME_TO_TYPE or CLIENT_TO_TYPE
 
         if self.type == TYPE_GEMINI:
             self.client = GeminiClient(self.name)
