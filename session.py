@@ -1,4 +1,3 @@
-import threading
 import time
 import re
 from googleapi import google as google_web
@@ -9,9 +8,8 @@ from constants import *
 
 class Session:
     def __init__(self, client_name):
-        self._stop_event = threading.Event()
         self.name = client_name
-        self.type = CLIENT_TO_TYPE[self.name] # CHANGE ENGINE_TO_TYPE to NAME_TO_TYPE or CLIENT_TO_TYPE
+        self.type = CLIENT_ID_TO_TYPE[self.name] 
 
         if self.type == TYPE_GEMINI:
             self.client = GeminiClient(self.name)
@@ -20,35 +18,34 @@ class Session:
         else:
             self.client = None
 
-    def get_response(self):
-        self.client.query = self.query
-        return self.client.get_response()
-
-    def format_response(self):
-        self.client.format_response()
+    def reset(self):
+        self.client.api_response = None
+        self.client.query = ''
+        self.client.response = ''
 
 class GeminiClient:
     def __init__(self, name):
-        self.query = None
-        self.response = None
-        self.output = ''
         self.model = genai.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
-    
-    def get_response(self):
-        self.response = self.chat.send_message(self.query)
-        return True if self.response else False
+
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+    def send_request(self):
+        self.api_response = self.chat.send_message(self.query)
+        return True if self.api_response else False
     
     def format_response(self):
-        text = self.response.text
+        response = self.api_response.text
 
-        text = self.f_code_blocks(text)
-        text = self.f_numbered_lists(text)
-        text = self.f_bold_text(text)
-        text = self.f_italicized_text(text)
-        text = self.f_general(text)
+        response = self.f_code_blocks(response)
+        response = self.f_numbered_lists(response)
+        response = self.f_bold_text(response)
+        response = self.f_italicized_text(response)
+        response = self.f_general(response)
 
-        self.output = text
+        self.response = response
 
     def f_code_blocks(response):
         pattern =  r'```(\w+)(.*?)```'
@@ -78,36 +75,39 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self):
-        self.query = None
-        self.results = None
-        self.output = ''
+        self.api_response = None
+        self.query = ''
+        self.response = ''
 
-    def get_response(self):
+    def send_request(self):
         wait = 0.5
-        while not self.results:
+        while not self.api_response:
                 if self.stopped():
                     return False
                 else:
-                    self.results = google_web.search(self.query)
+                    self.api_response = google_web.search(self.query)
                     time.sleep(wait)
 
                     wait += 0.5
                     if wait > 3:
                             break
 
-        return True if self.results else False
+        return True if self.api_response else False
     
     def format_response(self):
-        response = ''
-        num_results = len(self.results)
+        num_results = len(self.api_response)
 
-        for i, result in enumerate(self.results):
+        response = ''
+
+        for i, result in enumerate(self.api_response):
+
+            ## Remove link from title of search result
             end_of_name = result.name.find("https://")
             if not end_of_name:
                 end_of_name = result.name.find("http://")
-
             name = result.name[:end_of_name]
 
+            ## Populate response_string
             response += f"{i+1} {name}\n"
             response += f"\t{result.link}\n"
             if result.description:
@@ -115,7 +115,8 @@ class GoogleClient:
             else:
                 response += f"\n\tNo Description\n"
             
+            ## Add newline to end of response_string
             if i  < (num_results - 1):
                 response += '\n\n'
 
-        self.output = response
+        self.response = response
