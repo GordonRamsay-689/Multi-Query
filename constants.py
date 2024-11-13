@@ -1,10 +1,10 @@
 
-# Engine IDs
+# Client IDs
 GOOGLE_ID = "google"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
 GEMINI_PRO_ID = "gemini-1.5-pro"
 
-ALIAS_TO_ENGINE = {
+ALIAS_TO_CLIENT = {
     "gemini": GEMINI_FLASH_ID,
     "g-flash": GEMINI_FLASH_ID,
     "gemini-flash": GEMINI_FLASH_ID,
@@ -14,11 +14,11 @@ ALIAS_TO_ENGINE = {
     "web": GOOGLE_ID
 }
 
-# Engine TYPES
+# Client TYPES
 TYPE_GEMINI = "gemini"
 TYPE_GOOGLE = "google"
 
-ENGINE_TO_TYPE = {
+CLIENT_TO_TYPE = {
     GEMINI_PRO_ID: TYPE_GEMINI,
     GEMINI_FLASH_ID: TYPE_GEMINI,
     GOOGLE_ID: TYPE_GOOGLE
