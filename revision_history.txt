@@ -1,0 +1,17 @@
+
+
+13 Nov 2024:
+-   'session.py' is split into Session(), GeminiClient() and GoogleClient().
+-   removed function .get_response() (send_request()) and format_response() from
+Session() in favor of uniform function and variable naming for anytyhing that should
+be accessible inside the -Client() objects. 
+Calling send_request() from main would look like this:
+    session.client.send_request()
+- Added reset() function to Session(). We may want to add this to the -Client() objects
+as well in the future.
+-   controller Object HandleQuery() is also in 'master.py'. It is not necessary for 
+Session() to function as a library. It exists for the sake of the current project 
+implementation. 
+We should be able to safely thread HandleQuery() since we terminate the 
+object each loop, while keeping Session() and it's -Client() alive.
+-   renamed CLIENT_TO_TYPE to CLIENT_ID_TO_TYPE.
