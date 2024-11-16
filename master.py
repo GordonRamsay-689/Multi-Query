@@ -1,7 +1,7 @@
 import threading
 import time
 
-class HandleQuery:
+class QueryHandler:
     def __init__(self, session, console_lock):
         self.console_lock = console_lock
         self._stop_event = threading.Event()
