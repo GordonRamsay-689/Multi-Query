@@ -36,7 +36,7 @@ class GeminiClient:
         self.response = ''
 
     def send_request(self):
-        self.api_response = self.chat.send_message(self.query)
+        self.api_response = self.chat.send_message(self.query)   
         return True if self.api_response else False
     
     def format_response(self):
@@ -50,30 +50,30 @@ class GeminiClient:
 
         self.response = response
 
-    def f_code_blocks(response):
+    def f_code_blocks(self, response):
         pattern =  r'```(\w+)(.*?)```'
         replacement = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
-    def f_numbered_lists(response):
+    def f_numbered_lists(self, response):
         pattern = r'\*\*(\d)'
         replacement = r'\t\1' 
         return re.sub(pattern, replacement, response)
 
-    def f_bold_text(response):
+    def f_bold_text(self, response):
         # (for some reason, gemini uses double qoutes for bold)
         pattern = r'(?!\*\*\s)\*\*(.+?)(?!\s\*\*)\*\*'
         replacement = r'\033[39;49;1m\1\033[0m' # ANSI: bold, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
-    def f_italicized_text(response):
+    def f_italicized_text(self, response):
         # (for some reason, gemini uses single qoutes for italic)
         pattern = r'(?!\*\s)\*(.+?)(?!\s\*)\*'
         replacement = r'\033[39;49;3m\1\033[0m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
     ## REPLACE THIS FUNCTION WITH SMALLER FUNCTIONS
-    def f_general(response):
+    def f_general(self, response):
         return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-').replace("--", '')
 
 class GoogleClient:

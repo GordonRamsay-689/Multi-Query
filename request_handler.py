@@ -1,5 +1,9 @@
 import threading
+import google.generativeai as genai
 import time
+
+from constants import *
+from session import Session
 
 class RequestHandler:
     def __init__(self, console_lock):
@@ -25,6 +29,11 @@ class RequestHandler:
             thread = threading.Thread(target=request.main, daemon=True)
             request.thread = thread            
             request.thread.start()
+        
+    def join_requests(self): # TESTING FUNCTION. REPLACE WITH TIMEOUT AND PASSIVE JOINING
+        for request in self.requests:
+            request.thread.join()
+            
 
 class Request:
     def __init__(self, session, parent):
@@ -59,11 +68,9 @@ class Request:
             self.remove_from_requests()
             return
         
-        try:
-            self.session.client.format_response()
-        except Exception as e:
-            self.remove_from_requests()
-            return
+        
+        self.session.client.format_response()
+
         
         if not self.stopped():
             with self.parent.console_lock:
@@ -72,3 +79,24 @@ class Request:
         self.remove_from_requests()
         return
 
+def test():
+    while True:
+        query = input(">")
+        sessions = []
+        session = Session(GEMINI_PRO_ID)
+        sessions.append(session)
+        session = Session(GOOGLE_ID)
+        sessions.append(session)
+
+        cli_lock = threading.Lock()
+        handler = RequestHandler(cli_lock)
+        handler.sessions = sessions
+        print("submitting request")
+        handler.submit_requests(query)
+        handler.join_requests()
+
+if __name__ == '__main__':
+    pass
+    #gemini_api_key = 
+    #genai.configure(api_key=gemini_api_key)
+    #test()
