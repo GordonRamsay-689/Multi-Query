@@ -32,6 +32,11 @@ class GeminiClient:
         self.query = ''
         self.response = ''
 
+    def reset(self):
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
     def send_request(self):
         self.api_response = self.chat.send_message(self.query)
         return True if self.api_response else False
@@ -79,18 +84,26 @@ class GoogleClient:
         self.query = ''
         self.response = ''
 
+    def reset(self):
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        self._stop_event.is_set()
+
     def send_request(self):
         wait = 0.5
         while not self.api_response:
-                if self.stopped():
-                    return False
-                else:
-                    self.api_response = google_web.search(self.query)
-                    time.sleep(wait)
+                self.api_response = google_web.search(self.query)
+                time.sleep(wait)
 
-                    wait += 0.5
-                    if wait > 3:
-                            break
+                wait += 0.5
+                if wait > 3:
+                        break
 
         return True if self.api_response else False
     
