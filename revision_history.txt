@@ -1,4 +1,17 @@
-
+16 Nov 2024:
+-   Renamed QueryHandler() as RequestHandler().
+-   implemented RequestHandler.submit_requests()
+-   RequestHandler.stop_threads()
+-   implemented Reuqest()
+-   Settled on design/method for handling the individual request threads. RequestHandler()
+will handle thread creation, running and safe termination by creating individual, perishable
+Request() objects: 
+    * When the RequestHandler() times out with timeout method, or receives timeout 
+    event from main (I removed self._stop_event for now from RequestHandler() as it might not
+    be needed) it will call each Request() objects stop() function. 
+    * The Request() objects will remove themselves from 
+    * Request() is passed its parent so it can easily and safely use the same locks and mutables.
+- implemented try-except blocks in request_handler.Request().main()
 
 13 Nov 2024:
 -   'session.py' is split into Session(), GeminiClient() and GoogleClient().

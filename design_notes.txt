@@ -1,0 +1,8 @@
+- Threading will be handled outside of Session or -Client objects. There is 
+no need to add complexity to them when the QueryHandler() or Master are perfectly
+capable of taking care of those details.
+
+- Look up best ways to implement a timer for concurrent api calls, the one in 
+gemini.py.Master.timer() is most likely stupidly convoluted. Still, handling
+all threads from Master makes sense as it will be the one calling them, and 
+it avoids individual timer objects for each query.
