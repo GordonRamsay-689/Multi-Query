@@ -19,9 +19,7 @@ class Session:
             self.client = None
 
     def reset(self):
-        self.client.api_response = None
-        self.client.query = ''
-        self.client.response = ''
+        self.client.reset()
 
 class GeminiClient:
     def __init__(self, name):
