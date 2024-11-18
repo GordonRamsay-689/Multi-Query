@@ -1,9 +1,9 @@
+import api_session
+import google.generativeai
 import threading
-import google.generativeai as genai
 import time
 
-from constants import *
-from session import Session
+from constants import * ## Global constants
 
 class RequestHandler:
     def __init__(self, console_lock):
@@ -74,29 +74,39 @@ class Request:
         
         if not self.stopped():
             with self.parent.console_lock:
+                print(self.session.client.response)
                 pass # send self.session.client.response to UI
         
         self.remove_from_requests()
         return
 
-def test():
-    while True:
-        query = input(">")
-        sessions = []
-        session = Session(GEMINI_PRO_ID)
+def test(query, client):
+    sessions = []
+    if client == "GOOGLE":
+        session = api_session.Session(GOOGLE_ID)
         sessions.append(session)
-        session = Session(GOOGLE_ID)
+    elif client == "GEMINI":
+        session = api_session.Session(GEMINI_PRO_ID)
+        sessions.append(session)
+    elif client == "BOTH":
+        session = api_session.Session(GOOGLE_ID)
+        session = api_session.Session(GEMINI_PRO_ID)
+        sessions.append(session)
         sessions.append(session)
 
-        cli_lock = threading.Lock()
-        handler = RequestHandler(cli_lock)
-        handler.sessions = sessions
-        print("submitting request")
+    cli_lock = threading.Lock()
+    handler = RequestHandler(cli_lock)
+    handler.sessions = sessions
+    print("submitting request")
+    while True:
         handler.submit_requests(query)
-        handler.join_requests()
+        query = input("> ") # will look strange as this does not wait for answer
+        if query == "quit":
+            break
+    handler.join_requests()
 
 if __name__ == '__main__':
-    pass
-    #gemini_api_key = 
-    #genai.configure(api_key=gemini_api_key)
-    #test()
+    import sys
+    gemini_api_key = sys.argv[1]
+    google.generativeai.configure(api_key=gemini_api_key)
+    test(sys.argv[2], sys.argv[3].upper())

@@ -1,10 +1,9 @@
-import time
+import googleapi
+import google.generativeai
 import re
-from googleapi import google as google_web
-import google.generativeai as genai
+import time
 
-# From project folder
-from constants import *
+from constants import * ## Global constants
 
 class Session:
     def __init__(self, client_name):
@@ -23,7 +22,7 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
-        self.model = genai.GenerativeModel(model_name=name)
+        self.model = google.generativeai.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
         self.api_response = None
@@ -96,7 +95,7 @@ class GoogleClient:
     def send_request(self):
         wait = 0.5
         while not self.api_response:
-                self.api_response = google_web.search(self.query)
+                self.api_response = googleapi.google.search(self.query)
                 time.sleep(wait)
 
                 wait += 0.5

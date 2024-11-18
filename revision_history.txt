@@ -1,3 +1,9 @@
+18 Nov 2024:
+-   Renamed module "session.py" to "api_session.py". This allows for clearer namespace 
+and will be less confusing when using the variable session (which is used a lot).
+-   Added command line arguments to "request_handler.py" for gemini_api_key, query and
+client. Employed in the test function if __name__ == __main__
+
 16 Nov 2024:
 -   Renamed QueryHandler() as RequestHandler().
 -   implemented RequestHandler.submit_requests()
