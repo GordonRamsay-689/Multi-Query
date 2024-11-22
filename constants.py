@@ -43,6 +43,9 @@ ALIAS - CLIENT
 'msearch "query" gpro' will select {GEMINI_PRO_ID}..
 'msearch "query" gflash' will select {GEMINI_FLASH_ID}..
 and so on
+
+msearch is a suggested enviroment alias, replace with python3 request_handler.py
+if running directly from script directory.
 '''
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
