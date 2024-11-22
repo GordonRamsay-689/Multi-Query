@@ -1,5 +1,7 @@
 <h1>Multi-Search</h1>
 
+_Work in progress, use at your own discretion. Feel free to modify any way you like._
+
 This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. More engines and models will be
 added when _I_ feel like it, but it should be fairly easy to add your own if _you_ feel like it. 
 
