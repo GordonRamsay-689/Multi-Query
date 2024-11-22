@@ -1,7 +1,7 @@
 import api_session
 import google.generativeai
 import threading
-import time
+# import time
 
 from constants import * ## Global constants
 
@@ -13,13 +13,13 @@ class RequestHandler:
         self.sessions = []
         self.requests = []
 
-    def stop_threads(self):         # UNDERDEVELOPED FUNCTION. JUST A CONCEPT
+    def stop_threads(self): # Not in use yet
         for request in self.requests:
             request.stop()
 
     def submit_requests(self, query):
         for session in self.sessions:
-            session.client.query = query # Maybe just import entire prompt/query object and assign query.text for clearer types
+            session.client.query = query 
 
             # Create Request() and append to list of active requests
             request = Request(session, self)
