@@ -10,7 +10,7 @@ a client where you can keep a conversation going (or several conversations at on
 ### Prerequisites
 - Python 3.12.3 (tested on macOS. Linux compatibility is unconfirmed)
 - Google-Search-API by abenassi
-- Google Gemini API
+- Google's Gemini API
 
 <h2>Setup</h2>
 
