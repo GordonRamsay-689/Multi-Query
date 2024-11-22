@@ -36,7 +36,7 @@ I recommend setting an enviroment alias for easy access:
 ```
     alias msearch="python ~/path/to/script/script.py"
 ```
-At the moment you can run the module request_handler.py directly in terminal by simply typing:
+Run the module with the following command, replacing ```CLIENT``` with a valid alias (see bottom of readme):
 ```
     msearch "query" CLIENT
 ```
@@ -44,6 +44,7 @@ or just:
 ```
     msearch "query" // Defaults to gemini-flash
 ```
+
 You can add any number of clients to query:
 ```
     msearch "query" CLIENT_A CLIENT_B ...
@@ -51,3 +52,8 @@ You can add any number of clients to query:
 As you receive responses they will be printed, so as soon as one client responds you can read the response while waiting for the other clients to respond.
 
 There is no timeout feature implemented, so you can simply use CTRL + C to interrupt the script.
+
+### Valid client-aliases:
+- "gemini" or "gflash": Gemini 1.5 Flash
+- "gpro": Gemini 1.5 Pro
+- "google": Google Web Search
