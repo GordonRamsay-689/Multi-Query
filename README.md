@@ -20,7 +20,7 @@ a client where you can keep a conversation going (or several conversations at on
 ```
 3. After installing googleapi you need to patch it, as it no longer works:
 4. Navigate to python site-packages, on MacOS default location is ```/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/googleapi/modules/```
-5. Replace 'standard_search.py' with the file with the same name provided in the repository
+5. Replace 'standard_search.py' with the file with the same name provided in the repository inside folder "for_googleapi"
 6. Install [Gemini API](https://ai.google.dev/) and get a free API key
 ``` 
     pip3 install google-generativeai
