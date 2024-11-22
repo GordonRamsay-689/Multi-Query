@@ -1,9 +1,10 @@
+<h1>Multi-Search</h1>
+
 This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. More engines and models will be
 added when _I_ feel like it, but it should be fairly easy to add your own if _you_ feel like it. 
 
 The current implementation will only send the query you provided as an argument when running the script, but I have tested persistent chats, and will be adding 
-a client where you can keep a conversation going (or several conversations) for as long as you like. I didn't include that functionality when directly running
-the module with arguments because I didn't need it.
+a client where you can keep a conversation going (or several conversations) for as long as you like.
 
 ### Prerequisites
 - Python 3.12.3 (tested on macOS. Linux compatibility is unconfirmed)
