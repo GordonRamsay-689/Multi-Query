@@ -30,7 +30,7 @@ class RequestHandler:
             request.thread = thread            
             request.thread.start()
         
-    def join_requests(self): # TESTING FUNCTION. REPLACE WITH TIMEOUT AND PASSIVE JOINING
+    def join_requests(self): # For use when run with args
         for request in self.requests:
             request.thread.join()
             
@@ -63,15 +63,15 @@ class Request:
         if not successful_request:
             if not self.stopped():
                 with self.parent.console_lock:
+                    print("failed to receive response")
+                    print(self.session.name)
                     pass # send to UI that failed   
         
             self.remove_from_requests()
             return
         
-        
         self.session.client.format_response()
 
-        
         if not self.stopped():
             with self.parent.console_lock:
                 print(self.session.client.response)
@@ -80,33 +80,87 @@ class Request:
         self.remove_from_requests()
         return
 
-def test(query, client):
+def main(query, aliases, config_path):
+    # only in use when script run directly
+
     sessions = []
-    if client == "GOOGLE":
-        session = api_session.Session(GOOGLE_ID)
-        sessions.append(session)
-    elif client == "GEMINI":
-        session = api_session.Session(GEMINI_PRO_ID)
-        sessions.append(session)
-    elif client == "BOTH":
-        session = api_session.Session(GOOGLE_ID)
-        session = api_session.Session(GEMINI_PRO_ID)
-        sessions.append(session)
+    clients = []
+    for alias in aliases:
+        client_id = ALIAS_TO_CLIENT[alias]
+        clients.append(client_id)
+        
+    configure_clients(clients, config_path)
+
+    for client_id in clients:
+        session = api_session.Session(client_id)
         sessions.append(session)
 
     cli_lock = threading.Lock()
     handler = RequestHandler(cli_lock)
     handler.sessions = sessions
-    print("submitting request")
-    while True:
-        handler.submit_requests(query)
-        query = input("> ") # will look strange as this does not wait for answer
-        if query == "quit":
-            break
+
+    with cli_lock:
+        print("\nSending queries...\n")
+    
+    handler.submit_requests(query)
     handler.join_requests()
 
+def configure_clients(clients, config_path):
+    set_up_gemini = False
+
+    for client_id in clients:
+        if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
+            if set_up_gemini == False:
+                with open(config_path, "r") as config:
+                    contents = config.read()
+                contents = contents.splitlines()
+                google.generativeai.configure(api_key=contents[0])
+                set_up_gemini == True
+        else:
+            pass
+
+def setup(config_path):
+    with open(config_path, "w") as config:
+        config.write("")
+
+    for type in REQUIRES_KEY:
+        print(f"Enter API key for {type.capitalize()}")
+        key = input("> ")
+
+        with open(config_path, "a") as config:
+            config.write(key)
+    
+    with open(config_path, "r") as config:
+        contents = config.read()
+        
+    if contents:
+        print("Keys saved to config file")
+    else:
+        print("Failed to save keys to config file")
+
+def get_config_path():
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+    except Exception:
+        print(ERROR_SCRIPT_DIR)
+        sys.exit()
+    config_path = os.path.join(script_dir, CONFIG_FILENAME)
+    return config_path
+
 if __name__ == '__main__':
-    import sys
-    gemini_api_key = sys.argv[1]
-    google.generativeai.configure(api_key=gemini_api_key)
-    test(sys.argv[2], sys.argv[3].upper())
+    import os, sys
+
+    if len(sys.argv) < 2:
+        print(CLI_ERROR_NO_ARGS)
+        print(CLI_EXAMPLE_USAGE)
+        sys.exit()
+
+    config_path = get_config_path()
+    
+    if sys.argv[1] == "-setup":
+        setup(config_path)
+        sys.exit()
+    else:
+        main(sys.argv[1], sys.argv[2:], config_path)
+
+    

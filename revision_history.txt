@@ -1,3 +1,15 @@
+22 Nov 2024:
+-   command line arguments are now supported when running request_handler.py as 
+a script.
+-   Removed test() func, added main() for when module is run as __main__ with args.
+-   Added setup() which gets API key and stores in config.env
+-   Added configure_clients() which configures clients (currently just gemini) if they
+are used
+-   Added constants TYPES, REQUIRES_KEY to easily check if something requires a key
+or iterate over types 
+-   Removed all "-" from aliases. Removed some aliases.
+-   Added some strings as constants 
+
 18 Nov 2024:
 -   Renamed module "session.py" to "api_session.py". This allows for clearer namespace 
 and will be less confusing when using the variable session (which is used a lot).
