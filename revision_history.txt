@@ -1,3 +1,7 @@
+25 Nov 2024:
+-   Added handling for when no third argument is given (the arg specifying the 
+client to use). Default client when no third argument is given is gflash.
+
 22 Nov 2024:
 -   command line arguments are now supported when running request_handler.py as 
 a script.

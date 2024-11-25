@@ -160,6 +160,9 @@ if __name__ == '__main__':
     if sys.argv[1] == "-setup":
         setup(config_path)
         sys.exit()
+    elif len(sys.argv) < 3:
+        print(f"\nDefaulting to {GEMINI_FLASH_ID}")
+        main(sys.argv[1], ["gflash"], config_path)
     else:
         main(sys.argv[1], sys.argv[2:], config_path)
 
