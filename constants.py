@@ -32,7 +32,7 @@ CLIENT_ID_TO_TYPE = {
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 
-CLI_EXAMPLE_USAGE = f'''Example Usage: 
+CLI_EXAMPLE_USAGE = f'''Example Usage (args are not positional): 
 msearch
 msearch -setup
 msearch CLIENT
