@@ -42,7 +42,8 @@ msearch -help'''
 CLI_HELP = f'''\
 This information is only relevant for running the script with arguments.
 
-All args are optional, and are not reliant on position.
+All args are optional, and except for the query (which must come first
+if included) are not positional.
 
 To update API keys run:
 msearch -setup
