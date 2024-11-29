@@ -32,27 +32,39 @@ CLIENT_ID_TO_TYPE = {
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 
-CLI_EXAMPLE_USAGE = f'''Example Usage (args are not positional): 
-msearch
+CLI_EXAMPLE_USAGE = f'''\
+Example Usage: 
+msearch "query" -command client
+
+For more details:
+msearch -help'''
+
+CLI_HELP = f'''\
+This information is only relevant for running the script with arguments.
+
+All args are optional, and are not reliant on position.
+
+To update API keys run:
 msearch -setup
-msearch CLIENT
-msearch "query" CLIENT
-msearch "query" -c CLIENT
-msearch "query" // Defaults to gemini-flash
 
-To select a specific client/model use any of the following aliases:
+- Doublequotes signify a query. If you wish to include doubleqoutes
+in your query remember to escape them with '\\'. If the query starts
+with '-' then you must escape that too.
 
-ALIAS - CLIENT
-{ALIAS_TO_CLIENT}
+- To select a specific client use any of the following aliases:
 
-'msearch "query" gpro' will select {GEMINI_PRO_ID}..
-'msearch "query" gflash' will select {GEMINI_FLASH_ID}..
-and so on
+    ALIAS - CLIENT
+    {ALIAS_TO_CLIENT}
 
-Adding '-c' before the arguments specifying clients will start a persistent
-chat.
+If no client is provided the script will default to gemini-flash-1.5
+    
+- Commands are prepended with '-'
 
-msearch is a suggested enviroment alias, replace with python3 request_handler.py
+Some valid commands are:
+    'c' // Starts a persistent chat session with all clients.
+    'setup' // Update api keys.
+
+msearch is a suggested enviroment alias, replace with python3 master.py
 if running directly from script directory.
 '''
 

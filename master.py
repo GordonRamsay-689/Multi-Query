@@ -166,6 +166,9 @@ if __name__ == '__main__':
             if command == "-setup":
                 setup(config_path)
                 sys.exit()
+            elif command == 'help':
+                print(CLI_HELP)
+                sys.exit()
             elif command == '-c':
                 master.persistent_chat = True
 
