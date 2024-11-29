@@ -1,9 +1,11 @@
 import api_session
 import google.generativeai
 import request_handler
+import re
 import threading
 import os 
 import sys
+import ui
 
 from constants import * ## Global constants
 
@@ -75,6 +77,7 @@ class Master:
         self.populate_clients(aliases)
         self.configure_clients()
         self.populate_sessions()
+        self.handler.sessions = self.sessions
 
     def configure_clients(self):
         with open(self.config_path, "r") as config:
@@ -91,7 +94,7 @@ class Master:
                 if not self.configured_gemini:
                     google.generativeai.configure(api_key=contents[0])
                     self.configured_gemini = True
-
+        
     def populate_clients(self, aliases):
         while True:
             for alias in aliases:
@@ -104,15 +107,54 @@ class Master:
             if self.clients:
                 return
             else:
-                pass # get clients from user
+                if not self.query:
+                    self.query = input("")
             
     def populate_sessions(self):
         for client_id in self.clients:
             session = api_session.Session(client_id)
             self.sessions.append(session)
 
+    def get_query(self):
+        with self.cli_lock:
+            self.query = ui.c_in()
+        
+        if self.query:
+            self.extract_flags()
+    
+    def extract_flags(self):
+        query = self.query
+
+        pattern_add_client = r"--add:(\S+)"
+        matches = re.findall(pattern_add_client, query)
+        if matches:
+            self.add_models(matches)
+        query = re.sub(pattern_add_client, '', query)
+
+        pattern_remove_client = r"--rm:(\S+)"
+        matches = re.findall(pattern_remove_client, query)
+        if matches:
+            self.remove_models(matches)
+        query = re.sub(pattern_remove_client, '', query)
+
+        if query:
+            self.query = query
+
     def main(self):
-        pass
+        while True:
+            while not self.query:
+                with self.cli_lock:
+                    ui.c_out("Enter your query (triple click enter to submit):")
+                self.get_query()
+            
+
+
+            if self.persistent_chat:
+                self.reset()
+                continue
+            else:
+                sys.exit()
+
 
 def fatal_error(error_message):
     print(f"{SCRIPT_NAME}:")
