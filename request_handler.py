@@ -106,18 +106,17 @@ def main(query, aliases, config_path):
     handler.join_requests()
 
 def configure_clients(clients, config_path):
-    set_up_gemini = False
+    configured_gemini = False
 
     for client_id in clients:
         if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
-            if set_up_gemini == False:
+            if not configured_gemini:
                 with open(config_path, "r") as config:
                     contents = config.read()
+
                 contents = contents.splitlines()
                 google.generativeai.configure(api_key=contents[0])
-                set_up_gemini == True
-        else:
-            pass
+                configured_gemini = True
 
 def setup(config_path):
     with open(config_path, "w") as config:
