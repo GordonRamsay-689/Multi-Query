@@ -97,7 +97,7 @@ def main(query, aliases, config_path):
 
     cli_lock = threading.Lock()
     handler = RequestHandler(cli_lock)
-    handler.sessions = sessions # use a deepcopy instead when implementing persistent chats
+    handler.sessions = sessions
 
     with cli_lock:
         print("\nSending queries...\n")
