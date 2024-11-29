@@ -1,6 +1,9 @@
 
 CONFIG_FILENAME = "config.env"
 
+# Valid Commands
+VALID_COMMANDS = ["-c", "-setup"]
+
 # Client IDs
 GOOGLE_ID = "google"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
@@ -29,10 +32,12 @@ CLIENT_ID_TO_TYPE = {
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 
-CLI_ERROR_NO_ARGS = "No arguments provided"
 CLI_EXAMPLE_USAGE = f'''Example Usage: 
+msearch
 msearch -setup
+msearch CLIENT
 msearch "query" CLIENT
+msearch "query" -c CLIENT
 msearch "query" // Defaults to gemini-flash
 
 To select a specific client/model use any of the following aliases:
@@ -44,8 +49,13 @@ ALIAS - CLIENT
 'msearch "query" gflash' will select {GEMINI_FLASH_ID}..
 and so on
 
+Adding '-c' before the arguments specifying clients will start a persistent
+chat.
+
 msearch is a suggested enviroment alias, replace with python3 request_handler.py
 if running directly from script directory.
 '''
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
+
+SCRIPT_NAME = "MSearch"

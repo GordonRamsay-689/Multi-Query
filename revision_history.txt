@@ -1,3 +1,14 @@
+29 Nov 2024 (in branch 'controller'):
+-   Removed main(), get_script_dir(), get_config_path(), setup() from request_handler.py
+-   Added get_script_dir(), get_config_path(), setup() without changes to master.py
+-   Added constants SCRIPT_NAME, VALID_COMMANDS
+-   Removed all CLI_ERROR as none are in use anymore.
+-   Edited CLI_EXAMPLE_USAGE to reflect current state, not very refined at the moment.
+-   Created function parse_arguments() and remodeled argument parsing.
+-   Created class Master, far from finished.
+-   Created functions in Master: configure(), stop(), stopped(), reset(),
+configure_clients(), populate_clients(), populate_sessions()
+
 25 Nov 2024:
 -   Added handling for when no third argument is given (the arg specifying the 
 client to use). Default client when no third argument is given is gflash.
