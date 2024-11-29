@@ -77,13 +77,18 @@ class Master:
         self.populate_sessions()
 
     def configure_clients(self):
+        with open(self.config_path, "r") as config:
+            contents = config.read()
+
+        if contents:
+            contents = contents.splitlines()
+        else:
+            setup()
+            return self.configure_clients()
+
         for client_id in self.clients:
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
-                    with open(self.config_path, "r") as config:
-                        contents = config.read()
-
-                    contents = contents.splitlines()
                     google.generativeai.configure(api_key=contents[0])
                     self.configured_gemini = True
 
