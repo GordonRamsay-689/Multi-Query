@@ -97,7 +97,7 @@ def main(query, aliases, config_path):
 
     cli_lock = threading.Lock()
     handler = RequestHandler(cli_lock)
-    handler.sessions = sessions
+    handler.sessions = sessions # use a deepcopy instead when implementing persistent chats
 
     with cli_lock:
         print("\nSending queries...\n")
@@ -138,12 +138,16 @@ def setup(config_path):
     else:
         print("Failed to save keys to config file")
 
-def get_config_path():
+def get_script_dir():
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
     except Exception:
         print(ERROR_SCRIPT_DIR)
         sys.exit()
+
+    return script_dir
+
+def get_config_path(script_dir):
     config_path = os.path.join(script_dir, CONFIG_FILENAME)
     return config_path
 
@@ -155,7 +159,8 @@ if __name__ == '__main__':
         print(CLI_EXAMPLE_USAGE)
         sys.exit()
 
-    config_path = get_config_path()
+    script_dir = get_script_dir()
+    config_path = get_config_path(script_dir)
     
     if sys.argv[1] == "-setup":
         setup(config_path)
