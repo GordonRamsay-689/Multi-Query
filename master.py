@@ -47,9 +47,9 @@ class Master:
     def __init__(self, config_path):
         self._stop_event = threading.Event()
 
-        cli_lock = threading.Lock()
+        self.cli_lock = threading.Lock()
 
-        self.handler = request_handler.RequestHandler(cli_lock)
+        self.handler = request_handler.RequestHandler(self.cli_lock)
 
         self.config_path = config_path
 
@@ -58,7 +58,7 @@ class Master:
         self.clients = []
         self.sessions = []
         self.query = ''
-        self.persistent_chat = True
+        self.persistent_chat = False
 
     def reset(self):
         self._stop_event.clear()
@@ -72,7 +72,9 @@ class Master:
     
     def configure(self, aliases=None):
         if not aliases:
-            aliases = self.select_clients()
+            alias = input(">")
+            aliases = [alias]
+            #aliases = self.select_clients()
         
         self.populate_clients(aliases)
         self.configure_clients()
@@ -98,47 +100,66 @@ class Master:
     def populate_clients(self, aliases):
         while True:
             for alias in aliases:
-                try:
-                    client_id = ALIAS_TO_CLIENT[alias]
-                except KeyError:
-                    continue
-                self.clients.append(client_id)
+                client_id = ALIAS_TO_CLIENT[alias]
+                print(client_id)
+
+
+                if client_id not in self.clients:
+                    self.clients.append(client_id)
             
             if self.clients:
                 return
-            else:
-                if not self.query:
-                    self.query = input("")
             
     def populate_sessions(self):
         for client_id in self.clients:
             session = api_session.Session(client_id)
             self.sessions.append(session)
 
-    def get_query(self):
-        with self.cli_lock:
-            self.query = ui.c_in()
-        
-        if self.query:
-            self.extract_flags()
+    def remove_clients(self, matches):
+        for match in matches:
+            try:
+                client_id = ALIAS_TO_CLIENT[match]
+            except KeyError:
+                continue
+
+            self.clients.remove(client_id)
+            for session in self.sessions:
+                if session.name == client_id:
+                    self.sessions.remove(session)
     
+    def add_clients(self, matches):
+        for match in matches:
+            try:
+                client_id = ALIAS_TO_CLIENT[match]
+            except KeyError:
+                continue
+
+            self.clients.append(client_id)
+            session = api_session.Session(client_id)
+            self.sessions.append(session)
+            self.configure_clients()
+
     def extract_flags(self):
         query = self.query
 
         pattern_add_client = r"--add:(\S+)"
         matches = re.findall(pattern_add_client, query)
         if matches:
-            self.add_models(matches)
+            self.add_clients(matches)
         query = re.sub(pattern_add_client, '', query)
 
         pattern_remove_client = r"--rm:(\S+)"
         matches = re.findall(pattern_remove_client, query)
         if matches:
-            self.remove_models(matches)
+            self.remove_clients(matches)
         query = re.sub(pattern_remove_client, '', query)
 
         if query:
             self.query = query
+
+    def get_query(self):
+        with self.cli_lock:
+            self.query = ui.c_in()
 
     def main(self):
         while True:
@@ -146,15 +167,22 @@ class Master:
                 with self.cli_lock:
                     ui.c_out("Enter your query (triple click enter to submit):")
                 self.get_query()
-            
 
+            self.extract_flags()
+            
+            print(self.handler.sessions)
+
+            with self.cli_lock:
+                ui.c_out("Submitting requests...", isolate=True, indent=1)
+
+            self.handler.submit_requests(self.query)
+            self.handler.join_requests() ## temporary, replace with proper timeout
 
             if self.persistent_chat:
                 self.reset()
                 continue
             else:
                 sys.exit()
-
 
 def fatal_error(error_message):
     print(f"{SCRIPT_NAME}:")
@@ -214,6 +242,7 @@ if __name__ == '__main__':
             elif command == '-c':
                 master.persistent_chat = True
 
+        master.query = query
         master.configure(client_aliases)
     
     master.main()
