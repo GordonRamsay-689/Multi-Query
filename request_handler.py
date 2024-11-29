@@ -1,13 +1,14 @@
 import api_session
 import google.generativeai
 import threading
+import ui
 # import time
 
 from constants import * ## Global constants
 
 class RequestHandler:
-    def __init__(self, console_lock):
-        self.console_lock = console_lock
+    def __init__(self, cli_lock):
+        self.cli_lock = cli_lock
         self.requests_lock = threading.Lock()
 
         self.sessions = []
@@ -26,7 +27,7 @@ class RequestHandler:
             with self.requests_lock:
                 self.requests.append(request)
 
-            thread = threading.Thread(target=request.main, daemon=True)
+            thread = threading.Thread(target=request.main, daemon=False) # Temporarily set daemon to false
             request.thread = thread            
             request.thread.start()
         
@@ -62,9 +63,9 @@ class Request:
 
         if not successful_request:
             if not self.stopped():
-                with self.parent.console_lock:
-                    print("failed to receive response")
-                    print(self.session.name)
+                with self.parent.cli_lock:
+                    print("failed to receive response") # Debug
+                    print(self.session.name) # Debug
                     pass # send to UI that failed   
         
             self.remove_from_requests()
@@ -73,9 +74,9 @@ class Request:
         self.session.client.format_response()
 
         if not self.stopped():
-            with self.parent.console_lock:
-                print(self.session.client.response)
-                pass # send self.session.client.response to UI
+            with self.parent.cli_lock:
+                ui.c_out(f"Client: {self.session.name}", bottom_margin=True)
+                ui.c_out(self.session.client.response, separator=True)
         
         self.remove_from_requests()
         return
