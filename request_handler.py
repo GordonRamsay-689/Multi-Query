@@ -124,6 +124,7 @@ def setup(config_path):
 
     for type in REQUIRES_KEY:
         print(f"Enter API key for {type.capitalize()}")
+        print("WARNING! This will be stored localy in plain text.")
         key = input("> ")
 
         with open(config_path, "a") as config:
