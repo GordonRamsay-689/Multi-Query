@@ -67,13 +67,11 @@ class GeminiClient:
         return re.sub(pattern, replacement, response)
 
     def f_bold_text(self, response):
-        # (for some reason, gemini uses double qoutes for bold)
         pattern = r'(?!\*\*\s)\*\*(.+?)(?!\s\*\*)\*\*'
         replacement = r'\033[39;49;1m\1\033[0m' # ANSI: bold, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        # (for some reason, gemini uses single qoutes for italic)
         pattern = r'(?!\*\s)\*(.+?)(?!\s\*)\*'
         replacement = r'\033[39;49;3m\1\033[0m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
@@ -91,6 +89,7 @@ class GoogleClient:
         self.response = ''
 
     def reset(self):
+        self._stop_event.clear()
         self.api_response = None
         self.query = ''
         self.response = ''

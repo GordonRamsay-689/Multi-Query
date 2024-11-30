@@ -5,10 +5,10 @@ import re
 import threading
 import os 
 import sys
+import time
 import ui
 
 from constants import * ## Global constants
-
 
 def setup(config_path):
     with open(config_path, "w") as config:
@@ -44,11 +44,11 @@ def get_config_path(script_dir):
 
 class Master:
     def __init__(self, config_path):
-        self._stop_event = threading.Event()
+        self._finished = threading.Event()
 
         self.cli_lock = threading.Lock()
 
-        self.handler = request_handler.RequestHandler(self.cli_lock)
+        self.handler = request_handler.RequestHandler(self.cli_lock, self)
 
         self.config_path = config_path
 
@@ -60,15 +60,10 @@ class Master:
         self.persistent_chat = False
 
     def reset(self):
-        self._stop_event.clear()
+        for session in self.sessions:
+            session.client.reset()
         self.query = ''
 
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-    
     def configure(self, aliases=None):
         if not aliases:
             alias = input(">")
@@ -119,10 +114,12 @@ class Master:
             except KeyError:
                 continue
 
-            self.clients.remove(client_id)
-            for session in self.sessions:
-                if session.name == client_id:
-                    self.sessions.remove(session)
+            if client_id in self.clients:
+                self.clients.remove(client_id)
+
+                for session in self.sessions:
+                    if session.name == client_id:
+                        self.sessions.remove(session)
     
     def add_clients(self, matches):
         for match in matches:
@@ -131,10 +128,12 @@ class Master:
             except KeyError:
                 continue
 
-            self.clients.append(client_id)
-            session = api_session.Session(client_id)
-            self.sessions.append(session)
-            self.configure_clients()
+            if client_id not in self.clients:
+                self.clients.append(client_id)
+
+                session = api_session.Session(client_id)
+                self.sessions.append(session)
+                self.configure_clients()
 
     def extract_flags(self):
         query = self.query
@@ -170,20 +169,26 @@ class Master:
 
     def main(self):
         while True:
-            while not self.query:
+            with self.cli_lock:
+                ui.c_out(f"Active clients: {self.clients}")
+
+            while not self.query: # If we already got a query from args, do not ask for one
                 self.get_query()
 
             self.extract_flags()
 
-            with self.cli_lock:
-                ui.c_out("Submitting requests...", isolate=True, indent=1)
-
+            if self.sessions:
+                with self.cli_lock:
+                    ui.c_out("Submitting requests...", isolate=True, indent=1)
+            else:
+                with self.cli_lock:
+                    ui.c_out("No active sessions.", isolate=True, indent=1)
+            
             self.handler.submit_requests(self.query)
-            self.handler.join_requests() ## temporary, replace with proper timeout
+            self.handler.monitor_requests()
 
             if self.persistent_chat:
                 self.reset()
-                continue
             else:
                 sys.exit()
 
@@ -196,6 +201,7 @@ def parse_arguments(args):
     commands = []
     client_aliases = []
 
+    # If first argument is not a client or command, assume it is a query.
     if args[0] not in VALID_COMMANDS and args[0] not in ALIAS_TO_CLIENT.keys():
         query = args.pop(0)
     else:
@@ -209,7 +215,7 @@ def parse_arguments(args):
             if arg in VALID_COMMANDS:
                 commands.append(arg)
             else:
-                fatal_error(f"Unknown command: {arg}")
+                fatal_error(f"Unknown command: {arg}")          
         elif arg.lower() in ALIAS_TO_CLIENT.keys():
             client_aliases.append(arg)
         else:
@@ -243,6 +249,9 @@ if __name__ == '__main__':
                 sys.exit()
             elif command == '-c':
                 master.persistent_chat = True
+
+        if not query:
+            master.persistent_chat = True
 
         master.query = query
         master.configure(client_aliases)

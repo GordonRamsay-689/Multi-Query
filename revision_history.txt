@@ -1,3 +1,13 @@
+30 Nov 2024:
+-   Added monitor_requests() to RequestHandler, checking if any request remains in list
+of requests, and if timed out. This removes the need for flags in Master or RequestHandler.
+-   Removed flags from Master, now just calls RequestHandler.monitor_request().
+-   Added RequestHandler.stop_threads() setting stop flags in clients (right now only 
+GoogleClient) and in each Request stopping futher execution like printing responses.
+-   If no query is provided but clients are provided Master.persistent_chat = True
+-   Updated CLI_HELP in constants.py briefly but it is not really correct as of now.
+-   Added "-help" to VALID_COMMANDS
+
 29 Nov 2024 (in branch 'controller'):
 -   Removed main(), get_script_dir(), get_config_path(), setup() from request_handler.py
 -   Added get_script_dir(), get_config_path(), setup() without changes to master.py

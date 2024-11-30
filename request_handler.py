@@ -2,12 +2,13 @@ import api_session
 import google.generativeai
 import threading
 import ui
-# import time
+import time
 
 from constants import * ## Global constants
 
 class RequestHandler:
-    def __init__(self, cli_lock):
+    def __init__(self, cli_lock, parent):
+        self.parent = parent
         self.cli_lock = cli_lock
         self.requests_lock = threading.Lock()
 
@@ -15,8 +16,12 @@ class RequestHandler:
         self.requests = []
 
     def stop_threads(self): # Not in use yet
-        for request in self.requests:
-            request.stop()
+        with self.requests_lock:
+            for request in self.requests:
+                request.stop()
+
+        for session in self.sessions:
+            session.client.stop()
 
     def submit_requests(self, query):
         for session in self.sessions:
@@ -27,14 +32,27 @@ class RequestHandler:
             with self.requests_lock:
                 self.requests.append(request)
 
-            thread = threading.Thread(target=request.main, daemon=False) # Temporarily set daemon to false
+            thread = threading.Thread(target=request.main, daemon=True) # Temporarily set daemon to false
             request.thread = thread            
             request.thread.start()
-        
-    def join_requests(self): # For use when run with args
-        for request in self.requests:
-            request.thread.join()
-            
+
+    def monitor_requests(self):
+        start_time = time.time()
+
+        while True:
+            with self.requests_lock:
+                if not self.requests:
+                    return
+                
+            time.sleep(0.2)
+
+            if (time.time() - start_time) > 20:
+                self.stop_threads()
+
+                with self.cli_lock:
+                    ui.c_out("Requests timed out.", isolate=True)
+                
+                return
 
 class Request:
     def __init__(self, session, parent):
@@ -78,4 +96,3 @@ class Request:
                 ui.c_out(self.session.client.response, separator=True)
         
         self.remove_from_requests()
-        return

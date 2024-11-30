@@ -7,7 +7,7 @@ LRED = 196
 CONFIG_FILENAME = "config.env"
 
 # Valid Commands
-VALID_COMMANDS = ["-c", "-setup"]
+VALID_COMMANDS = ["-c", "-setup", "-help"]
 
 # Client IDs
 GOOGLE_ID = "google"
@@ -55,7 +55,9 @@ msearch -setup
 
 - Doublequotes signify a query. If you wish to include doubleqoutes
 in your query remember to escape them with '\\'. If the query starts
-with '-' then you must escape that too.
+with '-' then you must escape that too. If no query is included it 
+will be assumed that you wish to start a persistent chat with selected
+clients.
 
 - To select a specific client use any of the following aliases:
 
