@@ -28,7 +28,7 @@ def setup(config_path):
     if contents:
         ui.c_out("Keys saved to config file")
     else:
-        ui.c_out("Failed to save keys to config file", highlight=RED)
+        fatal_error("Failed to save keys to config file")
 
 def get_script_dir():
     try:
