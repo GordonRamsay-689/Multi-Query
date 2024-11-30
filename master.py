@@ -64,12 +64,8 @@ class Master:
             session.client.reset()
         self.query = ''
 
-    def configure(self, aliases=None):
-        if not aliases:
-            alias = input(">")
-            aliases = [alias]
-            #aliases = self.select_clients()
-        
+
+    def configure(self, aliases):        
         self.populate_clients(aliases)
         self.configure_clients()
         self.populate_sessions()
@@ -197,6 +193,26 @@ def fatal_error(error_message):
     ui.c_out(f"{error_message}", indent=1)
     sys.exit()
 
+def select_aliases():
+    aliases = []
+
+    while not aliases:
+        ui.c_out("Please enter the clients you wish to use:", bottom_margin=True)
+        ui.c_out("Alias - Client", indent=1)
+
+        for alias in sorted(ALIAS_TO_CLIENT.keys()):
+            ui.c_out(alias, indent=1, endline=False)
+            ui.c_out(" > ", endline=False)
+            ui.c_out(ALIAS_TO_CLIENT[alias])
+        
+        ui.c_out("")
+        text = input("> ")
+        for alias in sorted(ALIAS_TO_CLIENT.keys()):
+            if alias in text:
+                aliases.append(alias)
+
+    return aliases
+
 def parse_arguments(args):
     commands = []
     client_aliases = []
@@ -235,7 +251,7 @@ if __name__ == '__main__':
     master = Master(config_path)
 
     if len(sys.argv) < 2:
-        master.configure()
+        client_aliases = select_aliases()
         master.persistent_chat = True
     else: 
         query, commands, client_aliases = parse_arguments(sys.argv[1:])
@@ -254,6 +270,6 @@ if __name__ == '__main__':
             master.persistent_chat = True
 
         master.query = query
-        master.configure(client_aliases)
     
+    master.configure(client_aliases)
     master.main()
