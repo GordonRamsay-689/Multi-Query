@@ -4,8 +4,11 @@ _Work in progress for personal use, use at your own discretion. Feel free to mod
 
 This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
 
-The current implementation will only send the query you provided as an argument when running the script, but I have tested persistent chats, and will be adding 
-a client where you can keep a conversation going (or several conversations at once) for as long as you like.
+Persistent chat has now been added, as well as an input function that allows for multi-line queries 
+and pasted content (if no more than three newline chars **in sequence** inside the pasted content).
+
+**Disclaimer:** Google search is very spotty. I will look into porting parts of the API as it is unreliable at the 
+moment.
 
 ### Prerequisites
 - Python 3.12.3 (tested on macOS. Linux compatibility is unconfirmed)
@@ -33,6 +36,13 @@ a client where you can keep a conversation going (or several conversations at on
 
 <h2>Usage</h2>
 
+Running the script with no arguments will prompt you for necessary information.
+
+You can get more detailed info with:
+```
+    msearch -help
+```
+
 I recommend setting an enviroment alias for easy access: 
 ```
     alias msearch="python ~/path/to/script/script.py"
@@ -48,11 +58,22 @@ or just:
 
 You can add any number of clients to query:
 ```
-    msearch "query" CLIENT_A CLIENT_B ...
+    msearch CLIENT_A CLIENT_B ...
 ```
+
+The query is signified by doubleqoutes, and must be the first argument provided **if** provided.
+
+No other argument relies on position, and can be mixed freely:
+```
+    msearch "query" -command CLIENT_A -command CLIENT_B ...
+```
+
+Adding ```-c``` as an argument will start a persistent chat. Running the script without a query 
+will also automatically start a persistent chat with the given clients.
+
 As you receive responses they will be printed, so as soon as one client responds you can read the response while waiting for the other clients to respond.
 
-There is no timeout feature implemented, so you can simply use CTRL + C to interrupt the script.
+The requests time out after 20 seconds.
 
 ### Valid client-aliases:
 - "gemini" or "gflash": Gemini 1.5 Flash
