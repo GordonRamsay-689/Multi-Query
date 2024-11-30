@@ -1,4 +1,9 @@
 
+GREEN = 34
+RED = 52
+DRED = 1
+LRED = 196
+
 CONFIG_FILENAME = "config.env"
 
 # Valid Commands
