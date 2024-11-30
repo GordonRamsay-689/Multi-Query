@@ -2,6 +2,7 @@ import googleapi
 import google.generativeai
 import re
 import time
+import threading
 
 from constants import * ## Global constants
 
@@ -33,6 +34,12 @@ class GeminiClient:
         self.api_response = None
         self.query = ''
         self.response = ''
+
+    def stop(self):
+        pass
+    
+    def stopped(self):
+        pass
 
     def send_request(self):
         self.api_response = self.chat.send_message(self.query)   
@@ -77,6 +84,8 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self):
+        self._stop_event = threading.Event()
+
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -85,7 +94,7 @@ class GoogleClient:
         self.api_response = None
         self.query = ''
         self.response = ''
-
+        
     def stop(self):
         self._stop_event.set()
 
@@ -99,7 +108,7 @@ class GoogleClient:
                 time.sleep(wait)
 
                 wait += 0.5
-                if wait > 3:
+                if wait > 3 or self.stopped():
                         break
 
         return True if self.api_response else False
