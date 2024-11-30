@@ -14,9 +14,9 @@ def setup(config_path):
     with open(config_path, "w") as config:
         config.write("")
 
+    ui.c_out("WARNING! This will be stored localy in plain text.", highlight=RED, isolate=True)
     for type in REQUIRES_KEY:
-        print(f"Enter API key for {type.capitalize()}")
-        print("WARNING! This will be stored localy in plain text.")
+        ui.c_out(f"Enter API key for {type.capitalize()}")
         key = input("> ")
 
         with open(config_path, "a") as config:
@@ -26,16 +26,15 @@ def setup(config_path):
         contents = config.read()
         
     if contents:
-        print("Keys saved to config file")
+        ui.c_out("Keys saved to config file")
     else:
-        print("Failed to save keys to config file")
+        ui.c_out("Failed to save keys to config file", highlight=RED)
 
 def get_script_dir():
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
     except Exception:
-        print(ERROR_SCRIPT_DIR)
-        sys.exit()
+        fatal_error(ERROR_SCRIPT_DIR)
 
     return script_dir
 
@@ -101,8 +100,6 @@ class Master:
         while True:
             for alias in aliases:
                 client_id = ALIAS_TO_CLIENT[alias]
-                print(client_id)
-
 
                 if client_id not in self.clients:
                     self.clients.append(client_id)
@@ -177,8 +174,6 @@ class Master:
                 self.get_query()
 
             self.extract_flags()
-            
-            print(self.handler.sessions)
 
             with self.cli_lock:
                 ui.c_out("Submitting requests...", isolate=True, indent=1)
@@ -193,9 +188,8 @@ class Master:
                 sys.exit()
 
 def fatal_error(error_message):
-    print(f"{SCRIPT_NAME}:")
-    print("\tError: ")
-    print(f"\t{error_message}")
+    ui.c_out("Error: ", color=DRED, endline=False)
+    ui.c_out(f"{error_message}", indent=1)
     sys.exit()
 
 def parse_arguments(args):
@@ -222,8 +216,8 @@ def parse_arguments(args):
             fatal_error(f"Unknown command: {arg}")
     
     if not client_aliases:
-        print("No client alias provided.")
-        print(f"\nDefaulting to {GEMINI_FLASH_ID}.")
+        ui.c_out("No client alias provided.")
+        ui.c_out(f"\nDefaulting to {GEMINI_FLASH_ID}.")
         client_aliases.append("gflash")   
 
     return query, commands, client_aliases
@@ -245,7 +239,7 @@ if __name__ == '__main__':
                 setup(config_path)
                 sys.exit()
             elif command == '-help':
-                print(CLI_HELP)
+                ui.c_out(CLI_HELP)
                 sys.exit()
             elif command == '-c':
                 master.persistent_chat = True
