@@ -154,18 +154,26 @@ class Master:
             self.remove_clients(matches)
         query = re.sub(pattern_remove_client, '', query)
 
+        # pattern_restart_chat = r"--reset"
+        # match = re.match
+        # if matches:
+        #     print("resetting")
+        #     client
+        #     self.clear_sessions()
+        #     self.add_client()
+        # query = re.sub(pattern_restart_chat, '', query)
+
         if query:
             self.query = query
 
     def get_query(self):
         with self.cli_lock:
+            ui.c_out("Enter your query (triple click enter to submit):")
             self.query = ui.c_in()
 
     def main(self):
         while True:
             while not self.query:
-                with self.cli_lock:
-                    ui.c_out("Enter your query (triple click enter to submit):")
                 self.get_query()
 
             self.extract_flags()
@@ -236,7 +244,7 @@ if __name__ == '__main__':
             if command == "-setup":
                 setup(config_path)
                 sys.exit()
-            elif command == 'help':
+            elif command == '-help':
                 print(CLI_HELP)
                 sys.exit()
             elif command == '-c':
