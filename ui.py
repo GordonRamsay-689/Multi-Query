@@ -7,7 +7,7 @@ import subprocess
 def main():
     c_out("hi, my name is michael", isolate=True, color=5)
     c_out("I like veggies", isolate=True, bottom_margin=False)
-    c_out("and sake", isolate=False, indent=1, highlight=45, color=9, bottom_margin=True, endline=False)
+    c_out("and sake", isolate=False, indent=1, highlight=False, color=34, bottom_margin=True, endline=False)
     c_out("Error!", error=True, separator=True)
     
     c_out("Input: ")
@@ -59,11 +59,11 @@ def c_out(text, *, bottom_margin=False, color=None, endline=True, error=False, f
         
         (*)
         bottom_margin:  bool
-        color:          int (RGB value)
+        color:          str (RGB color value) | "0;0;0"
         endline:        bool
         error:          bool
         focus:          bool
-        highlight:      int (RGB value)
+        highlight:      str (RGB color value)
         indent:         int (> 0)
         isolate:        bool
         separator:      bool 
@@ -71,16 +71,17 @@ def c_out(text, *, bottom_margin=False, color=None, endline=True, error=False, f
 
     # SET dependent variables
     if error:
-        highlight = 47
+        highlight = 52
     if bottom_margin:
         endline = True
     endchar = '\n' if endline == True else ''
 
     # MANIPULATE text (ansi escape codes)
-    if highlight:
-        text = f"\033[37;{highlight}m {text}"
     if color:
-        text = f"\033[38;5;{color}m{text}"
+        text = f"\033[38;5;{color}m{text}" 
+    if highlight:
+        text = f"\033[48;5;{highlight}m {text}"
+
     text = f"{text}\033[0m" 
 
     # POSITION text
