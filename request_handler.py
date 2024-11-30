@@ -64,9 +64,8 @@ class Request:
         if not successful_request:
             if not self.stopped():
                 with self.parent.cli_lock:
-                    print("failed to receive response") # Debug
-                    print(self.session.name) # Debug
-                    pass # send to UI that failed   
+                    ui.c_out(f"Client: {self.session.name}", bottom_margin=True)
+                    ui.c_out("Failed to receive response.", separator=True)
         
             self.remove_from_requests()
             return
