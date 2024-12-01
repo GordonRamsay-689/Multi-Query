@@ -4,7 +4,7 @@ RED = 52
 DRED = 1
 LRED = 196
 
-TIMEOUT = 20
+TIMEOUT = 35
 
 CONFIG_FILENAME = "config.env"
 
