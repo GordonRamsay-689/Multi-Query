@@ -5,7 +5,7 @@ _Work in progress for personal use, use at your own discretion. Feel free to mod
 This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
 
 Persistent chat has now been added, as well as an input function that allows for multi-line queries 
-and pasted content (if no more than three newline chars **in sequence** inside the pasted content).
+and pasted content (if no more than three newline chars **in sequence** inside the pasted content). Different terminals handle pasting a bit differently, and some seem to cap the pasted content at about 4000 characters.
 
 **Disclaimer:** Google search is very spotty. I will look into porting parts of the API as it is unreliable at the 
 moment.
@@ -38,18 +38,20 @@ moment.
 
 Running the script with no arguments will prompt you for necessary information.
 
-You can get more detailed info with:
+For detailed information, use:
 ```
     msearch -help
 ```
 
-I recommend setting an enviroment alias for easy access: 
+I recommend setting an environment alias for easy access: 
 ```
     alias msearch="python ~/path/to/script/script.py"
 ```
-Run the module with the following command, replacing ```CLIENT``` with a valid alias (see bottom of readme):
+
+To query one or more clients, enter your query enclosed in double qoutes
+followed by one or more client aliases:
 ```
-    msearch "query" CLIENT
+    msearch "query" gflash
 ```
 or just:
 ```
@@ -58,24 +60,25 @@ or just:
 
 You can add any number of clients to query:
 ```
-    msearch CLIENT_A CLIENT_B ...
+    msearch gflash gpro ...
 ```
 
-The query is signified by doubleqoutes, and must be the first argument provided **if** provided.
-
-No other argument relies on position, and can be mixed freely:
+The query is signified by double qoutes, and must be the first argument provided **if** provided. Other arguments do not rely on position, and can be mixed freely:
 ```
     msearch "query" -command CLIENT_A -command CLIENT_B ...
 ```
 
-Adding ```-c``` as an argument will start a persistent chat. Running the script without a query 
-will also automatically start a persistent chat with the given clients.
+Use `-c` to start a persistent chat session.  This is also the default behavior if no query is provided.
 
-As you receive responses they will be printed, so as soon as one client responds you can read the response while waiting for the other clients to respond.
+As you receive responses they will be printed, as soon as one client responds you can read that response while waiting for the other clients to respond.
 
-The requests time out after 20 seconds.
+Requests will time out after 35 seconds.
 
 ### Valid client-aliases:
-- "gemini" or "gflash": Gemini 1.5 Flash
-- "gpro": Gemini 1.5 Pro
-- "google": Google Web Search
+```
+Client Alias | Model/Engine
+-|-
+gemini, gflash | Gemini 1.5 Flash
+gpro         | Gemini 1.5 Pro
+google       | Google Web Search
+```
