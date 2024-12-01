@@ -8,13 +8,12 @@ from constants import * ## Global constants
 
 class Session:
     def __init__(self, client_name):
-        self.name = client_name
-        self.type = CLIENT_ID_TO_TYPE[self.name] 
+        self.type = CLIENT_ID_TO_TYPE[client_name] 
 
         if self.type == TYPE_GEMINI:
-            self.client = GeminiClient(self.name)
+            self.client = GeminiClient(client_name)
         elif self.type == TYPE_GOOGLE:
-            self.client = GoogleClient()
+            self.client = GoogleClient(client_name)
         else:
             self.client = None
 
@@ -23,6 +22,8 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
+        self.name = name
+
         self.model = google.generativeai.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
@@ -81,7 +82,9 @@ class GeminiClient:
         return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-').replace("--", '')
 
 class GoogleClient:
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
+
         self._stop_event = threading.Event()
 
         self.api_response = None

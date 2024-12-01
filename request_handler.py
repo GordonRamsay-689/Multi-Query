@@ -82,7 +82,7 @@ class Request:
         if not successful_request:
             if not self.stopped():
                 with self.parent.cli_lock:
-                    ui.c_out(f"Client: {self.session.name}", bottom_margin=True)
+                    ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
                     ui.c_out("Failed to receive response.", separator=True)
         
             self.remove_from_requests()
@@ -92,7 +92,7 @@ class Request:
 
         if not self.stopped():
             with self.parent.cli_lock:
-                ui.c_out(f"Client: {self.session.name}", bottom_margin=True)
+                ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
                 ui.c_out(self.session.client.response, separator=True)
         
         self.remove_from_requests()

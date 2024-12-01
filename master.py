@@ -114,7 +114,7 @@ class Master:
                 self.clients.remove(client_id)
 
                 for session in self.sessions:
-                    if session.name == client_id:
+                    if session.client.name == client_id:
                         self.sessions.remove(session)
     
     def add_clients(self, matches):
