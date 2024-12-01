@@ -5,10 +5,12 @@ _Work in progress for personal use, use at your own discretion. Feel free to mod
 This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
 
 Persistent chat has now been added, as well as an input function that allows for multi-line queries 
-and pasted content (if no more than three newline chars **in sequence** inside the pasted content). Different terminals handle pasting a bit differently, and some seem to cap the pasted content at about 4000 characters.
+and pasted content (if no more than three newline chars **in sequence** inside the pasted content). 
 
-**Disclaimer:** Google search is very spotty. I will look into porting parts of the API as it is unreliable at the 
+**Disclaimers:** 
+- Google Search will often fail to return responses. I will look into porting parts of the API as it is unreliable at the 
 moment.
+- Different terminals handle pasting a bit differently, and some seem to cap the pasted content at about 4000 characters.
 
 ### Prerequisites
 - Python 3.12.3 (tested on macOS. Linux compatibility is unconfirmed)
@@ -75,10 +77,10 @@ As you receive responses they will be printed, as soon as one client responds yo
 Requests will time out after 35 seconds.
 
 ### Valid client-aliases:
-```
+
 Client Alias | Model/Engine
 -|-
 gemini, gflash | Gemini 1.5 Flash
 gpro         | Gemini 1.5 Pro
 google       | Google Web Search
-```
+
