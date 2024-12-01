@@ -46,7 +46,7 @@ class RequestHandler:
                 
             time.sleep(0.2)
 
-            if (time.time() - start_time) > 20:
+            if (time.time() - start_time) > TIMEOUT:
                 self.stop_threads()
 
                 with self.cli_lock:

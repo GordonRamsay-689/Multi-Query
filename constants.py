@@ -4,6 +4,8 @@ RED = 52
 DRED = 1
 LRED = 196
 
+TIMEOUT = 10
+
 CONFIG_FILENAME = "config.env"
 
 # Valid Commands
