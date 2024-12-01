@@ -72,7 +72,7 @@ Use `-c` to start a persistent chat session.  This is also the default behavior 
 
 As you receive responses they will be printed, as soon as one client responds you can read that response while waiting for the other clients to respond.
 
-Requests will time out after 35 seconds.
+Requests will time out after 45 seconds.
 
 ### Valid client-aliases:
 ```
