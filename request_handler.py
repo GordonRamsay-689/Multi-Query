@@ -19,6 +19,7 @@ class RequestHandler:
         with self.requests_lock:
             for request in self.requests:
                 request.stop()
+                self.requests.remove(request)
 
         for session in self.sessions:
             session.client.stop()

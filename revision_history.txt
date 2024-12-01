@@ -1,3 +1,20 @@
+1 Dec 2024:
+-   Ran tests in separate branch "test":
+    - Succesfully stops threads when calling RequestHandler.stop_threads()
+    - If thread takes to long Succesfully times out (request handler ignores 
+    any data passed back by the untimely Request)
+    - If one thread times out, other threads and chats continue succesfully, but
+    they will wait for the timeout as they still wait for first request. Added 
+    self.request.remove(request) to RequestHandler.stop_threads() to remedy this.
+    Now it works as it should
+    - Cannot add client that already exists
+    - If no active sessions, "no active sessions" is printed, nothing is queried
+- Changes made:
+    - Requests get removed from request list in RequestHandler by stop_threads() 
+    preventing main thread waiting for TIMEOUT when Request blocks.
+    - Added TIMEOUT variable to constants.py
+    - Session no longer stores name, it is now stored by Session.Client.
+
 30 Nov 2024:
 -   Added monitor_requests() to RequestHandler, checking if any request remains in list
 of requests, and if timed out. This removes the need for flags in Master or RequestHandler.
