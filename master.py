@@ -198,10 +198,11 @@ def select_aliases():
 
     while not aliases:
         ui.c_out("Please enter the clients you wish to use:", bottom_margin=True)
-        ui.c_out("Alias - Client", indent=1)
+        ui.c_out(f"{"Alias":^10}   {"Client":^10}", indent=1)
+        ui.c_out("-"*23, indent=1)
 
         for alias in sorted(ALIAS_TO_CLIENT.keys()):
-            ui.c_out(alias, indent=1, endline=False)
+            ui.c_out(f"{alias:10}", indent=1, endline=False)
             ui.c_out(" > ", endline=False)
             ui.c_out(ALIAS_TO_CLIENT[alias])
         
