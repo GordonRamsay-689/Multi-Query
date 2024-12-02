@@ -2,7 +2,7 @@
 
 _Work in progress for personal use, use at your own discretion. Feel free to modify any way you like._
 
-This is a simple script that lets you search Google and query Gemini directly in terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
+This is a simple script that lets you search Google and query Gemini directly from the terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
 
 Persistent chat has now been added, as well as an input function that allows for multi-line queries 
 and pasted content (if no more than three newline chars **in sequence** inside the pasted content). 
@@ -65,7 +65,7 @@ You can add any number of clients to query:
     msearch gflash gpro ...
 ```
 
-The query is signified by double qoutes, and must be the first argument provided **if** provided. Other arguments do not rely on position, and can be mixed freely:
+The query is signified by double quotes, and must be the first argument provided **if** provided. Other arguments do not rely on position, and can be mixed freely:
 ```
     msearch "query" -command CLIENT_A -command CLIENT_B ...
 ```
