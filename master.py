@@ -10,26 +10,6 @@ import ui
 
 from constants import * ## Global constants
 
-def setup(config_path):
-    with open(config_path, "w") as config:
-        config.write("")
-
-    ui.c_out("WARNING! This will be stored localy in plain text.", highlight=RED, isolate=True)
-    for type in REQUIRES_KEY:
-        ui.c_out(f"Enter API key for {type.capitalize()}")
-        key = input("> ")
-
-        with open(config_path, "a") as config:
-            config.write(key)
-    
-    with open(config_path, "r") as config:
-        contents = config.read()
-        
-    if contents:
-        ui.c_out("Keys saved to config file")
-    else:
-        fatal_error("Failed to save keys to config file:\n{config_path}")
-
 def get_script_dir():
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -38,19 +18,13 @@ def get_script_dir():
 
     return script_dir
 
-def get_config_path(script_dir):
-    config_path = os.path.join(script_dir, CONFIG_FILENAME)
-    return config_path
-
 class Master:
-    def __init__(self, config_path):
+    def __init__(self):
         self._finished = threading.Event()
 
         self.cli_lock = threading.Lock()
 
         self.handler = request_handler.RequestHandler(self.cli_lock, self)
-
-        self.config_path = config_path
 
         self.configured_gemini = False
 
@@ -72,19 +46,10 @@ class Master:
         self.handler.sessions = self.sessions
 
     def configure_clients(self):
-        with open(self.config_path, "r") as config:
-            contents = config.read()
-
-        if contents:
-            contents = contents.splitlines()
-        else:
-            setup()
-            return self.configure_clients()
-
         for client_id in self.clients:
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
-                    google.generativeai.configure(api_key=contents[0])
+                    google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
         
     def populate_clients(self, aliases):
@@ -247,9 +212,8 @@ def parse_arguments(args):
 
 if __name__ == '__main__':
     script_dir = get_script_dir()
-    config_path = get_config_path(script_dir)
 
-    master = Master(config_path)
+    master = Master()
 
     if len(sys.argv) < 2:
         client_aliases = select_aliases()
@@ -258,10 +222,7 @@ if __name__ == '__main__':
         query, commands, client_aliases = parse_arguments(sys.argv[1:])
 
         for command in commands:
-            if command == "-setup":
-                setup(config_path)
-                sys.exit()
-            elif command == '-help':
+            if command == '-help':
                 ui.c_out(CLI_HELP)
                 sys.exit()
             elif command == '-c':

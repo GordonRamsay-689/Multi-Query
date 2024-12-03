@@ -30,11 +30,10 @@ moment.
 ``` 
     pip3 install google-generativeai
 ```
-7. Run the setup to store your API keys in a local env file:
-``` 
-    msearch -setup
+7. Export your API keys as environment variables. For bash, sh, zsh:
 ```
-**This is not being encrypted in any way, so modify it yourself if you don't feel comfortable storing your keys locally without encryption.**
+    export GEMINI_API=your_key
+```
 
 <h2>Usage</h2>
 

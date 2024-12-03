@@ -9,7 +9,7 @@ TIMEOUT = 45
 CONFIG_FILENAME = "config.env"
 
 # Valid Commands
-VALID_COMMANDS = ["-c", "-setup", "-help"]
+VALID_COMMANDS = ["-c", "-help"]
 
 # Client IDs
 GOOGLE_ID = "google"
@@ -47,13 +47,14 @@ For more details:
 msearch -help'''
 
 CLI_HELP = f'''\
-This information is only relevant for running the script with arguments.
+Set enviroment variables in bash, sh or zsh with the following command:
+
+    export GEMINI_API=YOUR_KEY
+
+Replacing YOUR_KEY with your Gemini API Key.
 
 All args are optional, and except for the query (which must come first
 if included) are not positional.
-
-To update API keys run:
-msearch -setup
 
 - Doublequotes signify a query. If you wish to include doubleqoutes
 in your query remember to escape them with '\\'. If the query starts
