@@ -1,11 +1,9 @@
 import api_session
-import google.generativeai
 import request_handler
 import re
 import threading
 import os 
 import sys
-import time
 import ui
 
 from constants import * ## Global constants
@@ -27,6 +25,7 @@ class Master:
         self.handler = request_handler.RequestHandler(self.cli_lock, self)
 
         self.configured_gemini = False
+        self.configured_google = False
 
         self.clients = []
         self.sessions = []
@@ -49,8 +48,28 @@ class Master:
         for client_id in self.clients:
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
+                    try:
+                        import google.generativeai
+                    except ImportError:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("Could not locate google.generativeai, install with: ", 
+                                     color=DRED)
+                        continue
+
                     google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
+            if CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
+                if not self.configured_google:
+                    print("importing")
+                    try:
+                        import googleapi
+                    except ImportError:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("Could not locate googleapi, install with: ", 
+                                    color=DRED)
+                        continue
         
     def populate_clients(self, aliases):
         while True:

@@ -1,5 +1,3 @@
-import googleapi
-import google.generativeai
 import re
 import time
 import threading
@@ -22,11 +20,12 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
-        self.name = name
+        import google.generativeai
 
         self.model = google.generativeai.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
+        self.name = name
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -83,10 +82,13 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self, name):
-        self.name = name
+        import googleapi
+        
+        self.api = googleapi
 
         self._stop_event = threading.Event()
 
+        self.name = name
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -106,7 +108,7 @@ class GoogleClient:
     def send_request(self):
         wait = 0.5
         while not self.api_response:
-                self.api_response = googleapi.google.search(self.query)
+                self.api_response = self.api.google.search(self.query)
                 time.sleep(wait)
 
                 wait += 0.5

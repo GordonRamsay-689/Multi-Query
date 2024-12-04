@@ -1,5 +1,3 @@
-import api_session
-import google.generativeai
 import threading
 import ui
 import time
