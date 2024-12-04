@@ -22,7 +22,9 @@ class GeminiClient:
     def __init__(self, name):
         import google.generativeai
 
-        self.model = google.generativeai.GenerativeModel(model_name=name)
+        self.api = google.generativeai
+
+        self.model = self.api.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
         self.name = name
