@@ -61,7 +61,6 @@ class Master:
                     self.configured_gemini = True
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
                 if not self.configured_google:
-                    print("importing")
                     try:
                         import googleapi
                     except ImportError:
