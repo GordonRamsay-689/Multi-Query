@@ -1,3 +1,8 @@
+9 Dec 2024:
+-   Merged with branch "optional_import", making imports optional, allowing use of
+just what the user needs instead of having to install libraries you are not interested
+in.
+
 1 Dec 2024:
 -   Ran tests in separate branch "test":
     - Succesfully stops threads when calling RequestHandler.stop_threads()
