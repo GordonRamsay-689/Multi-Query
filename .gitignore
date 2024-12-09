@@ -3,5 +3,5 @@ __pycache__/
 .DS_Store
 openai/
 notes.txt
-todo.txt
+todo
 *.env
