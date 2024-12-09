@@ -1,4 +1,14 @@
 9 Dec 2024:
+-   Removed REQUIRES_KEY as it is redundant with optional imports. 
+-   Removed CONFIG_FILENAME as it is no longer used after switching to
+environment variables.
+-   Added variables for OpenAI IDs.
+-   Added IDs as keys for themselves for all clients.
+-   Added command -aliases.
+-   Added functions execute_commands(), display_aliases() to master.py
+-   Added parameter top_margin in ui.c_out()
+
+9 Dec 2024:
 -   Merged with branch "optional_import", making imports optional, allowing use of
 just what the user needs instead of having to install libraries you are not interested
 in.
