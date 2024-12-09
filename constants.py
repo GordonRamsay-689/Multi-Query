@@ -6,35 +6,66 @@ LRED = 196
 
 TIMEOUT = 45
 
-CONFIG_FILENAME = "config.env"
-
 # Valid Commands
-VALID_COMMANDS = ["-c", "-help"]
+VALID_COMMANDS = ["-c", "-help", "-aliases"]
 
 # Client IDs
 GOOGLE_ID = "google"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
 GEMINI_PRO_ID = "gemini-1.5-pro"
+GPT_3_5_TURBO_ID = "gpt-3.5-turbo"
+GPT_4_ID = "gpt-4"
+GPT_4_TURBO_ID = "gpt-4-turbo"
+GPT_4O_ID = "gpt-4o"
+GPT_4O_MINI_ID = "gpt-4o-mini"
+O1_PREVIEW_ID = "o1_preview"
+O1_MINI_ID = "o1-mini"
 
 # Client Aliases
 ALIAS_TO_CLIENT = {
+    GEMINI_FLASH_ID: GEMINI_FLASH_ID,
     "gemini": GEMINI_FLASH_ID,
     "gflash": GEMINI_FLASH_ID,
+    GEMINI_PRO_ID: GEMINI_PRO_ID,
     "gpro": GEMINI_PRO_ID,
+    GOOGLE_ID: GOOGLE_ID,
     "google": GOOGLE_ID,
+    GPT_3_5_TURBO_ID: GPT_3_5_TURBO_ID,
+    "turbo3.5": GPT_3_5_TURBO_ID,
+    GPT_4_ID: GPT_4_ID,
+    "gpt4": GPT_4_ID,
+    GPT_4_TURBO_ID: GPT_4_TURBO_ID,
+    "turbo": GPT_4_TURBO_ID,
+    GPT_4O_ID: GPT_4O_ID,
+    "gpt4o": GPT_4O_ID,
+    "4o": GPT_4O_ID,
+    GPT_4O_MINI_ID: GPT_4O_MINI_ID,
+    "mini": GPT_4O_MINI_ID,
+    O1_PREVIEW_ID: O1_PREVIEW_ID,
+    "o1p": O1_PREVIEW_ID,
+    O1_MINI_ID: O1_MINI_ID,
+    "o1m": O1_MINI_ID,
+    "o1mini": O1_MINI_ID
 }
 
 # Client TYPES
 TYPE_GEMINI = "gemini"
 TYPE_GOOGLE = "google"
+TYPE_OPENAI = "openai"
 
-TYPES = [TYPE_GEMINI, TYPE_GOOGLE]
-REQUIRES_KEY = [TYPE_GEMINI]
+TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI]
 
 CLIENT_ID_TO_TYPE = {
     GEMINI_PRO_ID: TYPE_GEMINI,
     GEMINI_FLASH_ID: TYPE_GEMINI,
-    GOOGLE_ID: TYPE_GOOGLE
+    GOOGLE_ID: TYPE_GOOGLE,
+    GPT_3_5_TURBO_ID: TYPE_OPENAI,
+    GPT_4_ID: TYPE_OPENAI,
+    GPT_4_TURBO_ID: TYPE_OPENAI,
+    GPT_4O_ID: TYPE_OPENAI,
+    GPT_4O_MINI_ID: TYPE_OPENAI,
+    O1_PREVIEW_ID: TYPE_OPENAI,
+    O1_MINI_ID: TYPE_OPENAI
 }
 
 # OUTPUT STRINGS (instructions, warnings, information..)
@@ -62,10 +93,8 @@ with '-' then you must escape that too. If no query is included it
 will be assumed that you wish to start a persistent chat with selected
 clients.
 
-- To select a specific client use any of the following aliases:
-
-    ALIAS - CLIENT
-    {ALIAS_TO_CLIENT}
+- To select a specific client use it's name or an alias as an argument.
+For a full list of aliases use the command '-aliases'.
 
 If no client is provided the script will default to gemini-flash-1.5
     
@@ -74,6 +103,7 @@ If no client is provided the script will default to gemini-flash-1.5
 Some valid commands are:
     'c' // Starts a persistent chat session with all clients.
     'setup' // Update api keys.
+    'aliases' // Full list of aliases
 
 msearch is a suggested enviroment alias, replace with python3 master.py
 if running directly from script directory.
@@ -81,4 +111,4 @@ if running directly from script directory.
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
 
-SCRIPT_NAME = "MSearch"
+SCRIPT_NAME = "msearch"
