@@ -47,7 +47,7 @@ def c_in():
     # Adjust for whitespace at end of input, remove it.    
     return string[:-5]
 
-def c_out(text, *, bottom_margin=False, color=None, endline=True, error=False, focus=False,
+def c_out(text, *, bottom_margin=False, top_margin=False, color=None, endline=True, error=False, focus=False,
           highlight=None, indent=0, isolate=False, separator=False):
     """ (str, *) -> None
     
@@ -67,6 +67,7 @@ def c_out(text, *, bottom_margin=False, color=None, endline=True, error=False, f
         indent:         int (> 0)
         isolate:        bool
         separator:      bool 
+        top_margin:     bool
     """
 
     # SET dependent variables
@@ -90,6 +91,8 @@ def c_out(text, *, bottom_margin=False, color=None, endline=True, error=False, f
         text = f"\n{text}\n"
     if bottom_margin:
         text = f"{text}\n"
+    if top_margin:
+        text = f"\n{text}"
 
     # PRINT text
     print(text, end=endchar)
