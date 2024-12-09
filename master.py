@@ -180,22 +180,39 @@ def select_aliases():
     aliases = []
 
     while not aliases:
-        ui.c_out("Please enter the clients you wish to use:", bottom_margin=True)
-        ui.c_out(f"{"Alias":^10}   {"Client":^10}", indent=1)
-        ui.c_out("-"*23, indent=1)
+        ui.c_out("Please enter the clients you wish to use:")
 
-        for alias in sorted(ALIAS_TO_CLIENT.keys()):
-            ui.c_out(f"{alias:10}", indent=1, endline=False)
-            ui.c_out(" > ", endline=False)
-            ui.c_out(ALIAS_TO_CLIENT[alias])
-        
-        ui.c_out("")
+        display_aliases()
+
         text = input("> ")
+        
         for alias in sorted(ALIAS_TO_CLIENT.keys()):
             if alias in text:
                 aliases.append(alias)
 
     return aliases
+
+def display_aliases():
+    ui.c_out(f"{"Alias":^10}   {"Client":^10}", top_margin=True, indent=1)
+    ui.c_out("-"*23, indent=1)
+
+    for alias in sorted(ALIAS_TO_CLIENT.keys()):
+        ui.c_out(f"{alias:10}", indent=1, endline=False)
+        ui.c_out(" > ", endline=False)
+        ui.c_out(ALIAS_TO_CLIENT[alias])
+    
+    ui.c_out("")
+
+def execute_commands(commands, master):
+    for command in commands:
+        if command == '-help':
+            ui.c_out(CLI_HELP)
+            sys.exit()
+        elif command == '-aliases':
+            display_aliases()
+            sys.exit()
+        elif command == '-c':
+            master.persistent_chat = True
 
 def parse_arguments(args):
     commands = []
@@ -220,11 +237,6 @@ def parse_arguments(args):
             client_aliases.append(arg)
         else:
             fatal_error(f"Unknown command: {arg}")
-    
-    if not client_aliases:
-        ui.c_out("No client alias provided.")
-        ui.c_out(f"\nDefaulting to {GEMINI_FLASH_ID}.")
-        client_aliases.append("gflash")   
 
     return query, commands, client_aliases
 
@@ -239,12 +251,12 @@ if __name__ == '__main__':
     else: 
         query, commands, client_aliases = parse_arguments(sys.argv[1:])
 
-        for command in commands:
-            if command == '-help':
-                ui.c_out(CLI_HELP)
-                sys.exit()
-            elif command == '-c':
-                master.persistent_chat = True
+        execute_commands(commands, master)
+
+        if not client_aliases:
+            ui.c_out("No client alias provided.")
+            ui.c_out(f"\nDefaulting to {GEMINI_FLASH_ID}.")
+            client_aliases.append("gflash")   
 
         if not query:
             master.persistent_chat = True
