@@ -10,32 +10,40 @@ and pasted content (if no more than three newline chars **in sequence** inside t
 **Disclaimers:** 
 - Google Search will often fail to return responses. I will look into porting parts of the API as it is unreliable at the 
 moment.
-- Different terminals handle pasting a bit differently, and some seem to cap the pasted content at about 4000 characters.
+- Different shells handle pasting a bit differently, and some seem to cap the pasted content at about 4000 characters.
 
 ### Prerequisites
 - Python 3.12.3 (tested on macOS. Linux compatibility is unconfirmed)
-- Google-Search-API by abenassi
-- Google's Gemini API
+
+Optional:
+- Google-Search-API by abenassi 
+- Google's Gemini API 
 
 <h2>Setup</h2>
 
+1. Install at least one of the following libraries (you only need the ones you plan to use):
+
+<h3>Gemini API</h3>
+1. Install [Gemini API](https://ai.google.dev/) and get a free API key:
+``` 
+    pip3 install google-generativeai
+```
+
+<h3>Google Web Search</h3>
 1. Install [Google Search API](https://github.com/abenassi/Google-Search-API)
 ```
     pip3 install git+https://github.com/abenassi/Google-Search-API
 ```
-3. After installing googleapi you need to patch it, as it no longer works:
-4. Navigate to python site-packages, on MacOS default location is ```/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/googleapi/modules/```
-5. Replace 'standard_search.py' with the file with the same name provided in the repository inside folder "for_googleapi"
-6. Install [Gemini API](https://ai.google.dev/) and get a free API key
-``` 
-    pip3 install google-generativeai
-```
-7. Export your API keys as environment variables. For bash, sh, zsh:
-```
-    export GEMINI_API=your_key
-```
+2. After installing googleapi you need to patch it, as it no longer works:
+3. Navigate to python site-packages, on MacOS default location is ```/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/googleapi/modules/```
+4. Replace 'standard_search.py' with ```multi_search/for_googleapi/standard_search.py```
 
 <h2>Usage</h2>
+
+Export your API keys as environment variables. For bash, sh, zsh:
+```
+    export GEMINI_API=key
+```
 
 Running the script with no arguments will prompt you for necessary information.
 
