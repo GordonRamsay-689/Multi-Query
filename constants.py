@@ -18,7 +18,7 @@ GPT_4_ID = "gpt-4"
 GPT_4_TURBO_ID = "gpt-4-turbo"
 GPT_4O_ID = "gpt-4o"
 GPT_4O_MINI_ID = "gpt-4o-mini"
-O1_PREVIEW_ID = "o1_preview"
+O1_PREVIEW_ID = "o1-preview"
 O1_MINI_ID = "o1-mini"
 TEST_ID = "test-client"
 
@@ -44,6 +44,7 @@ ALIAS_TO_CLIENT = {
     "mini": GPT_4O_MINI_ID,
     O1_PREVIEW_ID: O1_PREVIEW_ID,
     "o1p": O1_PREVIEW_ID,
+    "o1preview": O1_PREVIEW_ID,
     O1_MINI_ID: O1_MINI_ID,
     "o1m": O1_MINI_ID,
     "o1mini": O1_MINI_ID,
@@ -51,10 +52,10 @@ ALIAS_TO_CLIENT = {
 }
 
 # Client TYPES
-TYPE_GEMINI = "gemini"
-TYPE_GOOGLE = "google"
-TYPE_OPENAI = "openai"
-TYPE_TEST = "test"
+TYPE_GEMINI = "type_gemini"
+TYPE_GOOGLE = "type_google"
+TYPE_OPENAI = "type_openai"
+TYPE_TEST = "type_test"
 
 TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI]
 
