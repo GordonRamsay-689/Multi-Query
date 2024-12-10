@@ -6,7 +6,19 @@ import os
 import sys
 import ui
 
-from constants import * ## Global constants
+## Conditional
+try:
+    import google.generativeai
+except:
+    pass
+
+try:
+    import googleapi
+except:
+    pass
+
+## Global constants
+from constants import * 
 
 def get_script_dir():
     try:
@@ -46,11 +58,12 @@ class Master:
 
     def configure_clients(self):
         for client_id in self.clients:
+
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
                     try:
-                        import google.generativeai
-                    except ImportError:
+                        google.generativeai
+                    except NameError:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
@@ -59,16 +72,20 @@ class Master:
 
                     google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
-            if CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
+
+            elif CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
                 if not self.configured_google:
                     try:
-                        import googleapi
-                    except ImportError:
+                        googleapi
+                    except NameError:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
                                     color=DRED)
                         continue
+
+                    pass # Does not need to configure, just checks for import
+                    self.configured_google = True
         
     def populate_clients(self, aliases):
         while True:

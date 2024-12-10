@@ -2,7 +2,19 @@ import re
 import time
 import threading
 
-from constants import * ## Global constants
+## Contidional
+try:
+    import googleapi.google
+except:
+    pass
+
+try:
+    import google.generativeai
+except:
+    pass
+
+## Global constants
+from constants import * 
 
 class Session:
     def __init__(self, client_name):
@@ -20,11 +32,7 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
-        import google.generativeai
-
-        self.api = google.generativeai
-
-        self.model = self.api.GenerativeModel(model_name=name)
+        self.model = google.generativeai.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
         self.name = name
@@ -84,10 +92,6 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self, name):
-        import googleapi
-        
-        self.api = googleapi
-
         self._stop_event = threading.Event()
 
         self.name = name
@@ -109,13 +113,15 @@ class GoogleClient:
 
     def send_request(self):
         wait = 0.5
-        while not self.api_response:
-                self.api_response = self.api.google.search(self.query)
-                time.sleep(wait)
 
-                wait += 0.5
-                if wait > 3 or self.stopped():
-                        break
+        while not self.api_response:
+            self.api_response = googleapi.google.search(self.query)
+
+            time.sleep(wait)
+
+            wait += 0.5
+            if wait > 3 or self.stopped():
+                    break
 
         return True if self.api_response else False
     
