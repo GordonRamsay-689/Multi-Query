@@ -32,7 +32,8 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
-        self.model = google.generativeai.GenerativeModel(model_name=name)
+        self.api = google.generativeai
+        self.model = self.api.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
         self.name = name
@@ -92,6 +93,8 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self, name):
+        self.api = googleapi.google
+
         self._stop_event = threading.Event()
 
         self.name = name
@@ -115,7 +118,7 @@ class GoogleClient:
         wait = 0.5
 
         while not self.api_response:
-            self.api_response = googleapi.google.search(self.query)
+            self.api_response = self.api.search(self.query)
 
             time.sleep(wait)
 
