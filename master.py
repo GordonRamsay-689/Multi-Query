@@ -86,7 +86,19 @@ class Master:
 
                     pass # Does not need to configure, just checks for import
                     self.configured_google = True
-        
+            
+            elif CLIENT_ID_TO_TYPE[client_id] == TYPE_TEST:
+                try:
+                    object
+                except NameError:
+                    self.clients.remove(client_id)
+                    with self.cli_lock:
+                        ui.c_out("Test: Could not locate object error message.", 
+                        color=DRED)
+                    continue
+
+                pass
+                
     def populate_clients(self, aliases):
         while True:
             for alias in aliases:

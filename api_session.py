@@ -24,8 +24,11 @@ class Session:
             self.client = GeminiClient(client_name)
         elif self.type == TYPE_GOOGLE:
             self.client = GoogleClient(client_name)
+        elif self.type == TYPE_TEST:
+            self.client = TestClient(client_name)
         else:
             self.client = None
+            pass ## Throw error?
 
     def reset(self):
         self.client.reset()
@@ -154,3 +157,33 @@ class GoogleClient:
                 response += '\n\n'
 
         self.response = response
+
+class TestClient:
+    def __init__(self, name="Test-Client"):
+        self.api = None
+
+        self._stop_event = threading.Event()
+
+        self.name = name
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+    def reset(self):
+        self._stop_event.clear()
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+        
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        self._stop_event.is_set()
+        
+    def send_request(self):
+        self.api_response = TEST_RESPONSE
+        return True if self.api_response else False
+    
+    def format_response(self):
+        self.response = str(self.api_response) 

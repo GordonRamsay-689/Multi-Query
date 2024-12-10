@@ -20,6 +20,7 @@ GPT_4O_ID = "gpt-4o"
 GPT_4O_MINI_ID = "gpt-4o-mini"
 O1_PREVIEW_ID = "o1_preview"
 O1_MINI_ID = "o1-mini"
+TEST_ID = "test-client"
 
 # Client Aliases
 ALIAS_TO_CLIENT = {
@@ -45,13 +46,15 @@ ALIAS_TO_CLIENT = {
     "o1p": O1_PREVIEW_ID,
     O1_MINI_ID: O1_MINI_ID,
     "o1m": O1_MINI_ID,
-    "o1mini": O1_MINI_ID
+    "o1mini": O1_MINI_ID,
+    TEST_ID: TEST_ID
 }
 
 # Client TYPES
 TYPE_GEMINI = "gemini"
 TYPE_GOOGLE = "google"
 TYPE_OPENAI = "openai"
+TYPE_TEST = "test"
 
 TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI]
 
@@ -65,7 +68,8 @@ CLIENT_ID_TO_TYPE = {
     GPT_4O_ID: TYPE_OPENAI,
     GPT_4O_MINI_ID: TYPE_OPENAI,
     O1_PREVIEW_ID: TYPE_OPENAI,
-    O1_MINI_ID: TYPE_OPENAI
+    O1_MINI_ID: TYPE_OPENAI,
+    TEST_ID: TYPE_TEST
 }
 
 # OUTPUT STRINGS (instructions, warnings, information..)
@@ -112,3 +116,7 @@ if running directly from script directory.
 ERROR_SCRIPT_DIR = "Failed to get script directory."
 
 SCRIPT_NAME = "msearch"
+
+TEST_RESPONSE = "This is a test response for TestClient.\n\
+This is line 2 of the test response\n\
+This is line 3 of the test response"
