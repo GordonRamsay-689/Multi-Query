@@ -78,6 +78,16 @@ class Request:
         except Exception as e:
             successful_request = False
 
+        if self.parent.parent.stream_enabled:
+            with self.parent.cli_lock:
+                for chunk in self.session.client.api_response:
+                    response = self.session.client.format_response(chunk.text)
+                    ui.c_out(response)
+                ui.c_out("End of stream.", separator=True)
+
+            self.remove_from_requests()
+            return
+
         if not successful_request:
             if not self.stopped():
                 with self.parent.cli_lock:

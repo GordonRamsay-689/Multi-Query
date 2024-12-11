@@ -1,6 +1,7 @@
 import re
 import time
 import threading
+import ui
 
 ## Contidional
 try:
@@ -39,6 +40,8 @@ class GeminiClient:
         self.model = self.api.GenerativeModel(model_name=name)
         self.chat = self.model.start_chat()
 
+        self.stream_enabled = False
+
         self.name = name
         self.api_response = None
         self.query = ''
@@ -56,11 +59,12 @@ class GeminiClient:
         pass
 
     def send_request(self):
-        self.api_response = self.chat.send_message(self.query)   
+        self.api_response = self.chat.send_message(self.query, stream=self.stream_enabled)
+
         return True if self.api_response else False
     
-    def format_response(self):
-        response = self.api_response.text
+    def format_response(self, text=None):
+        response = text if text else self.api_response.text
 
         response = self.f_code_blocks(response)
         response = self.f_numbered_lists(response)
@@ -68,7 +72,10 @@ class GeminiClient:
         response = self.f_italicized_text(response)
         response = self.f_general(response)
 
-        self.response = response
+        if text:
+            return response
+        else:
+            self.response = response
 
     def f_code_blocks(self, response):
         pattern =  r'```(\w+)(.*?)```'
