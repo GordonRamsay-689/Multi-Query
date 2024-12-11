@@ -1,3 +1,13 @@
+11 Dec 2024:
+-   Added support for streamed content. 
+Currently streamed content is hardcoded inside Request.main(), we WILL need individual 
+functions for client regarding stream output but I just wanted it up and running at the moment
+and adapting it is most likely very simple (I will regret this sentence).
+-   Added --stream: flag which triggers Master.toggle_stream() (as of yet untested)
+-   Added -s command, enables streaming inside Master.populate_sessions() on Session creation
+-   Prepended underscore to variables in Client's to clearly separate what is private and 
+what is public 
+
 9 Dec 2024:
 -   Removed REQUIRES_KEY as it is redundant with optional imports. 
 -   Removed CONFIG_FILENAME as it is no longer used after switching to

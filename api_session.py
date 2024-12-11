@@ -36,9 +36,9 @@ class Session:
 
 class GeminiClient:
     def __init__(self, name):
-        self.api = google.generativeai
-        self.model = self.api.GenerativeModel(model_name=name)
-        self.chat = self.model.start_chat()
+        self._api = google.generativeai
+        self._model = self._api.GenerativeModel(model_name=name)
+        self._chat = self._model.start_chat()
 
         self.stream_enabled = False
 
@@ -59,7 +59,10 @@ class GeminiClient:
         pass
 
     def send_request(self):
-        self.api_response = self.chat.send_message(self.query, stream=self.stream_enabled)
+        self.api_response = self._chat.send_message(self.query, stream=self.stream_enabled)
+
+        if self.stream_enabled: # Shoddy error handling. Without this trying to access self.api_response throws error if stream_enabled
+            return True
 
         return True if self.api_response else False
     
@@ -103,7 +106,7 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self, name):
-        self.api = googleapi.google
+        self._api = googleapi.google
 
         self._stop_event = threading.Event()
 
@@ -128,7 +131,7 @@ class GoogleClient:
         wait = 0.5
 
         while not self.api_response:
-            self.api_response = self.api.search(self.query)
+            self.api_response = self._api.search(self.query)
 
             time.sleep(wait)
 
@@ -167,10 +170,10 @@ class GoogleClient:
 
 class TestClient:
     def __init__(self, name="Test-Client"):
-        self.api = None
+        self._api = None
 
         self._stop_event = threading.Event()
-
+        
         self.name = name
         self.api_response = None
         self.query = ''

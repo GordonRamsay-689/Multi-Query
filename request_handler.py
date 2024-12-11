@@ -78,7 +78,7 @@ class Request:
         except Exception as e:
             successful_request = False
 
-        if self.parent.parent.stream_enabled:
+        if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.parent.cli_lock:
                 for chunk in self.session.client.api_response:
                     response = self.session.client.format_response(chunk.text)

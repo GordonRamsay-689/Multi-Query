@@ -43,12 +43,13 @@ class Master:
         self.sessions = []
         self.query = ''
         self.persistent_chat = False
+        self.stream_enabled = False
+        self.active_stream = False
 
     def reset(self):
         for session in self.sessions:
             session.client.reset()
         self.query = ''
-
 
     def configure(self, aliases):        
         self.populate_clients(aliases)
@@ -113,7 +114,41 @@ class Master:
     def populate_sessions(self):
         for client_id in self.clients:
             session = api_session.Session(client_id)
+
+            if self.stream_enabled and session.type in STREAM_SUPPORT:
+                if not self.active_stream:
+                    session.client.stream_enabled = True
+                    self.active_stream = True
+            
             self.sessions.append(session)
+
+    def alias_to_session(self, alias):
+        for session in self.sessions:
+            if session.name == ALIAS_TO_CLIENT[alias]:
+                return session
+        
+        return False
+
+    def toggle_stream(self, alias):
+        session = self.alias_to_session(alias)
+
+        if not session:
+            with self.cli_lock:
+                ui.c_out(f"No active session matches the alias provided ({alias}) with flag '--stream:'.", color=DRED)
+            return
+
+        if session.type in STREAM_SUPPORT:
+            session.client.stream_enabled = not self.active_stream
+            self.stream_enabled = not self.active_stream
+            self.active_stream = not self.active_stream
+
+            state = "enabled" if self.active_stream else "disabled"
+
+            with self.cli_lock:
+                ui.c_out(f"Stream {state} for {session.name}", color=LBLUE)
+        else:
+            with self.cli_lock:
+                ui.c_out(f"{session.name} does not support streamed responses.", color=DRED)
 
     def remove_clients(self, matches):
         for match in matches:
@@ -143,7 +178,7 @@ class Master:
                 self.sessions.append(session)
                 self.configure_clients()
 
-    def extract_flags(self):
+    def extract_flags(self): # split into functions, lots of repetition here
         query = self.query
 
         pattern_add_client = r"--add:(\S+)"
@@ -157,6 +192,12 @@ class Master:
         if matches:
             self.remove_clients(matches)
         query = re.sub(pattern_remove_client, '', query)
+
+        pattern_enable_stream = r"--stream:(\S+)"
+        matches = re.findall(pattern_enable_stream, query)
+        if matches:
+            self.enable_stream(matches[0])
+        query = re.sub(pattern_enable_stream, '', query)
 
         # pattern_restart_chat = r"--reset"
         # match = re.match
@@ -242,6 +283,8 @@ def execute_commands(commands, master):
             sys.exit()
         elif command == '-c':
             master.persistent_chat = True
+        elif command == '-s':
+            master.stream_enabled = True
 
 def parse_arguments(args):
     commands = []
