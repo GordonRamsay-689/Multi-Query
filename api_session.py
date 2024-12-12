@@ -143,6 +143,52 @@ class GoogleClient:
 
         return True if self.api_response else False
     
+    def left_pad(self, text, line_length):
+        lines = []
+
+        start = 0
+        end = line_length
+        length_of_text = len(text)
+
+        if length_of_text < 1:
+            return "\tNo Description"
+
+        for n in range(length_of_text // line_length):
+            for i in range(end, 0, -1):
+                if text[i] in [" ", ".", "-", ","]:
+                    end = i
+                    break
+
+            if text[start] == " ":
+                start += 1
+
+            lines.append(text[start:end])
+            start = end
+            end *= 2
+
+            if end > length_of_text:
+                if text[start] == " ":
+                    start += 1
+
+                while start > length_of_text:
+                    start -=1
+
+                lines.append(text[start:])
+
+        formatted = ''
+  
+        num_lines = len(lines)
+        for i, l in enumerate(lines):
+            formatted += "\t" + l
+            if i < num_lines - 1:
+                formatted += '\n'
+
+        for c in formatted:
+            if c not in [" ", "\n"]:
+                return formatted
+            
+        return "\tNo Description"
+
     def format_response(self):
         num_results = len(self.api_response)
 
@@ -157,16 +203,18 @@ class GoogleClient:
             name = result.name[:end_of_name]
 
             ## Populate response_string
-            response += f"{i+1} {name}\n"
-            response += f"\t{result.link}\n"
+            response += f"\033[1m{i+1}. {name}\033[0m\n"
+            response += f"\n\t{result.link}\n"
             if result.description:
-                response += f"\n\t{result.description}\n"
+                description = self.left_pad(result.description, 55)
+                response += f"\n{description}\n"
             else:
                 response += f"\n\tNo Description\n"
-            
-            ## Add newline to end of response_string
-            if i  < (num_results - 1):
+
+            if i < num_results - 1:
                 response += '\n\n'
+            else:
+                response += '\n'
 
         self.response = response
 
