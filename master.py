@@ -10,12 +10,12 @@ import ui
 try:
     import google.generativeai
 except:
-    pass
+    google.generativeai = None
 
 try:
     import googleapi
 except:
-    pass
+    googleapi = None
 
 ## Global constants
 from constants import * 
@@ -62,9 +62,7 @@ class Master:
 
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
-                    try:
-                        google.generativeai
-                    except NameError:
+                    if google.generativeai is None:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
@@ -73,12 +71,9 @@ class Master:
 
                     google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
-
             elif CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
                 if not self.configured_google:
-                    try:
-                        googleapi
-                    except NameError:
+                    if googleapi is None:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
@@ -87,18 +82,6 @@ class Master:
 
                     pass # Does not need to configure, just checks for import
                     self.configured_google = True
-            
-            elif CLIENT_ID_TO_TYPE[client_id] == TYPE_TEST:
-                try:
-                    object
-                except NameError:
-                    self.clients.remove(client_id)
-                    with self.cli_lock:
-                        ui.c_out("Test: Could not locate object error message.", 
-                        color=DRED)
-                    continue
-
-                pass
                 
     def populate_clients(self, aliases):
         while True:
@@ -123,9 +106,14 @@ class Master:
             self.sessions.append(session)
 
     def alias_to_session(self, alias):
+        if alias not in ALIAS_TO_CLIENT.keys():
+            with self.cli_lock:
+                ui.c_out(f"Invalid alias provided: {alias}", color=DRED)
+            return False
+        
         for session in self.sessions:
-            if session.name == ALIAS_TO_CLIENT[alias]:
-                return session
+            if session.client.name == ALIAS_TO_CLIENT[alias]:
+                return session  
         
         return False
 
@@ -145,10 +133,10 @@ class Master:
             state = "enabled" if self.active_stream else "disabled"
 
             with self.cli_lock:
-                ui.c_out(f"Stream {state} for {session.name}", color=LBLUE)
+                ui.c_out(f"Stream {state} for {session.client.name}", color=LBLUE)
         else:
             with self.cli_lock:
-                ui.c_out(f"{session.name} does not support streamed responses.", color=DRED)
+                ui.c_out(f"{session.client.name} does not support streamed responses.", color=DRED)
 
     def remove_clients(self, matches):
         for match in matches:
@@ -193,11 +181,11 @@ class Master:
             self.remove_clients(matches)
         query = re.sub(pattern_remove_client, '', query)
 
-        pattern_enable_stream = r"--stream:(\S+)"
-        matches = re.findall(pattern_enable_stream, query)
-        if matches:
-            self.enable_stream(matches[0])
-        query = re.sub(pattern_enable_stream, '', query)
+        pattern_toggle_stream = r"--stream:(\S+)"
+        matches = re.findall(pattern_toggle_stream, query)
+        for match in matches:
+            self.toggle_stream(match)
+        query = re.sub(pattern_toggle_stream, '', query)
 
         # pattern_restart_chat = r"--reset"
         # match = re.match

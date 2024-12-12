@@ -1,3 +1,25 @@
+12 Dec 2024:
+-   Added function Session.output_stream(), containing functionality previously
+in Request. Must be called with cli_lock. May be better to simply pass it the 
+lock when needed, but will be less explicit that the lock is being used for the
+entire function from request_handler.
+-   If matches are found for the --stream: flag they will be iterated over,
+allowing toggling on and off two different streams in the same message. Tested
+and working as expected.
+-   Fixed typos/lapsus (calling session.name instead of session.client.name). Maybe
+life will be easier if the session stores name as well, albeit messier..
+-   Replaced the try-except block in Master.configure_clients() with if statement 
+comparing the imported namespace to None, which it is assigned to if import fails.
+```
+    try:
+        import x
+    except ImportError:
+        x = None
+```
+-   Added try-except around (or preceding checking 'if alias in ALIAS_TO_CLIENT.keys()) 
+around all ALIAS_TO_CLIENT[alias] calls. Not added for CLIENT_ID_TO_TYPE[client_id] since
+a client_id cannot be incorrectly provided by the user, as it is converted via ALIAS_TO_CLIENT.
+
 11 Dec 2024:
 -   Added support for streamed content. 
 Currently streamed content is hardcoded inside Request.main(), we WILL need individual 

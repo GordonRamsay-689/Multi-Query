@@ -80,9 +80,7 @@ class Request:
 
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.parent.cli_lock:
-                for chunk in self.session.client.api_response:
-                    response = self.session.client.format_response(chunk.text)
-                    ui.c_out(response)
+                self.session.client.output_stream()
                 ui.c_out("End of stream.", separator=True)
 
             self.remove_from_requests()

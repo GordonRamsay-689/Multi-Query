@@ -58,6 +58,11 @@ class GeminiClient:
     def stopped(self):
         pass
 
+    def output_stream(self):
+        for chunk in self.api_response:
+            self.format_response(chunk.text)
+            ui.c_out(self.response)
+
     def send_request(self):
         self.api_response = self._chat.send_message(self.query, stream=self.stream_enabled)
 
@@ -75,10 +80,7 @@ class GeminiClient:
         response = self.f_italicized_text(response)
         response = self.f_general(response)
 
-        if text:
-            return response
-        else:
-            self.response = response
+        self.response = response
 
     def f_code_blocks(self, response):
         pattern =  r'```(\w+)(.*?)```'
