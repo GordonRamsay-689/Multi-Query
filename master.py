@@ -126,6 +126,17 @@ class Master:
             return
 
         if session.type in STREAM_SUPPORT:
+            if self.active_stream and not session.client.stream_enabled:
+                self.stream_enabled = False
+                self.active_stream = False
+
+                for s in self.sessions:
+                    if s.type in STREAM_SUPPORT and s.client.stream_enabled:
+                        s.client.stream_enabled = False
+                
+                        with self.cli_lock:
+                            ui.c_out(f"Stream disabled for {s.client.name}", color=LBLUE)
+
             session.client.stream_enabled = not self.active_stream
             self.stream_enabled = not self.active_stream
             self.active_stream = not self.active_stream
@@ -138,47 +149,58 @@ class Master:
             with self.cli_lock:
                 ui.c_out(f"{session.client.name} does not support streamed responses.", color=DRED)
 
-    def remove_clients(self, matches):
-        for match in matches:
-            try:
-                client_id = ALIAS_TO_CLIENT[match]
-            except KeyError:
-                continue
+    def remove_clients(self, match):
+        session = self.alias_to_session(match)
 
-            if client_id in self.clients:
-                self.clients.remove(client_id)
+        if not session:
+            return
 
-                for session in self.sessions:
-                    if session.client.name == client_id:
-                        self.sessions.remove(session)
-    
-    def add_clients(self, matches):
-        for match in matches:
-            try:
-                client_id = ALIAS_TO_CLIENT[match]
-            except KeyError:
-                continue
+        if session.client.name in self.clients:
+            self.clients.remove(session.client.name)
 
-            if client_id not in self.clients:
-                self.clients.append(client_id)
+            if self.active_stream and session.client.name in STREAM_SUPPORT:
+                if session.client.stream_enabled:
+                    self.active_stream = False
+                    self.stream_enabled = False
 
-                session = api_session.Session(client_id)
-                self.sessions.append(session)
-                self.configure_clients()
+            self.sessions.remove(session)
+            
+            with self.cli_lock:
+                ui.c_out(f"Removed {session.client.name} from active session", color=LBLUE)
+
+    def add_clients(self, match):
+        try:
+            client_id = ALIAS_TO_CLIENT[match]
+        except KeyError:
+            with self.cli_lock:
+                ui.c_out(f"Invalid alias provided: {match}", color=DRED)
+            return
+
+        if client_id not in self.clients:
+            self.clients.append(client_id)
+
+            session = api_session.Session(client_id)
+            self.sessions.append(session)
+
+            with self.cli_lock:
+                ui.c_out(f"Added {session.client.name} from active session", color=LBLUE)
+            
+            self.configure_clients() # If unable to configure, informs user and removes self
+
 
     def extract_flags(self): # split into functions, lots of repetition here
         query = self.query
 
         pattern_add_client = r"--add:(\S+)"
         matches = re.findall(pattern_add_client, query)
-        if matches:
-            self.add_clients(matches)
+        for match in matches:
+            self.add_clients(match)
         query = re.sub(pattern_add_client, '', query)
 
         pattern_remove_client = r"--rm:(\S+)"
         matches = re.findall(pattern_remove_client, query)
-        if matches:
-            self.remove_clients(matches)
+        for match in matches:
+            self.remove_clients(match)
         query = re.sub(pattern_remove_client, '', query)
 
         pattern_toggle_stream = r"--stream:(\S+)"
@@ -186,6 +208,12 @@ class Master:
         for match in matches:
             self.toggle_stream(match)
         query = re.sub(pattern_toggle_stream, '', query)
+
+        pattern_display_aliases = r"--display:"
+        if pattern_display_aliases in query:
+            with self.cli_lock:
+                display_aliases()
+        query = re.sub(pattern_display_aliases, '', query)
 
         # pattern_restart_chat = r"--reset"
         # match = re.match
@@ -196,8 +224,7 @@ class Master:
         #     self.add_client()
         # query = re.sub(pattern_restart_chat, '', query)
 
-        if query:
-            self.query = query
+        self.query = query
 
     def get_query(self):
         with self.cli_lock:
@@ -211,8 +238,8 @@ class Master:
 
             while not self.query: # If we already got a query from args, do not ask for one
                 self.get_query()
-
-            self.extract_flags()
+                if self.query:
+                    self.extract_flags()
 
             if self.sessions:
                 with self.cli_lock:
@@ -242,20 +269,21 @@ def select_aliases():
 
         display_aliases()
 
-        text = input("> ")
+        user_in = input("> ")
         
-        for alias in sorted(ALIAS_TO_CLIENT.keys()):
-            if alias in text:
-                aliases.append(alias)
+        if user_in in sorted(ALIAS_TO_CLIENT.keys()):
+            aliases.append(user_in)
 
     return aliases
 
 def display_aliases():
-    ui.c_out(f"{"Alias":^10}   {"Client":^10}", top_margin=True, indent=1)
-    ui.c_out("-"*23, indent=1)
+    l = max([len(key) for key in ALIAS_TO_CLIENT.keys()])
+
+    ui.c_out(f"{"Alias":^{l}}   {"Client":^{l}}", top_margin=True, indent=1)
+    ui.c_out("-"*(3+l*2), indent=1)
 
     for alias in sorted(ALIAS_TO_CLIENT.keys()):
-        ui.c_out(f"{alias:10}", indent=1, endline=False)
+        ui.c_out(f"{alias:{l}}", indent=1, endline=False)
         ui.c_out(" > ", endline=False)
         ui.c_out(ALIAS_TO_CLIENT[alias])
     

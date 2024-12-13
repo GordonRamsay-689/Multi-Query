@@ -1,4 +1,17 @@
 12 Dec 2024:
+-   Modified Master.toggle_stream() to disable any other active stream if --stream:
+is encountered for any active client.   
+-   Fixed bug in select_aliases() where all keys with partially matching string to 
+input provided by user would be added to list of aliases.
+-   Streamlined Master. add_clients() and remove_clients(). 
+-   If a client is removed while it has stream enabled, Master.active_stream is disabled. Redundant for now, 
+but probably saves headaches in future.
+-   Alignment in display_aliases() adjusted to be dynamically set.
+-   Added flag --display: ( calls display_aliases() )
+-   Added feedback to user if a client is added or removed more than just list being
+updated.
+
+12 Dec 2024:
 -   Added function Session.output_stream(), containing functionality previously
 in Request. Must be called with cli_lock. May be better to simply pass it the 
 lock when needed, but will be less explicit that the lock is being used for the
