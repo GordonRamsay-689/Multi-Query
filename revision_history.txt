@@ -1,3 +1,7 @@
+13 Dec 2024:
+-   Fixed logical error with optional import handling, if an import was not imported succesfully, assigning namespace as None in except block works, but only for top-level mo
+dules. Of course, you cannot assign module.sub to anything as module does not have that attribute.
+
 12 Dec 2024:
 -   Modified Master.toggle_stream() to disable any other active stream if --stream:
 is encountered for any active client.   

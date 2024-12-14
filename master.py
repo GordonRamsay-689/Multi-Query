@@ -6,16 +6,18 @@ import os
 import sys
 import ui
 
-## Conditional
+## Optional
 try:
     import google.generativeai
+    google_generativeai_imported = True
 except:
-    google.generativeai = None
+    google_generativeai_imported = False
 
 try:
     import googleapi
+    googleapi_imported = True
 except:
-    googleapi = None
+    googleapi_imported = False
 
 ## Global constants
 from constants import * 
@@ -62,7 +64,7 @@ class Master:
 
             if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
                 if not self.configured_gemini:
-                    if google.generativeai is None:
+                    if not google_generativeai_imported:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
@@ -73,7 +75,7 @@ class Master:
                     self.configured_gemini = True
             elif CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
                 if not self.configured_google:
-                    if googleapi is None:
+                    if not google_generativeai_imported:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
@@ -189,6 +191,9 @@ class Master:
 
 
     def extract_flags(self): # split into functions, lots of repetition here
+        if not self.query:
+            return
+
         query = self.query
 
         pattern_add_client = r"--add:(\S+)"
@@ -238,8 +243,7 @@ class Master:
 
             while not self.query: # If we already got a query from args, do not ask for one
                 self.get_query()
-                if self.query:
-                    self.extract_flags()
+                self.extract_flags()
 
             if self.sessions:
                 with self.cli_lock:
