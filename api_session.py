@@ -6,17 +6,17 @@ import ui
 ## Optional
 try:
     import googleapi.google
-except:
+except ModuleNotFoundError:
     pass
 
 try:
     import google.generativeai
-except:
+except ModuleNotFoundError:
     pass
 
 try:
     import openai
-except:
+except ModuleNotFoundError:
     pass
 
 ## Global constants

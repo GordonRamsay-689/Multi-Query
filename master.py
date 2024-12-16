@@ -10,14 +10,20 @@ import ui
 try:
     import google.generativeai
     google_generativeai_imported = True
-except:
+except ModuleNotFoundError:
     google_generativeai_imported = False
 
 try:
     import googleapi
     googleapi_imported = True
-except:
+except ModuleNotFoundError:
     googleapi_imported = False
+
+try:
+    import openai
+except ModuleNotFoundError:
+    openai_imported = False
+
 
 ## Global constants
 from constants import * 
@@ -188,7 +194,6 @@ class Master:
                 ui.c_out(f"Added {session.client.name} from active session", color=LBLUE)
             
             self.configure_clients() # If unable to configure, informs user and removes self
-
 
     def extract_flags(self): # split into functions, lots of repetition here
         if not self.query:
