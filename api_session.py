@@ -76,7 +76,15 @@ class OpenaiClient:
         self.update_context(message)
 
     def output_stream(self):
-        pass
+        full_response = ''
+
+        for chunk in self.api_response:
+            self.format_response(chunk.choices[0].delta.content)
+            full_response += self.response + '\n'
+            ui.c_out(self.response)
+        
+        message = self.create_message("assistant", full_response)
+        self.update_context(message)
 
     def update_context(self, message):
         if not self.context:
@@ -87,7 +95,8 @@ class OpenaiClient:
     def send_request(self):
         self.api_response = self._model.chat.completions.create(
             model=self.name,
-            messages=self.context
+            messages=self.context,
+            stream=self.stream_enabled
         )
 
         if self.stream_enabled:
@@ -100,6 +109,8 @@ class OpenaiClient:
             response = text
         else:
             response = self.api_response.choices[0].message.content
+            message = self.create_message("assistant", response)
+            self.update_context(message)
 
         pass # Format response functions
 
