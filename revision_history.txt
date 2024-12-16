@@ -1,4 +1,10 @@
 16 Dec 2024:
+-   Implemented basics for OpenaiClient. All functions created, but format_response is a dummy at 
+the moment.
+-   OpenaiClient.output_stream() has akward update_context() implementation that is yet untested.
+-   All Clients now have Client.set_query() function.
+
+16 Dec 2024:
 -   Created new git repo created in openai/ for testing the openai library.
 -   2a64c39c33de7f07913287ddc0cd4d806819a566 has fully functional 
 chat memory. Stores chat history locally and after starting a session 
