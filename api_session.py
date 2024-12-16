@@ -67,23 +67,24 @@ class OpenaiClient:
     def stopped(self):
         pass
 
+    def create_message(self, role, text):
+        return {"role": role, "content": text}
+
     def set_query(self, query):
         self.query = query
-        self.update_context("user", query)
+        message = self.create_message("user", query)
+        self.update_context(message)
 
     def output_stream(self):
         pass
 
-    def update_context(self, role, text):
+    def update_context(self, message):
         if not self.context:
             self.context.append(self.sys_message)
-
-        message = {"role": role, "content": text}
-        self.context.append(message)
+        else:
+            self.context.append(message)
 
     def send_request(self):
-        self.update_context("user", self.query)
-
         self.api_response = self._model.chat.completions.create(
             model=self.name,
             messages=self.context
