@@ -89,8 +89,8 @@ class OpenaiClient:
     def update_context(self, message):
         if not self.context:
             self.context.append(self.sys_message)
-        else:
-            self.context.append(message)
+        
+        self.context.append(message)
 
     def send_request(self):
         self.api_response = self._model.chat.completions.create(
