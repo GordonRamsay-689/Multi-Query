@@ -24,7 +24,7 @@ class RequestHandler:
 
     def submit_requests(self, query):
         for session in self.sessions:
-            session.client.query = query 
+            session.client.set_query(query)
 
             # Create Request() and append to list of active requests
             request = Request(session, self)

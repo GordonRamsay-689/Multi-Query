@@ -76,6 +76,8 @@ CLIENT_ID_TO_TYPE = {
     TEST_ID: TYPE_TEST
 }
 
+DEFAULT_SYS_MSG = {"role": "system", "content": "You are efficient, to the point and helpful"}
+
 # OUTPUT STRINGS (instructions, warnings, information..)
 
 CLI_EXAMPLE_USAGE = f'''\

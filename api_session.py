@@ -48,11 +48,61 @@ class OpenaiClient:
 
         self.stream_enabled = False
 
+        self.sys_message = DEFAULT_SYS_MSG
         self.context = []
+
         self.name = name
         self.api_response = None
         self.query = ''
         self.response = ''
+
+    def reset(self):
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+    def stop(self):
+        pass
+
+    def stopped(self):
+        pass
+
+    def set_query(self, query):
+        self.query = query
+        self.update_context("user", query)
+
+    def output_stream(self):
+        pass
+
+    def update_context(self, role, text):
+        if not self.context:
+            self.context.append(self.sys_message)
+
+        message = {"role": role, "content": text}
+        self.context.append(message)
+
+    def send_request(self):
+        self.update_context("user", self.query)
+
+        self.api_response = self._model.chat.completions.create(
+            model=self.name,
+            messages=self.context
+        )
+
+        if self.stream_enabled:
+            return True
+
+        return True if self.api_response else False
+
+    def format_response(self, text=None):
+        if text:
+            response = text
+        else:
+            response = self.api_response.choices[0].message.content
+
+        pass # Format response functions
+
+        self.response = response
 
 class GeminiClient:
     def __init__(self, name):
@@ -77,6 +127,9 @@ class GeminiClient:
     
     def stopped(self):
         pass
+
+    def set_query(self, query):
+        self.query = query
 
     def output_stream(self):
         for chunk in self.api_response:
@@ -148,6 +201,9 @@ class GoogleClient:
 
     def stopped(self):
         self._stop_event.is_set()
+
+    def set_query(self, query):
+        self.query = query
 
     def send_request(self):
         wait = 0.5
