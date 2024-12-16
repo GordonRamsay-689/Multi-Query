@@ -21,9 +21,9 @@ except ModuleNotFoundError:
 
 try:
     import openai
+    openai_imported = True
 except ModuleNotFoundError:
     openai_imported = False
-
 
 ## Global constants
 from constants import * 
@@ -46,6 +46,7 @@ class Master:
 
         self.configured_gemini = False
         self.configured_google = False
+        self.configured_openai = False
 
         self.clients = []
         self.sessions = []
@@ -67,8 +68,9 @@ class Master:
 
     def configure_clients(self):
         for client_id in self.clients:
+            client_type = CLIENT_ID_TO_TYPE[client_id]
 
-            if CLIENT_ID_TO_TYPE[client_id] == TYPE_GEMINI:
+            if client_type == TYPE_GEMINI:
                 if not self.configured_gemini:
                     if not google_generativeai_imported:
                         self.clients.remove(client_id)
@@ -79,7 +81,20 @@ class Master:
 
                     google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
-            elif CLIENT_ID_TO_TYPE[client_id] == TYPE_GOOGLE:
+            
+            elif client_type == TYPE_OPENAI:
+                if not self.configured_openai:
+                    if not openai_imported:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("Could not locate openai, install with: ", 
+                                    color=DRED)
+                        continue
+                    
+                    pass # No need to configure, gets key from environ automatically
+                    self.configured_openai = True
+
+            elif client_type == TYPE_GOOGLE:
                 if not self.configured_google:
                     if not google_generativeai_imported:
                         self.clients.remove(client_id)
