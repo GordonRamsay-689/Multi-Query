@@ -79,9 +79,16 @@ class OpenaiClient:
         full_response = ''
 
         for chunk in self.api_response:
-            self.format_response(chunk.choices[0].delta.content)
-            full_response += self.response + '\n'
-            ui.c_out(self.response)
+            response = chunk.choices[0].delta.content
+            
+            if not response:
+                continue
+
+            self.format_response(response)
+
+            full_response += self.response
+            ui.c_out(self.response, endline='')
+        ui.c_out('')
         
         message = self.create_message("assistant", full_response)
         self.update_context(message)
