@@ -14,6 +14,11 @@ try:
 except:
     pass
 
+try:
+    import openai
+except:
+    pass
+
 ## Global constants
 from constants import * 
 
@@ -25,6 +30,8 @@ class Session:
             self.client = GeminiClient(client_name)
         elif self.type == TYPE_GOOGLE:
             self.client = GoogleClient(client_name)
+        elif self.type == TYPE_OPENAI:
+            self.client = OpenaiClient(client_name)
         elif self.type == TYPE_TEST:
             self.client = TestClient(client_name)
         else:
@@ -33,6 +40,19 @@ class Session:
 
     def reset(self):
         self.client.reset()
+
+class OpenaiClient:
+    def __init__(self, name):
+        self._api = openai
+        self._model = openai.OpenAI()
+
+        self.stream_enabled = False
+
+        self.context = []
+        self.name = name
+        self.api_response = None
+        self.query = ''
+        self.response = ''
 
 class GeminiClient:
     def __init__(self, name):
