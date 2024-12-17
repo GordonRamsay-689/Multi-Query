@@ -23,7 +23,7 @@ except ModuleNotFoundError:
 from constants import * 
 
 class Session:
-    def __init__(self, client_name, sys_message):
+    def __init__(self, client_name, sys_message=None):
         self.type = CLIENT_ID_TO_TYPE[client_name] 
 
         if self.type == TYPE_GEMINI:
