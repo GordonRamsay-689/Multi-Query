@@ -1,3 +1,9 @@
+17 Dec 2024:
+-   Implemented -sys command. Updates system message with the argument that follows if not in
+VALID_COMMANDS or ALIAS_TO_CLIENT.keys(). 
+-   Renamed populate_sessions() to init_sessions(). Initial sys message assignment happens in 
+init_sessions() if a message was provided.
+
 16 Dec 2024:
 -   Implemented basics for OpenaiClient. All functions created, but format_response is a dummy at 
 the moment.
