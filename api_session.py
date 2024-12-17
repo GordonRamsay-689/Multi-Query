@@ -43,8 +43,8 @@ class Session:
 
 class OpenaiClient:
     def __init__(self, name, sys_message):
-        self._api = openai
-        self._model = openai.OpenAI()
+        self.api = openai
+        self.model = openai.OpenAI()
 
         self.stream_enabled = False
 
@@ -107,7 +107,7 @@ class OpenaiClient:
         self.context.append(message)
 
     def send_request(self):
-        self.api_response = self._model.chat.completions.create(
+        self.api_response = self.model.chat.completions.create(
             model=self.name,
             messages=self.context,
             stream=self.stream_enabled
@@ -137,10 +137,10 @@ class GeminiClient:
         else:
             self.sys_message = DEFAULT_SYS_MSG
 
-        self._api = google.generativeai
-        self._model = self._api.GenerativeModel(model_name=name, 
+        self.api = google.generativeai
+        self.model = self.api.GenerativeModel(model_name=name, 
                                                 system_instruction=self.sys_message)
-        self._chat = self._model.start_chat()
+        self.chat = self.model.startchat()
 
         self.stream_enabled = False
 
@@ -169,7 +169,7 @@ class GeminiClient:
             ui.c_out(self.response)
 
     def send_request(self):
-        self.api_response = self._chat.send_message(self.query, stream=self.stream_enabled)
+        self.api_response = self.chat.send_message(self.query, stream=self.stream_enabled)
 
         if self.stream_enabled: # Shoddy error handling. Without this trying to access self.api_response throws error if stream_enabled
             return True
@@ -213,7 +213,7 @@ class GeminiClient:
 
 class GoogleClient:
     def __init__(self, name, sys_message):
-        self._api = googleapi.google
+        self.api = googleapi.google
 
         self._stop_event = threading.Event()
 
@@ -241,7 +241,7 @@ class GoogleClient:
         wait = 0.5
 
         while not self.api_response:
-            self.api_response = self._api.search(self.query)
+            self.api_response = self.api.search(self.query)
 
             time.sleep(wait)
 
@@ -328,7 +328,7 @@ class GoogleClient:
 
 class TestClient:
     def __init__(self, name, sys_message):
-        self._api = None
+        self.api = None
 
         self._stop_event = threading.Event()
         
