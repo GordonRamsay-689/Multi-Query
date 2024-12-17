@@ -23,17 +23,17 @@ except ModuleNotFoundError:
 from constants import * 
 
 class Session:
-    def __init__(self, client_name):
+    def __init__(self, client_name, sys_message):
         self.type = CLIENT_ID_TO_TYPE[client_name] 
 
         if self.type == TYPE_GEMINI:
-            self.client = GeminiClient(client_name)
+            self.client = GeminiClient(client_name, sys_message)
         elif self.type == TYPE_GOOGLE:
-            self.client = GoogleClient(client_name)
+            self.client = GoogleClient(client_name, sys_message)
         elif self.type == TYPE_OPENAI:
-            self.client = OpenaiClient(client_name)
+            self.client = OpenaiClient(client_name, sys_message)
         elif self.type == TYPE_TEST:
-            self.client = TestClient(client_name)
+            self.client = TestClient(client_name, sys_message)
         else:
             self.client = None
             pass ## Throw error?
@@ -42,13 +42,17 @@ class Session:
         self.client.reset()
 
 class OpenaiClient:
-    def __init__(self, name):
+    def __init__(self, name, sys_message):
         self._api = openai
         self._model = openai.OpenAI()
 
         self.stream_enabled = False
 
-        self.sys_message = DEFAULT_SYS_MSG
+        if sys_message:
+            self.sys_message = self.create_message("system", sys_message)
+        else:
+            self.sys_message = DEFAULT_SYS_MSG
+
         self.context = []
 
         self.name = name
@@ -124,9 +128,15 @@ class OpenaiClient:
         self.response = response
 
 class GeminiClient:
-    def __init__(self, name):
+    def __init__(self, name, sys_message):
+        if sys_message:
+            self.sys_message = sys_message
+        else:
+            self.sys_message = DEFAULT_SYS_MSG
+
         self._api = google.generativeai
-        self._model = self._api.GenerativeModel(model_name=name)
+        self._model = self._api.GenerativeModel(model_name=name, 
+                                                system_instruction=self.sys_message)
         self._chat = self._model.start_chat()
 
         self.stream_enabled = False
@@ -199,7 +209,7 @@ class GeminiClient:
         return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-').replace("--", '')
 
 class GoogleClient:
-    def __init__(self, name):
+    def __init__(self, name, sys_message):
         self._api = googleapi.google
 
         self._stop_event = threading.Event()
@@ -314,7 +324,7 @@ class GoogleClient:
         self.response = response
 
 class TestClient:
-    def __init__(self, name="Test-Client"):
+    def __init__(self, name, sys_message):
         self._api = None
 
         self._stop_event = threading.Event()

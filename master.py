@@ -118,12 +118,8 @@ class Master:
             
     def init_sessions(self, sys_message):
         for client_id in self.clients:
-            session = api_session.Session(client_id)
+            session = api_session.Session(client_id, sys_message)
 
-            if sys_message and hasattr(session.client, "sys_message"):
-                sys_message = session.client.create_message("system", sys_message)
-                session.client.sys_message = sys_message
-            
             if self.stream_enabled and session.type in STREAM_SUPPORT:
                 if not self.active_stream:
                     session.client.stream_enabled = True
