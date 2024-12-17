@@ -95,7 +95,7 @@ class Master:
 
             elif client_type == TYPE_GOOGLE:
                 if not self.configured_google:
-                    if not google_generativeai_imported:
+                    if not googleapi_imported:
                         self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
