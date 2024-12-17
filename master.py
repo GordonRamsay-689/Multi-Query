@@ -60,10 +60,10 @@ class Master:
             session.client.reset()
         self.query = ''
 
-    def configure(self, aliases):        
+    def configure(self, aliases, sys_message):        
         self.populate_clients(aliases)
         self.configure_clients()
-        self.populate_sessions()
+        self.init_sessions(sys_message)
         self.handler.sessions = self.sessions
 
     def configure_clients(self):
@@ -91,7 +91,6 @@ class Master:
                                     color=DRED)
                         continue
                     
-                    pass # No need to configure, gets key from environ automatically
                     self.configured_openai = True
 
             elif client_type == TYPE_GOOGLE:
@@ -117,15 +116,19 @@ class Master:
             if self.clients:
                 return
             
-    def populate_sessions(self):
+    def init_sessions(self, sys_message):
         for client_id in self.clients:
             session = api_session.Session(client_id)
 
+            if sys_message and hasattr(session.client, "sys_message"):
+                sys_message = session.client.create_message("system", sys_message)
+                session.client.sys_message = sys_message
+            
             if self.stream_enabled and session.type in STREAM_SUPPORT:
                 if not self.active_stream:
                     session.client.stream_enabled = True
                     self.active_stream = True
-            
+
             self.sessions.append(session)
 
     def alias_to_session(self, alias):
@@ -329,6 +332,7 @@ def execute_commands(commands, master):
 def parse_arguments(args):
     commands = []
     client_aliases = []
+    sys_message = None
 
     # If first argument is not a client or command, assume it is a query.
     if args[0] not in VALID_COMMANDS and args[0] not in ALIAS_TO_CLIENT.keys():
@@ -342,7 +346,16 @@ def parse_arguments(args):
 
         if arg.startswith('-'):
             if arg in VALID_COMMANDS:
-                commands.append(arg)
+                if arg == "-sys":
+                    try:
+                        sys_message = args.pop(0)
+                    except IndexError:
+                        fatal_error("No sys message provided after arg -sys.")
+
+                    if sys_message in VALID_COMMANDS or sys_message in ALIAS_TO_CLIENT.keys():
+                        fatal_error("No sys message provided after arg -sys.")
+                else:
+                    commands.append(arg)
             else:
                 fatal_error(f"Unknown command: {arg}")          
         elif arg.lower() in ALIAS_TO_CLIENT.keys():
@@ -350,7 +363,7 @@ def parse_arguments(args):
         else:
             fatal_error(f"Unknown command: {arg}")
 
-    return query, commands, client_aliases
+    return query, commands, client_aliases, sys_message
 
 if __name__ == '__main__':
     script_dir = get_script_dir()
@@ -361,7 +374,7 @@ if __name__ == '__main__':
         client_aliases = select_aliases()
         master.persistent_chat = True
     else: 
-        query, commands, client_aliases = parse_arguments(sys.argv[1:])
+        query, commands, client_aliases, sys_message = parse_arguments(sys.argv[1:])
 
         execute_commands(commands, master)
 
@@ -375,5 +388,5 @@ if __name__ == '__main__':
 
         master.query = query
     
-    master.configure(client_aliases)
+    master.configure(client_aliases, sys_message)
     master.main()

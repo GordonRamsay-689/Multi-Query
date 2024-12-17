@@ -8,7 +8,7 @@ LRED = 196
 TIMEOUT = 45
 
 # Valid Commands
-VALID_COMMANDS = ["-c", "-help", "-aliases", "-s"] 
+VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys"] 
 
 # Client IDs
 GOOGLE_ID = "google"
