@@ -239,6 +239,12 @@ class Master:
                 display_aliases()
         query = re.sub(pattern_display_aliases, '', query)
 
+        pattern_sys_message = r'--sys:"(.*?)"'
+        matches = re.findall(pattern_sys_message, query)
+        if matches:
+            self.update_system_message(matches[0])
+        query = re.sub(pattern_sys_message, '', query)
+
         # pattern_restart_chat = r"--reset"
         # match = re.match
         # if matches:
@@ -249,6 +255,11 @@ class Master:
         # query = re.sub(pattern_restart_chat, '', query)
 
         self.query = query
+
+    def update_system_message(self, match):
+        for session in self.sessions:
+            if hasattr(session.client, "previous_sys_message"):
+                session.client.sys_message = session.client.create_message("system", match)
 
     def get_query(self):
         with self.cli_lock:
@@ -369,6 +380,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         client_aliases = select_aliases()
         master.persistent_chat = True
+        sys_message = None
     else: 
         query, commands, client_aliases, sys_message = parse_arguments(sys.argv[1:])
 

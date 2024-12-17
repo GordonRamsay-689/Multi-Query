@@ -6,3 +6,4 @@ notes.txt
 todo
 *.env
 test.py
+gemini/

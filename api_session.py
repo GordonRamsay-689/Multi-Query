@@ -53,6 +53,7 @@ class OpenaiClient:
         else:
             self.sys_message = DEFAULT_SYS_MSG
 
+        self.previous_sys_message = None
         self.context = []
 
         self.name = name
@@ -98,8 +99,10 @@ class OpenaiClient:
         self.update_context(message)
 
     def update_context(self, message):
-        if not self.context:
+        if self.sys_message != self.previous_sys_message:
             self.context.append(self.sys_message)
+            self.previous_sys_message = self.sys_message
+            self.sys_message = None
         
         self.context.append(message)
 
