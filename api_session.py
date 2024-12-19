@@ -135,7 +135,7 @@ class GeminiClient:
         if sys_message:
             self.sys_message = sys_message
         else:
-            self.sys_message = DEFAULT_SYS_MSG
+            self.sys_message = DEFAULT_SYS_MSG["content"]
 
         self.api = google.generativeai
         self.model = self.api.GenerativeModel(model_name=name, 
