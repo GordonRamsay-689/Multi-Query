@@ -140,7 +140,7 @@ class GeminiClient:
         self.api = google.generativeai
         self.model = self.api.GenerativeModel(model_name=name, 
                                                 system_instruction=self.sys_message)
-        self.chat = self.model.startchat()
+        self.chat = self.model.start_chat()
 
         self.stream_enabled = False
 
