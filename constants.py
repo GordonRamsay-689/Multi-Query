@@ -1,11 +1,13 @@
+TIMEOUT = 45
 
+DEFAULT_SYS_MSG = {"role": "system", "content": "You are efficient, to the point and helpful"}
+
+# 256-Color Codes
 GREEN = 34
 LBLUE = 26
 RED = 52
 DRED = 1
 LRED = 196
-
-TIMEOUT = 45
 
 # Valid Commands
 VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys"] 
@@ -76,10 +78,7 @@ CLIENT_ID_TO_TYPE = {
     TEST_ID: TYPE_TEST
 }
 
-DEFAULT_SYS_MSG = {"role": "system", "content": "You are efficient, to the point and helpful"}
-
 # OUTPUT STRINGS (instructions, warnings, information..)
-
 CLI_EXAMPLE_USAGE = f'''\
 Example Usage: 
 msearch "query" -command client
