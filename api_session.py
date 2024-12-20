@@ -102,8 +102,7 @@ class OpenaiClient:
         if self.sys_message != self.previous_sys_message:
             self.context.append(self.sys_message)
             self.previous_sys_message = self.sys_message
-            self.sys_message = None
-        
+       
         self.context.append(message)
 
     def send_request(self):
@@ -355,3 +354,7 @@ class TestClient:
     
     def format_response(self):
         self.response = str(self.api_response) 
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
