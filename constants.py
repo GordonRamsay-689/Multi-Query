@@ -1,5 +1,7 @@
 TIMEOUT = 45
 
+SCRIPT_NAME = "search"
+
 DEFAULT_SYS_MSG = {"role": "system", "content": "You are efficient, to the point and helpful"}
 
 # 256-Color Codes
@@ -119,8 +121,6 @@ if running directly from script directory.
 '''
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
-
-SCRIPT_NAME = "msearch"
 
 TEST_RESPONSE = "This is a test response for TestClient.\n\
 This is line 2 of the test response\n\
