@@ -354,7 +354,3 @@ class TestClient:
     
     def format_response(self):
         self.response = str(self.api_response) 
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
