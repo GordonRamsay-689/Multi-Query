@@ -14,6 +14,15 @@ LRED = 196
 # Valid Commands
 VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys"] 
 
+# Flags (during runtime, not args)
+# Flags include ':' to avoid conflating with flags the user may search for
+ADD_FLAG = '--add:'
+REMOVE_FLAG = '--rm:'
+STREAM_FLAG = '--stream:'
+DISPLAY_FLAG = '--display:'
+SYSMSG_FLAG = '--sys:'
+VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG] 
+
 # Client IDs
 GOOGLE_ID = "google"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
