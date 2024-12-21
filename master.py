@@ -274,7 +274,7 @@ class Master:
             ui.c_out("Enter your query (triple click enter to submit):")
             self.query = ui.c_in()
 
-    def init_flags_dict():
+    def init_flags_dict(self):
         flags = {}
 
         for flag in VALID_FLAGS:
