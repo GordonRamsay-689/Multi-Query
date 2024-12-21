@@ -271,9 +271,13 @@ class Master:
             with self.cli_lock:
                 ui.c_out(f"Active clients: {self.clients}")
 
-            while not self.query: # If we already got a query from args, do not ask for one
+            flags = {}
+            while not self.query:
                 self.get_query()
-                self.extract_flags()
+                self.extract_flags(flags)
+
+            if flags:
+                self.execute_flags(flags)
 
             if self.sessions:
                 with self.cli_lock:
