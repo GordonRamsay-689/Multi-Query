@@ -1,3 +1,14 @@
+21 Dec 2024:
+-   Renamed add_clients and remove_clients to add_client and remove_client
+to reflect their actual function.
+-   Created Master.init_flags_dict()
+-   Separated extract_flags() into extract_flags() and execute_flags().
+-   Flags can now be executed in a more controlled order, for example, 
+sys_message can be retreived and then provided when add_client() is called
+which is useful for Gemini which requires sys_message to be set at init. 
+-   Created constants for flags and VALID_FLAGS list.
+-   Added execute_flags() and the dict flags to Master.main().
+
 17 Dec 2024:
 -   Implemented -sys command. Updates system message with the argument that follows if not in
 VALID_COMMANDS or ALIAS_TO_CLIENT.keys(). 

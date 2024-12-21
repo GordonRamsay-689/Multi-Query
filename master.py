@@ -171,8 +171,8 @@ class Master:
             with self.cli_lock:
                 ui.c_out(f"{session.client.name} does not support streamed responses.", color=DRED)
 
-    def remove_clients(self, match):
-        session = self.alias_to_session(match)
+    def remove_client(self, alias):
+        session = self.alias_to_session(alias)
 
         if not session:
             return
@@ -190,18 +190,18 @@ class Master:
             with self.cli_lock:
                 ui.c_out(f"Removed {session.client.name} from active session", color=LBLUE)
 
-    def add_clients(self, match):
+    def add_client(self, alias, sys_message):
         try:
-            client_id = ALIAS_TO_CLIENT[match]
+            client_id = ALIAS_TO_CLIENT[alias]
         except KeyError:
             with self.cli_lock:
-                ui.c_out(f"Invalid alias provided: {match}", color=DRED)
+                ui.c_out(f"Invalid alias provided: {alias}", color=DRED)
             return
 
         if client_id not in self.clients:
             self.clients.append(client_id)
 
-            session = api_session.Session(client_id)
+            session = api_session.Session(client_id, sys_message=sys_message)
             self.sessions.append(session)
 
             with self.cli_lock:
@@ -230,10 +230,15 @@ class Master:
                     flags[DISPLAY_FLAG] = True
             else:
                 matches = re.findall(pattern, query)
+
                 for match in matches:
-                    flags[pattern].append(match)
+                    flags[flag].append(match)
 
                     if flag == SYSMSG_FLAG:
+                        if len(matches) > 1:
+                            with self.cli_lock:
+                                ui.c_out("You can only provide one system message at a time. \nUsing first message provided.",
+                                        color=DRED)
                         break
 
             query = re.sub(pattern, '', query)
@@ -241,35 +246,23 @@ class Master:
         self.query = query
 
     def execute_flags(self, flags):
-
-        matches = re.findall(pattern_add_client, query)
-        for match in matches:
-            flags[]
-        query = re.sub(pattern_add_client, '', query)
-
-        pattern_remove_client = rf"{REMOVE_FLAG}(\S+)"
-        matches = re.findall(pattern_remove_client, query)
-        for match in matches:
-            self.remove_clients(match)
-        query = re.sub(pattern_remove_client, '', query)
-
-        pattern_toggle_stream = rf"{STREAM_FLAG}(\S+)"
-        matches = re.findall(pattern_toggle_stream, query)
-        for match in matches:
-            self.toggle_stream(match)
-        query = re.sub(pattern_toggle_stream, '', query)
-
-        pattern_display_aliases = rf"{DISPLAY_FLAG}"
-        if pattern_display_aliases in query:
+        if flags[DISPLAY_FLAG]:
             with self.cli_lock:
                 display_aliases()
-        query = re.sub(pattern_display_aliases, '', query)
 
-        pattern_sys_message = rf'{SYSMSG_FLAG}"(.*?)"'
-        matches = re.findall(pattern_sys_message, query)
-        if matches:
-            self.update_system_message(matches[0])
-        query = re.sub(pattern_sys_message, '', query)
+        for match in flags[REMOVE_FLAG]:
+            self.remove_client(match)
+
+        sys_message = flags[SYSMSG_FLAG][0] if flags[SYSMSG_FLAG] else None
+
+        if sys_message:
+            self.update_system_message(sys_message)
+
+        for match in flags[ADD_FLAG]:
+            self.add_client(match, sys_message)
+
+        for match in flags[STREAM_FLAG]:
+            self.toggle_stream(match)
 
     def update_system_message(self, match):
         for session in self.sessions:
@@ -299,8 +292,7 @@ class Master:
             while not self.query:
                 self.get_query()
                 self.extract_flags(flags)
-
-            self.execute_flags(flags)
+                self.execute_flags(flags)
 
             if self.sessions:
                 with self.cli_lock:
