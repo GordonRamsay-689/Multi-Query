@@ -209,52 +209,67 @@ class Master:
             
             self.configure_clients() # If unable to configure, informs user and removes self
 
-    def extract_flags(self): # split into functions, lots of repetition here
+    def extract_flags(self, flags): # split into functions, lots of repetition here
         if not self.query:
             return
 
         query = self.query
 
-        pattern_add_client = r"--add:(\S+)"
+        patterns = {}
+        patterns[ADD_FLAG] = rf"{ADD_FLAG}(\S+)"
+        patterns[REMOVE_FLAG] = rf"{REMOVE_FLAG}(\S+)"
+        patterns[STREAM_FLAG] = rf"{STREAM_FLAG}(\S+)"
+        patterns[DISPLAY_FLAG] = DISPLAY_FLAG
+        patterns[SYSMSG_FLAG] = rf'{SYSMSG_FLAG}"(.*?)"'
+
+        for flag in patterns:
+            pattern = patterns[flag]
+            
+            if flag == DISPLAY_FLAG:
+                if DISPLAY_FLAG in query:
+                    flags[DISPLAY_FLAG] = True
+            else:
+                matches = re.findall(pattern, query)
+                for match in matches:
+                    flags[pattern].append(match)
+
+                    if flag == SYSMSG_FLAG:
+                        break
+
+            query = re.sub(pattern, '', query)
+        
+        self.query = query
+
+    def execute_flags(self, flags):
+
         matches = re.findall(pattern_add_client, query)
         for match in matches:
-            self.add_clients(match)
+            flags[]
         query = re.sub(pattern_add_client, '', query)
 
-        pattern_remove_client = r"--rm:(\S+)"
+        pattern_remove_client = rf"{REMOVE_FLAG}(\S+)"
         matches = re.findall(pattern_remove_client, query)
         for match in matches:
             self.remove_clients(match)
         query = re.sub(pattern_remove_client, '', query)
 
-        pattern_toggle_stream = r"--stream:(\S+)"
+        pattern_toggle_stream = rf"{STREAM_FLAG}(\S+)"
         matches = re.findall(pattern_toggle_stream, query)
         for match in matches:
             self.toggle_stream(match)
         query = re.sub(pattern_toggle_stream, '', query)
 
-        pattern_display_aliases = r"--display:"
+        pattern_display_aliases = rf"{DISPLAY_FLAG}"
         if pattern_display_aliases in query:
             with self.cli_lock:
                 display_aliases()
         query = re.sub(pattern_display_aliases, '', query)
 
-        pattern_sys_message = r'--sys:"(.*?)"'
+        pattern_sys_message = rf'{SYSMSG_FLAG}"(.*?)"'
         matches = re.findall(pattern_sys_message, query)
         if matches:
             self.update_system_message(matches[0])
         query = re.sub(pattern_sys_message, '', query)
-
-        # pattern_restart_chat = r"--reset"
-        # match = re.match
-        # if matches:
-        #     print("resetting")
-        #     client
-        #     self.clear_sessions()
-        #     self.add_client()
-        # query = re.sub(pattern_restart_chat, '', query)
-
-        self.query = query
 
     def update_system_message(self, match):
         for session in self.sessions:
@@ -266,18 +281,26 @@ class Master:
             ui.c_out("Enter your query (triple click enter to submit):")
             self.query = ui.c_in()
 
+    def init_flags_dict():
+        flags = {}
+
+        for flag in VALID_FLAGS:
+            flags[flag] = []
+        
+        return flags
+
     def main(self):
         while True:
             with self.cli_lock:
                 ui.c_out(f"Active clients: {self.clients}")
 
-            flags = {}
+            flags = self.init_flags_dict()
+
             while not self.query:
                 self.get_query()
                 self.extract_flags(flags)
 
-            if flags:
-                self.execute_flags(flags)
+            self.execute_flags(flags)
 
             if self.sessions:
                 with self.cli_lock:
