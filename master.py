@@ -366,7 +366,7 @@ def parse_arguments(args):
     else:
         query = None
 
-    if len(args) != len(set(sys.argv)):
+    if len(args) != len(set(args)):
         fatal_error("Duplicate arguments provided.")
 
     while args:
