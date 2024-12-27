@@ -366,6 +366,9 @@ def parse_arguments(args):
     else:
         query = None
 
+    if len(args) != len(set(sys.argv)):
+        fatal_error("Duplicate arguments provided.")
+
     while args:
         arg = args.pop(0)
         arg = arg.lower()
