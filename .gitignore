@@ -3,7 +3,7 @@ __pycache__/
 .DS_Store
 openai/
 notes.txt
-todo
+/todo
 *.env
 test.py
 gemini/
