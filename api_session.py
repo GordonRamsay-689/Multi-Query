@@ -23,17 +23,17 @@ except ModuleNotFoundError:
 from constants import * 
 
 class Session:
-    def __init__(self, client_name, sys_message=None):
-        self.type = CLIENT_ID_TO_TYPE[client_name] 
+    def __init__(self, client_id, sys_message=None):
+        self.type = CLIENT_ID_TO_TYPE[client_id] 
 
         if self.type == TYPE_GEMINI:
-            self.client = GeminiClient(client_name, sys_message)
+            self.client = GeminiClient(client_id, sys_message)
         elif self.type == TYPE_GOOGLE:
-            self.client = GoogleClient(client_name, sys_message)
+            self.client = GoogleClient(client_id, sys_message)
         elif self.type == TYPE_OPENAI:
-            self.client = OpenaiClient(client_name, sys_message)
+            self.client = OpenaiClient(client_id, sys_message)
         elif self.type == TYPE_TEST:
-            self.client = TestClient(client_name, sys_message)
+            self.client = TestClient(client_id, sys_message)
         else:
             self.client = None
             pass ## Throw error?
