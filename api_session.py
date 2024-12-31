@@ -42,7 +42,7 @@ class Session:
         self.client.reset()
 
 class OpenaiClient:
-    def __init__(self, name, sys_message):
+    def __init__(self, client_id, sys_message):
         self.api = openai
         self.model = openai.OpenAI()
 
@@ -56,7 +56,7 @@ class OpenaiClient:
         self.previous_sys_message = None
         self.context = []
 
-        self.name = name
+        self.name = client_id
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -130,20 +130,20 @@ class OpenaiClient:
         self.response = response
 
 class GeminiClient:
-    def __init__(self, name, sys_message):
+    def __init__(self, client_id, sys_message):
         if sys_message:
             self.sys_message = sys_message
         else:
             self.sys_message = DEFAULT_SYS_MSG["content"]
 
         self.api = google.generativeai
-        self.model = self.api.GenerativeModel(model_name=name, 
+        self.model = self.api.GenerativeModel(model_name=client_id, 
                                                 system_instruction=self.sys_message)
         self.chat = self.model.start_chat()
 
         self.stream_enabled = False
 
-        self.name = name
+        self.name = client_id
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -211,12 +211,12 @@ class GeminiClient:
         return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-')
 
 class GoogleClient:
-    def __init__(self, name, sys_message):
+    def __init__(self, client_id, sys_message):
         self.api = googleapi.google
 
         self._stop_event = threading.Event()
 
-        self.name = name
+        self.name = client_id
         self.api_response = None
         self.query = ''
         self.response = ''
@@ -326,12 +326,12 @@ class GoogleClient:
         self.response = response
 
 class TestClient:
-    def __init__(self, name, sys_message):
+    def __init__(self, client_id, sys_message):
         self.api = None
 
         self._stop_event = threading.Event()
         
-        self.name = name
+        self.name = client_id
         self.api_response = None
         self.query = ''
         self.response = ''
