@@ -4,9 +4,6 @@ import unittest
 import api_session
 from constants import * 
 
-BULLET_ITEM = '* Large pot or Dutch oven'
-BULLET_ITEM_WITH_ASTERISK = '\n* Dial *555'
-FORMATTED_BULLET_ITEM_WITH_ASTERISK = '\n\t- Dial *555'
 
 BOLD_NUMBERED_LIST = '''1. **Rules of the Road:** Master traffic laws, signs, and signals.
 2. **Vehicle Operation:** Understand how your vehicle works, including basic maintenance.
@@ -19,72 +16,6 @@ BOLD_NUMBERED_LIST = '''1. **Rules of the Road:** Master traffic laws, signs, an
 9. **Distracted Driving:** Avoid distractions like cell phones and focus on the road.
 10. **Practice Regularly:** Consistent practice is key to becoming a safe and confident driver.'''
 
-BULLET_LIST = '''
-* 1 cup red lentils, rinsed
-* 2 cups water or vegetable broth
-* 1 tbsp oil
-* 1 tsp ground cumin
-* 1 tsp ground coriander
-* ½ tsp turmeric powder
-* ½ tsp garam masala
-* ¼ tsp cayenne pepper (optional)
-* 1 small onion, chopped
-* 2 cloves garlic, minced
-* 1 inch ginger, grated
-* Salt to taste
-* Fresh cilantro, chopped (for garnish)'''
-FORMATTED_BULLET_LIST = '''
-\t- 1 cup red lentils, rinsed
-\t- 2 cups water or vegetable broth
-\t- 1 tbsp oil
-\t- 1 tsp ground cumin
-\t- 1 tsp ground coriander
-\t- ½ tsp turmeric powder
-\t- ½ tsp garam masala
-\t- ¼ tsp cayenne pepper (optional)
-\t- 1 small onion, chopped
-\t- 2 cloves garlic, minced
-\t- 1 inch ginger, grated
-\t- Salt to taste
-\t- Fresh cilantro, chopped (for garnish)'''
-
-RECIPE = '''**Yields:** 4 servings
-**Prep time:** 10 minutes
-**Cook time:** 30 minutes 
-
-**Ingredients:**
-* 1 cup red lentils, rinsed
-* 2 cups water or vegetable broth
-* 1 tbsp oil
-* 1 tsp ground cumin
-* 1 tsp ground coriander
-* ½ tsp turmeric powder
-* ½ tsp garam masala
-* ¼ tsp cayenne pepper (optional)
-* 1 small onion, chopped
-* 2 cloves garlic, minced
-* 1 inch ginger, grated
-* Salt to taste
-* Fresh cilantro, chopped (for garnish)
-
-**Equipment:**
-* Large pot or Dutch oven
-
-**Instructions**
-
-**Get started:**
-1. Rinse the red lentils under cold water until the water runs clear.
-
-**Cook the daal:**
-1. Heat the oil in a large pot or Dutch oven over medium heat. Add the onion and cook until softened, about 5 minutes. 
-2. Add the garlic and ginger and cook for another minute until fragrant.
-3. Stir in the cumin, coriander, turmeric, garam masala, and cayenne pepper (if using) and cook for 30 seconds, or until fragrant.
-4. Add the rinsed red lentils and water or broth to the pot. Bring to a boil, then reduce heat to low, cover, and simmer for 20-25 minutes, or until the lentils are tender and have broken down.
-5. Stir occasionally to prevent sticking. If the daal becomes too thick, add more water or broth as needed.
-
-**Finish and serve:**
-1. Season with salt to taste.
-2. Garnish with fresh cilantro and serve hot with rice, naan, or roti.'''
 
 class TestSession(unittest.TestCase):
     def test_session_client_init(self):
@@ -113,6 +44,38 @@ class TestSession(unittest.TestCase):
 class TestGeminiFormatResponse(unittest.TestCase):
     ''' Test GeminiClient.format_response(). '''  
 
+    bullet_list = '''
+* 1 cup red lentils, rinsed
+* 2 cups water or vegetable broth
+* 1 tbsp oil
+* 1 tsp ground cumin
+* 1 tsp ground coriander
+* ½ tsp turmeric powder
+* ½ tsp garam masala
+* ¼ tsp cayenne pepper (optional)
+* 1 small onion, chopped
+* 2 cloves garlic, minced
+* 1 inch ginger, grated
+* Salt to taste
+* Fresh cilantro, chopped (for garnish)'''
+    formatted_bullet_list = '''
+\t- 1 cup red lentils, rinsed
+\t- 2 cups water or vegetable broth
+\t- 1 tbsp oil
+\t- 1 tsp ground cumin
+\t- 1 tsp ground coriander
+\t- ½ tsp turmeric powder
+\t- ½ tsp garam masala
+\t- ¼ tsp cayenne pepper (optional)
+\t- 1 small onion, chopped
+\t- 2 cloves garlic, minced
+\t- 1 inch ginger, grated
+\t- Salt to taste
+\t- Fresh cilantro, chopped (for garnish)'''
+    bullet_item = '* Large pot or Dutch oven'
+    bullet_item_with_asterisk = '\n* Dial *555'
+    formatted_bullet_item_with_asterisk = '\n\t- Dial *555'
+
     @classmethod
     def setUpClass(cls):
         cls.session = api_session.Session(GEMINI_FLASH_ID)
@@ -126,8 +89,8 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.session.reset()
 
     def test_bullet_item_with_asterisk(self):
-        pre = BULLET_ITEM_WITH_ASTERISK
-        expected = FORMATTED_BULLET_ITEM_WITH_ASTERISK
+        pre = self.bullet_item_with_asterisk
+        expected = self.formatted_bullet_item_with_asterisk
 
         self.format_response(text=pre)
         post = self.session.client.response
@@ -135,8 +98,8 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.assertEqual(post, expected)
     
     def test_bullet_list(self):
-        pre = BULLET_LIST
-        expected = FORMATTED_BULLET_LIST
+        pre = self.bullet_list
+        expected = self.formatted_bullet_list
 
         self.format_response(text=pre)
         post = self.session.client.response
