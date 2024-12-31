@@ -4,19 +4,6 @@ import unittest
 import api_session
 from constants import * 
 
-
-BOLD_NUMBERED_LIST = '''1. **Rules of the Road:** Master traffic laws, signs, and signals.
-2. **Vehicle Operation:** Understand how your vehicle works, including basic maintenance.
-3. **Safe Driving Practices:** Learn defensive driving techniques and how to handle different road conditions.
-4. **Sharing the Road:**  Know how to interact safely with pedestrians, cyclists, and other vehicles.
-5. **Driving in Different Conditions:** Practice driving in various weather conditions (rain, fog, etc.) and at night.
-6. **Parking Skills:** Be proficient in parallel parking, perpendicular parking, and three-point turns.
-7. **Emergency Procedures:** Know what to do in case of an accident or breakdown.
-8. **Legal Responsibilities:** Understand your legal obligations as a driver.
-9. **Distracted Driving:** Avoid distractions like cell phones and focus on the road.
-10. **Practice Regularly:** Consistent practice is key to becoming a safe and confident driver.'''
-
-
 class TestSession(unittest.TestCase):
     def test_session_client_init(self):
         ''' Test if the attribute client.api matches the expected module. '''
@@ -58,7 +45,7 @@ class TestGeminiFormatResponse(unittest.TestCase):
 * 1 inch ginger, grated
 * Salt to taste
 * Fresh cilantro, chopped (for garnish)'''
-    formatted_bullet_list = '''
+    f_bullet_list = '''
 \t- 1 cup red lentils, rinsed
 \t- 2 cups water or vegetable broth
 \t- 1 tbsp oil
@@ -72,9 +59,11 @@ class TestGeminiFormatResponse(unittest.TestCase):
 \t- 1 inch ginger, grated
 \t- Salt to taste
 \t- Fresh cilantro, chopped (for garnish)'''
-    bullet_item = '* Large pot or Dutch oven'
+    bullet_item_bold = '\n* **Boldened Text** Unboldened text.'
+    f_bullet_item_bold = '\n\t- \033[39;49;1mBoldened Text\033[0m Unboldened text.'
+    bullet_item = '\n* Large pot or Dutch oven'
     bullet_item_with_asterisk = '\n* Dial *555'
-    formatted_bullet_item_with_asterisk = '\n\t- Dial *555'
+    f_bullet_item_with_asterisk = '\n\t- Dial *555'
 
     @classmethod
     def setUpClass(cls):
@@ -90,7 +79,7 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
     def test_bullet_item_with_asterisk(self):
         pre = self.bullet_item_with_asterisk
-        expected = self.formatted_bullet_item_with_asterisk
+        expected = self.f_bullet_item_with_asterisk
 
         self.format_response(text=pre)
         post = self.session.client.response
@@ -99,7 +88,16 @@ class TestGeminiFormatResponse(unittest.TestCase):
     
     def test_bullet_list(self):
         pre = self.bullet_list
-        expected = self.formatted_bullet_list
+        expected = self.f_bullet_list
+
+        self.format_response(text=pre)
+        post = self.session.client.response
+
+        self.assertEqual(post, expected)
+
+    def test_bullet_list_boldened(self):
+        pre = self.bullet_item_bold
+        expected = self.f_bullet_item_bold
 
         self.format_response(text=pre)
         post = self.session.client.response
