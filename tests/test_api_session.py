@@ -68,6 +68,7 @@ class TestGeminiFormatResponse(unittest.TestCase):
     f_bullet_item_with_asterisk = '\n\t- Dial *555'
     all_italic_one_bold = '*Text **bold** text*'
     f_all_italic_one_bold = '\033[39;49;3mText \033[39;49;1mbold\033[22m text\033[23m'
+    
     @classmethod
     def setUpClass(cls):
         cls.session = api_session.Session(GEMINI_FLASH_ID)
@@ -84,6 +85,24 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.format_response(text=pre)
         return self.session.client.response
         
+    def test_numbered_list_inside_code_block(self):
+        pre = "```python\n**1. Item\n```\n **2."
+        expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n \t2."
+
+        self.assertEqual(self.func(pre), expected)
+
+    def test_boldened_inside_code_block(self):
+        pre = "```python\n**boldened**\n```**boldened**"
+        expected = "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m"
+
+        self.assertEqual(self.func(pre), expected)
+
+    def test_code_block_with_italic_inside(self):
+        pre = "```python\nHey, some *code*\n```"
+        expected = "\tpython: - - - - -\nHey, some *code*\n\t- - - - - - - - - -"
+
+        self.assertEqual(self.func(pre), expected)
+
     def test_bullet_item_with_asterisk(self):
         pre = self.bullet_item_with_asterisk
         expected = self.f_bullet_item_with_asterisk
