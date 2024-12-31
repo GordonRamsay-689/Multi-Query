@@ -200,12 +200,12 @@ class GeminiClient:
 
     def f_bold_text(self, response):
         pattern = r'(?!\*\*\s)\*\*(.+?)(?!\s\*\*)\*\*'
-        replacement = r'\033[39;49;1m\1\033[0m' # ANSI: bold, \1, ANSI: reset
+        replacement = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
         pattern = r'(?!\*\s)\*(.+?)(?!\s\*)\*'
-        replacement = r'\033[39;49;3m\1\033[0m' # ANSI: italic, \1, ANSI: reset
+        replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
     ## REPLACE THIS FUNCTION WITH SMALLER FUNCTIONS
@@ -312,7 +312,7 @@ class GoogleClient:
             name = result.name[:end_of_name]
 
             ## Populate response_string
-            response += f"\033[1m{i+1}. {name}\033[0m\n"
+            response += f"\033[1m{i+1}. {name}\033[22m\n"
             response += f"\n\t{result.link}\n"
             if result.description:
                 description = self.left_pad(result.description, 55)
