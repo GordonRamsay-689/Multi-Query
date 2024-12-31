@@ -179,14 +179,25 @@ class GeminiClient:
     def format_response(self, text=None, format=True):
         response = text if text else self.api_response.text
 
-        if format:
-            response = self.f_code_blocks(response)
-            response = self.f_numbered_lists(response)
-            response = self.f_bold_text(response)
-            response = self.f_italicized_text(response)
-            response = self.f_general(response)
+        if format:    
+            # Split the response by code blocks
+            parts = re.split(r'(```\w+.*?```)', response, flags=re.DOTALL)
+    
+            # This will hold the modified parts
+            result = []
+    
+            # Process each part
+            for part in parts:
+                if part.startswith('```'):  # Code block, just add it back without modification
+                    part = self.f_code_blocks(part)
+                else:  # Non-code block content
+                    part = self.f_numbered_lists(part)
+                    part = self.f_bold_text(part)
+                    part = self.f_italicized_text(part)
+                    part = self.f_general(part)
+                result.append(part)
 
-        self.response = response
+            self.response = ''.join(result)
 
     def f_code_blocks(self, response):
         pattern =  r'```(\w+)(.*?)```'
