@@ -181,7 +181,7 @@ class GeminiClient:
 
         if format:    
             # Split the response by code blocks
-            parts = re.split(r'(```\w+.*?```)', response, flags=re.DOTALL)
+            parts = re.split(r'(```\S+.*?```)', response, flags=re.DOTALL)
     
             # This will hold the modified parts
             result = []
@@ -200,7 +200,7 @@ class GeminiClient:
             self.response = ''.join(result)
 
     def f_code_blocks(self, response):
-        pattern =  r'```(\w+)(.*?)```'
+        pattern =  r'```(\S+)(.*?)```'
         replacement = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
