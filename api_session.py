@@ -194,6 +194,8 @@ class GeminiClient:
                     part = self.f_numbered_lists(part)
                     part = self.f_bold_text(part)
                     part = self.f_italicized_text(part)
+                    part = self.f_header(part)
+                    part = self.f_bullet(part)
                     part = self.f_general(part)
                 result.append(part)
 
@@ -219,9 +221,17 @@ class GeminiClient:
         replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
-    ## REPLACE THIS FUNCTION WITH SMALLER FUNCTIONS
+    def f_header(self, response):
+        return response.replace('\t#', '\t\t')
+    
+    def f_bullet(self, response):
+        response = response.replace("* **", '- ')
+        response = response.replace("\n    *", '\n    -')
+        return response.replace("\n*", '\n\t-')
+
     def f_general(self, response):
-        return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-')
+        # Odd unknown. Used for emphasis sometimes, doesn't seem to
+        return response.replace("**", '')
 
 class GoogleClient:
     def __init__(self, client_id, sys_message):
