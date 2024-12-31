@@ -58,6 +58,7 @@ class Request:
         self._stop_event = threading.Event()
         self.session = session
         self.parent = parent
+        self.master = parent.parent
 
     def stop(self):
         self._stop_event.set()
@@ -81,7 +82,7 @@ class Request:
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.parent.cli_lock:
                 ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
-                self.session.client.output_stream()
+                self.session.client.output_stream(self.master.format)
                 ui.c_out("End of stream.", separator=True)
 
             self.remove_from_requests()
@@ -96,7 +97,7 @@ class Request:
             self.remove_from_requests()
             return
         
-        self.session.client.format_response()
+        self.session.client.format_response(format=self.master.format)
 
         if not self.stopped():
             with self.parent.cli_lock:

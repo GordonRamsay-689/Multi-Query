@@ -80,16 +80,16 @@ class OpenaiClient:
         message = self.create_message("user", query)
         self.update_context(message)
 
-    def output_stream(self):
+    def output_stream(self, format):
         full_response = ''
 
         for chunk in self.api_response:
-            response = chunk.choices[0].delta.content
+            chunk_text = chunk.choices[0].delta.content
             
-            if not response:
+            if not chunk_text:
                 continue
 
-            self.format_response(response)
+            self.format_response(text=chunk_text, format=format)
 
             full_response += self.response
             ui.c_out(self.response, endline='')
@@ -117,7 +117,7 @@ class OpenaiClient:
 
         return True if self.api_response else False
 
-    def format_response(self, text=None):
+    def format_response(self, text=None, format=True):
         if text:
             response = text
         else:
@@ -125,7 +125,8 @@ class OpenaiClient:
             message = self.create_message("assistant", response)
             self.update_context(message)
 
-        pass # Format response functions
+        if format:
+            pass # Format response functions
 
         self.response = response
 
@@ -162,9 +163,9 @@ class GeminiClient:
     def set_query(self, query):
         self.query = query
 
-    def output_stream(self):
+    def output_stream(self, format):
         for chunk in self.api_response:
-            self.format_response(chunk.text)
+            self.format_response(text=chunk.text, format=format)
             ui.c_out(self.response)
 
     def send_request(self):
@@ -175,14 +176,15 @@ class GeminiClient:
 
         return True if self.api_response else False
     
-    def format_response(self, text=None):
+    def format_response(self, text=None, format=True):
         response = text if text else self.api_response.text
 
-        response = self.f_code_blocks(response)
-        response = self.f_numbered_lists(response)
-        response = self.f_bold_text(response)
-        response = self.f_italicized_text(response)
-        response = self.f_general(response)
+        if format:
+            response = self.f_code_blocks(response)
+            response = self.f_numbered_lists(response)
+            response = self.f_bold_text(response)
+            response = self.f_italicized_text(response)
+            response = self.f_general(response)
 
         self.response = response
 
@@ -296,7 +298,7 @@ class GoogleClient:
             
         return "\tNo Description"
 
-    def format_response(self):
+    def format_response(self, format=True):
         num_results = len(self.api_response)
 
         response = ''
@@ -352,5 +354,5 @@ class TestClient:
         self.api_response = f"Query recieved: {self.query}\nTest response: {TEST_RESPONSE}"
         return True if self.api_response else False
     
-    def format_response(self):
+    def format_response(self, text=None, format=True):
         self.response = str(self.api_response) 

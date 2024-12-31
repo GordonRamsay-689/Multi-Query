@@ -54,6 +54,7 @@ class Master:
         self.persistent_chat = False
         self.stream_enabled = False
         self.active_stream = False
+        self.format = True
 
     def reset(self):
         for session in self.sessions:
@@ -354,6 +355,9 @@ def execute_commands(commands, master):
             master.persistent_chat = True
         elif command == '-s':
             master.stream_enabled = True
+        elif command == '-noformat':
+            master.format = False
+
 
 def parse_arguments(args):
     commands = []

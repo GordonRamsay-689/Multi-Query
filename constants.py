@@ -12,7 +12,7 @@ DRED = 1
 LRED = 196
 
 # Valid Commands
-VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys"] 
+VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys", "-noformat"] 
 
 # Flags (during runtime, not args)
 # Flags include ':' to avoid conflating with flags the user may search for
