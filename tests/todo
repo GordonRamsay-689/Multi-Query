@@ -1,1 +1,39 @@
 TESTS THAT MUST BE PERFORMED:
+
+Consider: individual test case for each client-type OR test together?
+__ Will differ on test-to-test basis.
+
+api_session.py:
+
+- set_query()
+-- Correctly sets query for each possible type
+
+- reset()
+-- Correctly resets expected attributes.
+
+- Response Formatting
+
+- Test each possible client
+-- No error raised on init
+-- Receives response (isinstance(response, str) or for openai, isinstance(response, dict))
+
+- For openai: context properly updated
+    - After stream
+    - Without stream
+
+request_handler.py:
+
+- Fail to receive response
+-- Request removes self from requests.
+-- ui.c_out is called.
+
+- API throws error
+    - During formatting.
+    - During query.
+    - During stream.
+-- No error messages are propagataed to user.
+-- Request removes self from requests.
+-- Consider: add handling for specific exceptions to
+completely remove the client-session (or even suggest
+application restart).
+
