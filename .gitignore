@@ -3,9 +3,9 @@ __pycache__/
 .DS_Store
 openai/
 notes.txt
-/todo
+todo
 *.env
 test.py
 gemini/
-tests_todo
 tests/escape_codes.txt
+*.code-workspace
