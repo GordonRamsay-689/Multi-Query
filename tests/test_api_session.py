@@ -85,6 +85,12 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.format_response(text=pre)
         return self.session.client.response
         
+    def test_multiple_code_blocks(self):
+        pre = "```python\nCode\n```\nText\n```C++\nCode\n```\nText"
+        expected = "\tpython: - - - - -\nCode\n\t- - - - - - - - - -\nText\n\tC++: - - - - -\nCode\n\t- - - - - - - - - -\nText"
+
+        self.assertEqual(self.func(pre), expected)
+
     def test_numbered_list_inside_code_block(self):
         pre = "```python\n**1. Item\n```\n **2."
         expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n \t2."
