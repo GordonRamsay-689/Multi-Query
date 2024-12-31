@@ -208,7 +208,7 @@ class GeminiClient:
 
     ## REPLACE THIS FUNCTION WITH SMALLER FUNCTIONS
     def f_general(self, response):
-        return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-').replace("--", '')
+        return response.replace('\t#', '\t\t').replace("* **", '- ').replace("**", '').replace("\n    *", '\n    -').replace("\n*", '\n\t-')
 
 class GoogleClient:
     def __init__(self, name, sys_message):
