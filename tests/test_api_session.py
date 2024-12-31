@@ -84,7 +84,13 @@ class TestGeminiFormatResponse(unittest.TestCase):
     def func(self, pre):
         self.format_response(text=pre)
         return self.session.client.response
-        
+
+    def test_header(self):
+        pre = '\t# This is header'
+        expected = '\t\t This is header'
+
+        self.assertEqual(self.func(pre), expected)
+
     def test_multiple_code_blocks(self):
         pre = "```python\nCode\n```\nText\n```C++\nCode\n```\nText"
         expected = "\tpython: - - - - -\nCode\n\t- - - - - - - - - -\nText\n\tC++: - - - - -\nCode\n\t- - - - - - - - - -\nText"
@@ -106,6 +112,18 @@ class TestGeminiFormatResponse(unittest.TestCase):
     def test_code_block_with_italic_inside(self):
         pre = "```python\nHey, some *code*\n```"
         expected = "\tpython: - - - - -\nHey, some *code*\n\t- - - - - - - - - -"
+
+        self.assertEqual(self.func(pre), expected)
+
+    def test_bullet_item_indented(self):
+        pre = '\n    * A'
+        expected = '\n    - A'
+
+        self.assertEqual(self.func(pre), expected)
+
+    def test_bullet_item_complex(self):
+        pre = '* **A'
+        expected = '- A'
 
         self.assertEqual(self.func(pre), expected)
 
