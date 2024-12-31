@@ -13,7 +13,7 @@ class RequestHandler:
         self.sessions = []
         self.requests = []
 
-    def stop_threads(self): # Not in use yet
+    def stop_threads(self):
         with self.requests_lock:
             for request in self.requests:
                 request.stop()
