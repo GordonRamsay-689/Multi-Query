@@ -61,6 +61,8 @@ class TestGeminiFormatResponse(unittest.TestCase):
 \t- Fresh cilantro, chopped (for garnish)'''
     bullet_item_bold = '\n* **Boldened Text** Unboldened text.'
     f_bullet_item_bold = '\n\t- \033[39;49;1mBoldened Text\033[0m Unboldened text.'
+    bullet_item_bold_italic = '\n* ***Boldened Italic.***'
+    f_bullet_item_bold_italic = '\n\t- \033[39;49;1m\033[39;49;3mBoldened Italic.\033[0m\033[0m'
     bullet_item = '\n* Large pot or Dutch oven'
     bullet_item_with_asterisk = '\n* Dial *555'
     f_bullet_item_with_asterisk = '\n\t- Dial *555'
@@ -95,10 +97,18 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
         self.assertEqual(post, expected)
 
-    def test_bullet_list_boldened(self):
+    def test_bullet_item_bold(self):
         pre = self.bullet_item_bold
         expected = self.f_bullet_item_bold
 
+        self.format_response(text=pre)
+        post = self.session.client.response
+
+        self.assertEqual(post, expected)
+
+    def test_bullet_item_bold_italic(self):
+        pre = self.bullet_item_bold_italic
+        expected = self.f_bullet_item_bold_italic
         self.format_response(text=pre)
         post = self.session.client.response
 
