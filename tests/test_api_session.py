@@ -161,5 +161,54 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
         self.compare(pre, expected)
 
+class TestGeminiFormatFunctions(unittest.TestCase):
+    ''' Tests the formatting methods used by GeminiClient.format_response(). '''
+    
+    texts = {
+        'bullet-complex': '* **Text',
+        'numbered-list-item': '**1.'
+        }
+    f_texts = {
+        'bullet-complex': '- Text',
+        'numbered-list-item': '\t1.'
+        }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.session = api_session.Session(GEMINI_FLASH_ID)
+        cls.format_response = cls.session.client.format_response
+
+    @classmethod
+    def tearDownClass(cls):
+        del cls.session
+
+    def run_tests(self, function_name, name):
+        func = getattr(self.session.client, function_name)
+
+        for key in self.texts:
+            with self.subTest(key=key):
+                expected = self.get_expected(name, key)
+
+                pre = self.texts[key]
+                post = func(pre)
+
+                self.assertEqual(post, expected)
+
+    def get_expected(self, name, current):
+        ''' If the callers name matches the current text's key
+        return formatted version of the text otherwise return
+        unformatted version of the current text. '''
+        if name == current:
+            return self.f_texts[current]
+        else:
+            return self.texts[current]
+
+    def test_f_bullet_complex(self):
+        name = 'bullet-complex'
+        function_name = 'f_bullet'
+
+        self.run_tests(function_name, name)
+
+    
 if __name__ == '__main__':
     unittest.main(verbosity=2)
