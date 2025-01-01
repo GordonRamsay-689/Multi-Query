@@ -167,12 +167,12 @@ class TestGeminiFormatFunctions(unittest.TestCase):
     texts = {
         'bullet-complex': '* **Text',
         'bullet-indented': '\n    * Text',
-        'numbered-lists-item': '**1.'
+        'numbered_lists-item': '**1.'
         }
     f_texts = {
         'bullet-complex': '- Text',
         'bullet-indented': '\n    - Text',
-        'numbered-lists-item': '\t1.'
+        'numbered_lists-item': '\t1.'
         }
 
     @classmethod
@@ -200,7 +200,6 @@ class TestGeminiFormatFunctions(unittest.TestCase):
         ''' Returns expected output for each function name. '''
 
         function_name = function_name.strip('f_')
-        function_name = function_name.replace('_', '-')
 
         if current.startswith(function_name):
             return self.f_texts[current]
