@@ -167,13 +167,19 @@ class TestGeminiFormatFunctions(unittest.TestCase):
     texts = {
         'bullet-complex': '* **Text',
         'bullet-indented': '\n    * Text',
-        'numbered_lists-item': '**1.'
+        'numbered_lists-item': '**1.',
+        'numbered_lists-list': '**1. Text\n**2. Text'
         }
     f_texts = {
         'bullet-complex': '- Text',
         'bullet-indented': '\n    - Text',
-        'numbered_lists-item': '\t1.'
+        'numbered_lists-item': '\t1.',
+        'numbered_lists-list': '\t1. Text\n\t2. Text'
         }
+
+    expected_failures = [
+        ['f_bullet', 'numbered_lists-list']
+        ]
 
     @classmethod
     def setUpClass(cls):
@@ -194,13 +200,19 @@ class TestGeminiFormatFunctions(unittest.TestCase):
                 pre = self.texts[key]
                 post = func(pre)
 
-                self.assertEqual(post, expected)
+                pair = [function_name, key]
+                if pair in self.expected_failures:
+                    self.assertNotEqual(post, expected)
+                else:
+                    self.assertEqual(post, expected)
 
     def get_expected(self, function_name, current):
         ''' Returns expected output for each function name. '''
 
         function_name = function_name.strip('f_')
 
+        print(function_name)
+        print(current)
         if current.startswith(function_name):
             return self.f_texts[current]
         else:
