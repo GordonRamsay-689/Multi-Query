@@ -59,15 +59,6 @@ class TestGeminiFormatResponse(unittest.TestCase):
 \t- 1 inch ginger, grated
 \t- Salt to taste
 \t- Fresh cilantro, chopped (for garnish)'''
-    bullet_item_bold = '\n* **Boldened Text** Unboldened text.'
-    f_bullet_item_bold = '\n\t- \033[39;49;1mBoldened Text\033[22m Unboldened text.'
-    bullet_item_bold_italic = '\n* ***Boldened Italic.***'
-    f_bullet_item_bold_italic = '\n\t- \033[39;49;1m\033[39;49;3mBoldened Italic.\033[22m\033[23m'
-    bullet_item = '\n* Large pot or Dutch oven'
-    bullet_item_with_asterisk = '\n* Dial *555'
-    f_bullet_item_with_asterisk = '\n\t- Dial *555'
-    all_italic_one_bold = '*Text **bold** text*'
-    f_all_italic_one_bold = '\033[39;49;3mText \033[39;49;1mbold\033[22m text\033[23m'
     
     @classmethod
     def setUpClass(cls):
@@ -82,80 +73,93 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.session.reset()
 
     def func(self, pre):
+        ''' The function we are testing. Returns relevant modified variable '''
         self.format_response(text=pre)
         return self.session.client.response
 
-    def test_header(self):
-        pre = '\t# This is header'
-        expected = '\t\t This is header'
+    def compare(self, pre, expected):
+        ''' Compares output of function we are testing when 
+        passed 'pre' with expected output '''
+        return self.assertEqual(self.func(pre), expected)
 
-        self.assertEqual(self.func(pre), expected)
+    def test_format_response_bullet_item(self):
+        pre = '\n* Large pot or Dutch oven'
+        expected = '\n\t- Large pot or Dutch oven'
 
-    def test_multiple_code_blocks(self):
-        pre = "```python\nCode\n```\nText\n```C++\nCode\n```\nText"
-        expected = "\tpython: - - - - -\nCode\n\t- - - - - - - - - -\nText\n\tC++: - - - - -\nCode\n\t- - - - - - - - - -\nText"
+        self.compare(pre, expected)
 
-        self.assertEqual(self.func(pre), expected)
+    def test_format_response_bullet_item_followed_by_boldened_text(self):
+        pre = '\n* **Boldened Text** Unboldened text.'
+        expected = '\n\t- \033[39;49;1mBoldened Text\033[22m Unboldened text.'
 
-    def test_numbered_list_inside_code_block(self):
-        pre = "```python\n**1. Item\n```\n **2."
-        expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n \t2."
+        self.compare(pre, expected)
 
-        self.assertEqual(self.func(pre), expected)
+    def test_format_response_bullet_item_followed_by_boldened_italicized_text(self):
+        pre = '\n* ***Boldened Italic.***'
+        expected = '\n\t- \033[39;49;1m\033[39;49;3mBoldened Italic.\033[22m\033[23m'
 
-    def test_boldened_inside_code_block(self):
-        pre = "```python\n**boldened**\n```**boldened**"
-        expected = "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m"
+        self.compare(pre, expected)
 
-        self.assertEqual(self.func(pre), expected)
-
-    def test_code_block_with_italic_inside(self):
-        pre = "```python\nHey, some *code*\n```"
-        expected = "\tpython: - - - - -\nHey, some *code*\n\t- - - - - - - - - -"
-
-        self.assertEqual(self.func(pre), expected)
-
-    def test_bullet_item_indented(self):
+    def test_format_response_bullet_item_indented(self):
         pre = '\n    * A'
         expected = '\n    - A'
 
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
 
-    def test_bullet_item_complex(self):
+    def test_format_response_bullet_item_complex(self):
         pre = '* **A'
         expected = '- A'
 
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
 
-    def test_bullet_item_with_asterisk(self):
-        pre = self.bullet_item_with_asterisk
-        expected = self.f_bullet_item_with_asterisk
+    def test_format_response_bullet_item_followed_by_asterisk(self):
+        pre = '\n* Dial *555'
+        expected = '\n\t- Dial *555'
 
-        self.assertEqual(self.func(pre), expected)
-    
-    def test_bullet_list(self):
+        self.compare(pre, expected)
+   
+    def test_format_response_bullet_list(self):
+        ''' Complete multi-line bullet list '''
         pre = self.bullet_list
         expected = self.f_bullet_list
 
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
 
-    def test_bullet_item_bold(self):
-        pre = self.bullet_item_bold
-        expected = self.f_bullet_item_bold
+    def test_format_response_code_blocks(self):
+        pre = "```python\nCode\n```\nText\n```C++\nCode\n```\nText"
+        expected = "\tpython: - - - - -\nCode\n\t- - - - - - - - - -\nText\n\tC++: - - - - -\nCode\n\t- - - - - - - - - -\nText"
 
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
 
-    def test_bullet_item_bold_italic(self):
-        pre = self.bullet_item_bold_italic
-        expected = self.f_bullet_item_bold_italic
+    def test_format_response_code_block_containing_numbered_list(self):
+        pre = "```python\n**1. Item\n```\n **2."
+        expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n \t2."
 
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
 
-    def test_all_italic_one_bold(self):
-        pre = self.all_italic_one_bold
-        expected = self.f_all_italic_one_bold
+    def test_format_response_code_block_containing_boldened_text(self):
+        pre = "```python\n**boldened**\n```**boldened**"
+        expected = "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m"
+
+        self.compare(pre, expected)
+
+    def test_format_response_code_block_containing_italicized_text(self):
+        pre = "```python\nHey, some *code*\n```"
+        expected = "\tpython: - - - - -\nHey, some *code*\n\t- - - - - - - - - -"
+
+        self.compare(pre, expected)
+
+    def test_format_response_bold_text_containing_italic_text(self):
+        pre = '*Text **bold** text*'
+        expected = '\033[39;49;3mText \033[39;49;1mbold\033[22m text\033[23m'
         
-        self.assertEqual(self.func(pre), expected)
+        self.compare(pre, expected)
+
+    def test_format_response_top_header(self):
+        pre = '\t# This is header'
+        expected = '\t\t This is header'
+
+        self.compare(pre, expected)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
