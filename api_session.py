@@ -196,7 +196,9 @@ class GeminiClient:
                     part = self.f_general(part)
                 result.append(part)
 
-            self.response = ''.join(result)
+            response = ''.join(result)
+        
+        self.response = response
 
     def f_code_blocks(self, response):
         pattern =  r'```(\S+)(.*?)```'
