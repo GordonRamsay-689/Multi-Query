@@ -155,6 +155,10 @@ class TestGeminiFormatResponse(unittest.TestCase):
         
         self.compare(pre, expected)
 
+    def test_format_bold_after_complex_numbered_list_item(self):
+        pre = '* ** **Text**'
+        expected = '- \033[39;49;1mText\033[22m'
+
     def test_format_response_top_header(self):
         pre = '\t# This is header'
         expected = '\t\t This is header'
@@ -168,17 +172,27 @@ class TestGeminiFormatFunctions(unittest.TestCase):
         'bullet-complex': '* **Text',
         'bullet-indented': '\n    * Text',
         'numbered_lists-item': '**1.',
-        'numbered_lists-list': '**1. Text\n**2. Text'
+        'numbered_lists-list': '**1. Text\n**2. Text',
+        'header-1': '\t# Header 1 #',
+        'header-1-not': '\t # Header',
+        'bold_text-simple': '**Text**',
+        'bold_text-complex': '** * Text * ***'
         }
     f_texts = {
         'bullet-complex': '- Text',
         'bullet-indented': '\n    - Text',
         'numbered_lists-item': '\t1.',
-        'numbered_lists-list': '\t1. Text\n\t2. Text'
+        'numbered_lists-list': '\t1. Text\n\t2. Text',
+        'header-1': '\t\t Header 1 #',
+        'header-1-not': '\t # Header',
+        'bold_text-simple': '\033[39;49;1mText\033[22m',
+        'bold_text-complex': '\033[39;49;1m* Text *\033[22m*'
         }
 
     expected_failures = [
-        ['f_bullet', 'numbered_lists-list']
+        ['f_bullet', 'numbered_lists-list'],
+        ['f_bullet', 'bold_text-complex'],
+        ['f_bold_text', 'bold_text-complex'] # AOI-1
         ]
 
     @classmethod
@@ -192,14 +206,16 @@ class TestGeminiFormatFunctions(unittest.TestCase):
 
     def run_tests(self, function_name):
         func = getattr(self.session.client, function_name)
-
+        print(function_name)
         for key in self.texts:
             with self.subTest(key=key):
                 expected = self.get_expected(function_name, key)
-
+                print(expected)
                 pre = self.texts[key]
+                print(pre)
                 post = func(pre)
-
+                print(post)
+                
                 pair = [function_name, key]
                 if pair in self.expected_failures:
                     self.assertNotEqual(post, expected)
@@ -211,8 +227,6 @@ class TestGeminiFormatFunctions(unittest.TestCase):
 
         function_name = function_name.strip('f_')
 
-        print(function_name)
-        print(current)
         if current.startswith(function_name):
             return self.f_texts[current]
         else:
@@ -228,6 +242,15 @@ class TestGeminiFormatFunctions(unittest.TestCase):
 
         self.run_tests(function_name)
 
+    def test_f_header(self):
+        function_name = 'f_header'
+
+        self.run_tests(function_name)
+
+    def test_f_bold_text(self):
+        function_name = 'f_bold_text'
+
+        self.run_tests(function_name)
     
 if __name__ == '__main__':
     unittest.main(verbosity=2)
