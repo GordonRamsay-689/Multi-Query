@@ -226,6 +226,8 @@ class GeminiClient:
     def f_bullet(self, response):
         response = response.replace("* **", '- ')
         response = response.replace("\n    *", '\n    -')
+        response = response.replace("\n   *", '\n   -')
+        response = response.replace("\t* ", '\t- ')
         return response.replace("\n*", '\n\t-')
 
     def f_general(self, response):
