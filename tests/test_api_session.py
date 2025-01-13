@@ -60,6 +60,16 @@ class TestGeminiFormatResponse(unittest.TestCase):
 \t- Salt to taste
 \t- Fresh cilantro, chopped (for garnish)'''
     
+
+    indented_bullet_list = '''1. Test CMake Directly:
+   * Install CMake independently of Homebrew (e.g., from the CMake website's official macOS distribution).  
+   * Create a simple CMake project (e.g., `CMakeLists.txt` containing `cmake_minimum_required(VERSION 3.10) project(MyProject) add_executable(MyProject main.cpp)`, and `main.cpp` containing a basic "Hello, world!" program).
+   * Try to build it using the independently installed CMake from the command line. This helps determine if CMake itself is malfunctioning.'''
+    f_indented_bullet_list = '''1. Test CMake Directly:
+   - Install CMake independently of Homebrew (e.g., from the CMake website's official macOS distribution).  
+   - Create a simple CMake project (e.g., `CMakeLists.txt` containing `cmake_minimum_required(VERSION 3.10) project(MyProject) add_executable(MyProject main.cpp)`, and `main.cpp` containing a basic "Hello, world!" program).
+   - Try to build it using the independently installed CMake from the command line. This helps determine if CMake itself is malfunctioning.'''
+
     @classmethod
     def setUpClass(cls):
         cls.session = api_session.Session(GEMINI_FLASH_ID)
@@ -81,6 +91,12 @@ class TestGeminiFormatResponse(unittest.TestCase):
         ''' Compares output of function we are testing when 
         passed 'pre' with expected output '''
         return self.assertEqual(self.func(pre), expected)
+
+    def test_format_response_indented_bullet_list(self):
+        pre = self.indented_bullet_list
+        expected = self.f_indented_bullet_list
+    
+        self.compare(pre, expected)
 
     def test_format_response_bullet_item(self):
         pre = '\n* Large pot or Dutch oven'
@@ -210,11 +226,8 @@ class TestGeminiFormatFunctions(unittest.TestCase):
         for key in self.texts:
             with self.subTest(key=key):
                 expected = self.get_expected(function_name, key)
-                print(expected)
                 pre = self.texts[key]
-                print(pre)
                 post = func(pre)
-                print(post)
                 
                 pair = [function_name, key]
                 if pair in self.expected_failures:
