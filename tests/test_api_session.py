@@ -28,6 +28,82 @@ class TestSession(unittest.TestCase):
 
                 self.assertEqual(module_str, expected_module_str)
 
+
+class TestOpenaiClient(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.session = api_session.Session(GPT_4O_MINI_ID)
+        cls.client = cls.session.client 
+
+    @classmethod
+    def tearDownClass(cls):
+        del cls.session
+
+    def setUp(self):
+        self.session.reset()
+        self.client.sys_message = DEFAULT_SYS_MSG
+        self.client.previous_sys_message = None
+        self.client.context = []
+
+    def tearDown(self):
+        pass
+
+    def _create_message_and_compare(self, role, text, expected):
+        message = self.client.create_message(role, text)
+        self.assertIsInstance(message, dict)
+        self.assertEqual(message, expected)
+
+    def test_create_message_single_line(self):
+        role = "user"
+        text = "I am dog."
+        expected = {"role": "user", "content": "I am dog."}
+        self._create_message_and_compare(role, text, expected)
+
+    def test_update_context(self):
+        context = self.client.context
+        client = self.client
+
+        sys_message = "First System Message"
+        message = "First Message"
+
+        client.sys_message = sys_message
+        client.update_context(message)
+        expected = [sys_message, message]
+
+        self.assertEqual(context, expected)
+        self.assertEqual(client.current_sys_message, "First System Message")
+
+        client.sys_message = sys_message
+        message = "Second Message"
+        client.update_context(message)
+        expected.append(message)
+
+        self.assertEqual(context, expected)
+        self.assertEqual(client.current_sys_message, "First System Message")
+
+        sys_message = "Second System Message"
+        message = "Third Message"
+
+        client.sys_message = sys_message
+        client.update_context(message)
+        expected.append(sys_message)
+        expected.append(message)
+
+        self.assertEqual(context, expected)
+        self.assertEqual(client.current_sys_message, "Second System Message")
+
+        sys_message = "Third System Message"
+        message = "Fourth Message"
+
+        client.sys_message = sys_message
+        client.update_context(message)
+        expected.append(sys_message)
+        expected.append(message)
+
+        self.assertEqual(context, expected)
+        self.assertEqual(client.current_sys_message, "Third System Message")
+
+
 class TestGeminiFormatResponse(unittest.TestCase):
     ''' Test GeminiClient.format_response(). '''  
 
@@ -78,9 +154,6 @@ class TestGeminiFormatResponse(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         del cls.session
-
-    def setUp(self):
-        self.session.reset()
 
     def func(self, pre):
         ''' The function we are testing. Returns relevant modified variable '''
