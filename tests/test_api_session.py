@@ -276,7 +276,9 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
         'simple_math-mult-C': '5*10*3 = 9',
-        'f_italicized_text-sentence-with-asteriskts': 'Hey * this is not * italicized'
+        'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
+        'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
+        'italicized_text-sentence': 'Hey *this is* italicized'
         }
     f_texts = {
         'bullet-complex': '- Text',
@@ -291,7 +293,9 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
         'simple_math-mult-C': '5*10*3 = 9',
-        'f_italicized_text-sentence-with-asteriskts': 'Hey * this is not * italicized'
+        'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
+        'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
+        'italicized_text-sentence': 'Hey \033[39;49;3mthis is\033[23m italicized'
         }
 
     expected_failures = [
