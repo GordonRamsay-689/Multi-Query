@@ -190,8 +190,8 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.compare(pre, expected)
 
     def test_format_response_bullet_item_followed_by_boldened_text_and_asterisks(self):
-        pre = '\n* * **Boldened NOT Italic. * **'
-        expected = '\n\t- * \033[39;49;1mBoldened NOT Italic. * \033[22m'
+        pre = '\n* * **Boldened NOT Italic.** *'
+        expected = '\n\t- * \033[39;49;1mBoldened NOT Italic.\033[22m *'
 
         self.compare(pre, expected)
 

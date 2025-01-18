@@ -211,7 +211,7 @@ class GeminiClient:
         return re.sub(pattern, replacement, response)
 
     def f_bold_text(self, response):
-        pattern = r'(?!\*\*\s)\*\*(.+?)(?!\s\*\*)\*\*'
+        pattern = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
         replacement = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
