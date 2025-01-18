@@ -187,7 +187,7 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
         self.compare(pre, expected)
 
-class TestGeminiFormatFunctions(unittest.TestCase):
+class TestGeminiFormatHelperFunctions(unittest.TestCase):
     ''' Tests the formatting methods used by GeminiClient.format_response(). '''
     
     texts = {
