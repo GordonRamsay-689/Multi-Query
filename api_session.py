@@ -53,7 +53,7 @@ class OpenaiClient:
         else:
             self.sys_message = DEFAULT_SYS_MSG
 
-        self.previous_sys_message = None
+        self.current_sys_message = None
         self.context = []
 
         self.name = client_id
@@ -99,9 +99,9 @@ class OpenaiClient:
         self.update_context(message)
 
     def update_context(self, message):
-        if self.sys_message != self.previous_sys_message:
+        if self.sys_message != self.current_sys_message:
             self.context.append(self.sys_message)
-            self.previous_sys_message = self.sys_message
+            self.current_sys_message = self.sys_message
        
         self.context.append(message)
 
@@ -216,7 +216,7 @@ class GeminiClient:
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        pattern = r'(?!\*\s)\*(.+?)(?!\s\*)\*'
+        pattern = r'(?!\*\s)\*(.+?\S)(?!\s\*)\*'
         replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 
