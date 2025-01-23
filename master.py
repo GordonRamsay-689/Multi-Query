@@ -206,7 +206,7 @@ class Master:
             self.sessions.append(session)
 
             with self.cli_lock:
-                ui.c_out(f"Added {session.client.name} from active session", color=LBLUE)
+                ui.c_out(f"Added {session.client.name} to active session", color=LBLUE)
             
             self.configure_clients() # If unable to configure, informs user and removes self
 
