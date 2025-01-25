@@ -188,6 +188,7 @@ class GeminiClient:
                 if part.startswith('```'):
                     part = self.f_code_blocks(part)
                 else:
+                    pass # remove "    " quad whitespace from gflash 2.0
                     part = self.f_numbered_lists(part)
                     part = self.f_bold_text(part)
                     part = self.f_italicized_text(part)
@@ -206,9 +207,15 @@ class GeminiClient:
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
     def f_numbered_lists(self, response):
+        pattern = r'\*\*(\d)\s\s\s\s' # New signature for flash 2.0
+        replacement = r'\t\1 ' 
+        response = re.sub(pattern, replacement, response)
+
         pattern = r'\*\*(\d)'
         replacement = r'\t\1' 
-        return re.sub(pattern, replacement, response)
+        response = re.sub(pattern, replacement, response)
+
+        return response 
 
     def f_bold_text(self, response):
         pattern = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
@@ -225,6 +232,13 @@ class GeminiClient:
     
     def f_bullet(self, response):
         response = response.replace("* **", '- ')
+
+        # Streaming sometimes generates just the bullet and newline.
+        pattern = r'^\*\n'
+        response = re.sub(pattern, r"\t- ", response, re.MULTILINE)
+
+        response = response.replace("*   ", '- ') # New signature for flash 2.0
+        
         response = response.replace("\n    *", '\n    -')
         response = response.replace("\n   *", '\n   -')
         response = response.replace("\t* ", '\t- ')
