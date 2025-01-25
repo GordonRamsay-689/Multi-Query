@@ -49,7 +49,7 @@ class RequestHandler:
                 self.stop_threads()
 
                 with self.cli_lock:
-                    ui.c_out("Requests timed out.", isolate=True)
+                    ui.c_out("Requests timed out.", color=DRED, isolate=True)
                 
                 return
 
@@ -77,14 +77,18 @@ class Request:
         try:
             successful_request = self.session.client.send_request()
         except Exception as e:
+            pass # Log exception. 
             successful_request = False
 
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.parent.cli_lock:
                 ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
-                self.session.client.output_stream(self.master.format)
-                ui.c_out("End of stream.", separator=True)
-
+                try:
+                    self.session.client.output_stream(self.master.format)
+                    ui.c_out("End of stream.", separator=True)
+                except TypeError:
+                    ui.c_out("Failed to stream response.", isolate=True, color=DRED, separator=True)
+                
             self.remove_from_requests()
             return
 
