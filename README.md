@@ -2,13 +2,13 @@
 
 _Work in progress for personal use, use at your own discretion. Feel free to modify any way you like._
 
-This is a simple script that lets you search Google and query Gemini, OpenAI models directly from the terminal, neatly displaying the results. You can query several models/engines at once, responses being printed as they are received.
+This is a simple script that lets you search Google and query LLMs (Gemini, OpenAI) directly from the terminal, neatly displaying the results. You can query several models/engines at the same time, responses being printed as they are received.
 
 Persistent chat sessions have now been added, as well as an input function that allows for multi-line queries 
 and pasted content (if no more than three newline chars **in sequence** inside the pasted content). 
 
 **Disclaimers:** 
-- Google Search will sometimes fail to return responses, if you are usinga VPN try disabling it. 
+- Google Search will sometimes fail to return responses, if you are using a VPN try disabling it. 
 - Different shells handle pasting a bit differently, most seem to cap pasted content at around 4000 characters.
 - There is currently no way to load conversations from previous sessions, but this will be implemented in the future.
 
@@ -61,7 +61,9 @@ If using any of the APIs, export your API keys as environment variables. For bas
     export OPENAI_API_KEY=*
 ```
 
-Running the script with no arguments will prompt you for the necessary information. This is useful when your initial query needs to be formatted, or include copy-pasted text.
+Running the script with no arguments will prompt you for necessary information, but providing information as arguments is often more efficient.
+
+If you start a persistent chat session (default if no query is provided) an interface which allows for multi-line input is presented. To send a message, enter three newline characters in a row (press enter four times). Pasted content is supported as long as it does not include three sequential newline characters, which is unusual.
 
 I recommend setting an environment alias for easy access: 
 ```
@@ -73,7 +75,7 @@ For detailed help, use:
     search -help
 ```
 
-To query one or more clients, enter your query enclosed in double qoutes
+To query one or more clients, enter your query enclosed in double quotes
 followed by one or more client aliases:
 ```
     search "query" gflash
@@ -93,10 +95,6 @@ The query is signified by double quotes, and must be the first argument provided
     search "query" -command CLIENT_A -command CLIENT_B ...
 ```
 
-As you receive responses they will be printed, as soon as one client responds you can read that response while waiting for the other clients to respond.
-
-Requests will time out after 45 seconds.
-
 <h3>Commands</h3>
 
 Commands are optional and are provided as arguments after the query, if provided. Commands are signified by a preceding dash.
@@ -108,7 +106,7 @@ Commmand | Function
 ```-c``` | Initiate a persistent chat session.
 ```-help``` | Detailed usage information.
 ```-noformat``` | Disables output formatting (except for Google Web Search which cannot be provided without formatting).
-```-s``` | Enables streamed responses (from supported models/egnines).
+```-s``` | Enables streamed responses (from supported models/engines).
 ```-sys``` | Provide a system message to supported models, ```-sys``` must be followed by the message in question.
 
 <h3>Flags</h3>
@@ -121,13 +119,17 @@ If you for example want to add Gemini 1.5 Pro to the conversation, you would typ
 ```
 
 **Available flags:**
-Flag         | Function
+Flag | Function
 -|-
 ```--add:``` | Add a model/engine to the conversation. Needs to be followed by a client alias.
 ```--rm:``` | Remove a model/engine from the conversation. Needs to be followed by a client alias.
-```--stream:``` | Toggle streamed responses for a specific model/engine. Needs to be followed by a client alias. (Only one client can have streaming enabled at one given time. Enabling streaming for a new client will disable streaming for all other clients.)
+```--stream:``` | Toggle streamed responses for a specific model/engine. Needs to be followed by a client alias.* 
 ```--aliases:``` | Display a table of available models/engines and their aliases. Does not need to be followed by a client alias.
-```--sys:``` | Specify a new system message, added to conversation if a client/model supports insertion of system messages mid conversation (currently, only Gemini does not support this). You can only provide one system message at a time. Needs to be followed by a system message, which must be enclosed in doubleqoutes.
+```--sys:``` | Specify a new system message. You can only provide one system message at a time. Needs to be followed by a system message, which must be enclosed in double quotes.**
+
+*\* Only one client can have streaming enabled at any given time. Enabling streaming for a new client will disable streaming for all other clients.*
+
+*\*\* Currently the only clients that support adding system messages mid conversation are OpenAI Clients.*
 
 ### Valid client-aliases:
 
@@ -149,4 +151,4 @@ mini | gpt-4o-mini
 o1m, o1mini | o1-mini
 o1p, o1preview | o1-preview
 
-**Disclaimer:** Some models use more tokens than others or require an API you do not have installed or access to. At the moment no checks regarding expected token use are performed before sending a query. No error will be thrown however if you provid a client alias for a client you do not have installed, it will simply be omitted.
+**Disclaimer:** Some models use more tokens than others or require an API you may not have installed or access to. At the moment no checks regarding expected token use are performed before sending a query. No error will be thrown however if you provide a client alias for a client you do not have installed, it will simply be omitted.
