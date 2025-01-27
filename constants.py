@@ -19,7 +19,7 @@ VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys", "-noformat"]
 ADD_FLAG = '--add:'
 REMOVE_FLAG = '--rm:'
 STREAM_FLAG = '--stream:'
-DISPLAY_FLAG = '--display:'
+DISPLAY_FLAG = '--aliases:'
 SYSMSG_FLAG = '--sys:'
 VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG] 
 
