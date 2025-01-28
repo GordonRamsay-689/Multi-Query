@@ -28,7 +28,6 @@ class TestSession(unittest.TestCase):
 
                 self.assertEqual(module_str, expected_module_str)
 
-
 class _OpenaiAPIResponseMessageObject:
     def __init__(self, text):
         self.content = text
