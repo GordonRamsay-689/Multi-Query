@@ -29,6 +29,20 @@ class TestSession(unittest.TestCase):
                 self.assertEqual(module_str, expected_module_str)
 
 
+class _OpenaiAPIResponseMessageObject:
+    def __init__(self, text):
+        self.content = text
+
+class _OpenaiAPIResponseTextObject:
+    def __init__(self, text):
+        self.message = _OpenaiAPIResponseMessageObject(text)
+
+class _OpenaiAPIResponseObject:
+    def __init__(self, text):
+        text_object = _OpenaiAPIResponseTextObject(text)
+
+        self.choices = [text_object]
+
 class TestOpenaiClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -59,7 +73,7 @@ class TestOpenaiClient(unittest.TestCase):
         expected = {"role": "user", "content": "I am dog."}
         self._create_message_and_compare(role, text, expected)
 
-    def test_update_context(self):
+    def test_update_sys_message_context(self):
         context = self.client.context
         client = self.client
 
@@ -103,6 +117,23 @@ class TestOpenaiClient(unittest.TestCase):
         self.assertEqual(context, expected)
         self.assertEqual(client.current_sys_message, "Third System Message")
 
+    def test_update_context(self):
+        context = self.client.context
+        client = self.client
+
+        messages = ["first", "second", "third", "fourth"]
+
+        expected = [DEFAULT_SYS_MSG]
+
+        for message in messages:
+            client.set_query(f"{message} query")
+            expected.append({"role": "user", "content": f"{message} query"})
+            self.assertEqual(context, expected)
+
+            client.api_response = _OpenaiAPIResponseObject(f"{message} response")
+            client.format_response()
+            expected.append({"role": "assistant", "content": f"{message} response"})
+            self.assertEqual(context, expected)
 
 class TestGeminiFormatResponse(unittest.TestCase):
     ''' Test GeminiClient.format_response(). '''  
