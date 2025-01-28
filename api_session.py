@@ -92,7 +92,7 @@ class OpenaiClient:
             self.format_response(text=chunk_text, format=format)
 
             full_response += self.response
-            ui.c_out(self.response, endline='')
+            ui.c_out(self.response, endline=False)
         ui.c_out('')
         
         message = self.create_message("assistant", full_response)
@@ -166,7 +166,8 @@ class GeminiClient:
     def output_stream(self, format):
         for chunk in self.api_response:
             self.format_response(text=chunk.text, format=format)
-            ui.c_out(self.response)
+            ui.c_out(self.response, endline=False)
+        ui.c_out('')
 
     def send_request(self):
         self.api_response = self.chat.send_message(self.query, stream=self.stream_enabled)
