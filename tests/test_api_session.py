@@ -265,6 +265,8 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
     
     texts = {
         'bullet-complex': '* **Text',
+        'bullet-streamed': '*\nText',
+        'bullet-streamed-multiline': '*\nText\n* Text\n*\n Text',
         'bullet-indented': '\n    * Text',
         'numbered_lists-item': '**1.',
         'numbered_lists-list': '**1. Text\n**2. Text',
@@ -283,6 +285,8 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         }
     f_texts = {
         'bullet-complex': '- Text',
+        'bullet-streamed': '\t- Text',
+        'bullet-streamed-multiline': '\t- Text\n\t- Text\n\t-\n Text',
         'bullet-indented': '\n    - Text',
         'numbered_lists-item': '\t1.',
         'numbered_lists-list': '\t1. Text\n\t2. Text',
