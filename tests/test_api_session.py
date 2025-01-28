@@ -32,15 +32,37 @@ class _OpenaiAPIResponseMessageObject:
     def __init__(self, text):
         self.content = text
 
-class _OpenaiAPIResponseTextObject:
+class _OpenaiAPIResponseChoiceObject:
     def __init__(self, text):
         self.message = _OpenaiAPIResponseMessageObject(text)
+        self.delta = _OpenaiAPIResponseMessageObject(text)
 
 class _OpenaiAPIResponseObject:
-    def __init__(self, text):
-        text_object = _OpenaiAPIResponseTextObject(text)
+    ''' Doubles as a 'chunk' object. '''
+    def __init__(self, text=''):
+        choice_object = _OpenaiAPIResponseChoiceObject(text)
 
-        self.choices = [text_object]
+        self.choices = [choice_object]
+
+        self.chunks = []
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.chunks:
+            return self.chunks.pop(0)
+        else:
+            raise StopIteration
+        
+    def create_chunks(self, text):
+        split_text = text.split('\n')
+        
+        for part in split_text:
+            part += '\n'
+            chunk = _OpenaiAPIResponseObject(part)
+
+            self.chunks.append(chunk)
 
 class TestOpenaiClient(unittest.TestCase):
     @classmethod
@@ -133,6 +155,21 @@ class TestOpenaiClient(unittest.TestCase):
             client.format_response()
             expected.append({"role": "assistant", "content": f"{message} response"})
             self.assertEqual(context, expected)
+
+    def test_update_context_streaming(self):
+        context = self.client.context
+        client = self.client
+
+        client.api_response = _OpenaiAPIResponseObject()
+        
+        full_text = "This is line 1\nThis is line 2\nThis is line 3"
+        client.api_response.create_chunks(full_text)
+
+        client.output_stream(format=True)
+
+        full_text += '\n'
+        expected = [client.create_message("assistant", full_text)]
+        self.assertEqual(context, expected)
 
 class TestGeminiFormatResponse(unittest.TestCase):
     ''' Test GeminiClient.format_response(). '''  
