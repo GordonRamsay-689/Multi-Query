@@ -51,7 +51,7 @@ class OpenaiClient:
         if sys_message:
             self.sys_message = self.create_message("system", sys_message)
         else:
-            self.sys_message = DEFAULT_SYS_MSG
+            self.sys_message = None
 
         self.current_sys_message = None
         self.context = []
@@ -132,12 +132,9 @@ class OpenaiClient:
 
 class GeminiClient:
     def __init__(self, client_id, sys_message):
-        if sys_message:
-            self.sys_message = sys_message
-        else:
-            self.sys_message = DEFAULT_SYS_MSG["content"]
-
         self.api = google.generativeai
+
+        self.sys_message = sys_message
         self.model = self.api.GenerativeModel(model_name=client_id, 
                                                 system_instruction=self.sys_message)
         self.chat = self.model.start_chat()

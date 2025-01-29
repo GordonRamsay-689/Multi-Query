@@ -76,7 +76,7 @@ class TestOpenaiClient(unittest.TestCase):
 
     def setUp(self):
         self.session.reset()
-        self.client.sys_message = DEFAULT_SYS_MSG
+        self.client.sys_message = None
         self.client.previous_sys_message = None
         self.client.context = []
 
@@ -144,7 +144,7 @@ class TestOpenaiClient(unittest.TestCase):
 
         messages = ["first", "second", "third", "fourth"]
 
-        expected = [DEFAULT_SYS_MSG]
+        expected = []
 
         for message in messages:
             client.set_query(f"{message} query")
