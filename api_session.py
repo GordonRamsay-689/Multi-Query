@@ -437,8 +437,11 @@ class TestClient:
     def stopped(self):
         self._stop_event.is_set()
         
+    def set_query(self, query):
+        self.query = query
+    
     def send_request(self):
-        self.api_response = f"Query recieved: {self.query}\nTest response: {TEST_RESPONSE}"
+        self.api_response = f'Query recieved:\n"{self.query}"\n\nTest response: \n"{TEST_RESPONSE}"'
         return True if self.api_response else False
     
     def format_response(self, text=None, format=True):
