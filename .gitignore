@@ -9,3 +9,4 @@ test.py
 gemini/
 tests/escape_codes.txt
 *.code-workspace
+.vscode/
