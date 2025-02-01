@@ -1,3 +1,7 @@
+# TODO: 
+# - Shared variables for non-unique regex patterns.
+# - Shared variables for non-unique regex replacements.
+
 import re
 import time
 import threading
@@ -31,7 +35,6 @@ def format_response(client, response):
         if part.startswith('```'):
             part = client.f_code_blocks(part)
         else:
-            pass # remove "    " quad whitespace from gflash 2.0
             part = client.f_numbered_lists(part)
             part = client.f_bold_text(part)
             part = client.f_italicized_text(part)
@@ -275,8 +278,9 @@ class GeminiClient:
         return response.replace("\n*", '\n\t-')
 
     def f_general(self, response):
-        # Odd unknown. Used for emphasis sometimes, doesn't seem to
-        return response.replace("**", '')
+        pass # remove "    " quad whitespace from gflash 2.0
+        response = response.replace("**", '') # Odd unknown. Used for emphasis sometimes, doesn't seem to
+        return response
 
 class GoogleClient:
     def __init__(self, client_id, sys_message):
