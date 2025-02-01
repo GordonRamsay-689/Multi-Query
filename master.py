@@ -324,7 +324,7 @@ class Master:
 
             if self.sessions:
                 with self.cli_lock:
-                    ui.c_out("Submitting requests...", isolate=True, indent=1)
+                    ui.c_out("Submitting requests...", isolate=True)
             else:
                 with self.cli_lock:
                     ui.c_out("No active sessions.", isolate=True, indent=1)
