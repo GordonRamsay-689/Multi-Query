@@ -22,6 +22,27 @@ except ModuleNotFoundError:
 ## Global constants
 from constants import * 
 
+def format_response(client, response):
+    parts = re.split(r'(```\S+.*?```)', response, flags=re.DOTALL)
+
+    result = []
+
+    for part in parts:
+        if part.startswith('```'):
+            part = client.f_code_blocks(part)
+        else:
+            pass # remove "    " quad whitespace from gflash 2.0
+            part = client.f_numbered_lists(part)
+            part = client.f_bold_text(part)
+            part = client.f_italicized_text(part)
+            part = client.f_header(part)
+            part = client.f_bullet(part)
+            part = client.f_general(part)
+        result.append(part)
+
+    response = ''.join(result)
+    return response 
+
 class Session:
     def __init__(self, client_id, sys_message=None):
         self.type = CLIENT_ID_TO_TYPE[client_id] 
@@ -126,9 +147,37 @@ class OpenaiClient:
             self.update_context(message)
 
         if format:
-            pass # Format response functions
+            response = format_response(self, response)
 
         self.response = response
+
+    def f_code_blocks(self, response):
+        pattern =  r'```(\S+)(.*?)```'
+        replacement = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
+        return re.sub(pattern, replacement, response, flags=re.DOTALL)
+
+    def f_numbered_lists(self, response):
+        return response 
+
+    def f_bold_text(self, response):
+        pattern = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
+        replacement = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
+        return re.sub(pattern, replacement, response)
+
+    def f_italicized_text(self, response):
+        pattern = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
+        replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
+        return re.sub(pattern, replacement, response)
+
+    def f_header(self, response):
+        return response
+    
+    def f_bullet(self, response):
+        return response
+
+    def f_general(self, response):
+        return response
+  
 
 class GeminiClient:
     def __init__(self, client_id, sys_message):
@@ -178,24 +227,7 @@ class GeminiClient:
         response = text if text else self.api_response.text
 
         if format:    
-            parts = re.split(r'(```\S+.*?```)', response, flags=re.DOTALL)
-    
-            result = []
-    
-            for part in parts:
-                if part.startswith('```'):
-                    part = self.f_code_blocks(part)
-                else:
-                    pass # remove "    " quad whitespace from gflash 2.0
-                    part = self.f_numbered_lists(part)
-                    part = self.f_bold_text(part)
-                    part = self.f_italicized_text(part)
-                    part = self.f_header(part)
-                    part = self.f_bullet(part)
-                    part = self.f_general(part)
-                result.append(part)
-
-            response = ''.join(result)
+            response = format_response(self, response)
         
         self.response = response
 
