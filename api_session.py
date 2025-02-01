@@ -7,7 +7,7 @@ import re
 import time
 import threading
 import ui
-
+import os
 ## Optional
 try:
     import googleapi.google
@@ -64,7 +64,7 @@ class Session:
             self.client = GeminiClient(client_id, sys_message)
         elif self.type == TYPE_GOOGLE:
             self.client = GoogleClient(client_id, sys_message)
-        elif self.type == TYPE_OPENAI:
+        elif self.type == TYPE_OPENAI or self.type == TYPE_DEEPSEEK:
             self.client = OpenaiClient(client_id, sys_message)
         elif self.type == TYPE_TEST:
             self.client = TestClient(client_id, sys_message)
@@ -78,7 +78,11 @@ class Session:
 class OpenaiClient:
     def __init__(self, client_id, sys_message):
         self.api = openai
-        self.model = openai.OpenAI()
+
+        if CLIENT_ID_TO_TYPE[client_id] == TYPE_DEEPSEEK:
+            self.model = openai.OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPEN_ROUTER_API"])   
+        else:
+            self.model = openai.OpenAI()
 
         self.stream_enabled = False
 
@@ -149,7 +153,7 @@ class OpenaiClient:
         if self.stream_enabled:
             return True
 
-        return True if self.api_response else False
+        return True if self.api_response.choices else False
 
     def format_response(self, text=None, format=True):
         if text:
@@ -193,7 +197,6 @@ class OpenaiClient:
     def f_general(self, response):
         return response
   
-
 class GeminiClient:
     def __init__(self, client_id, sys_message):
         self.api = google.generativeai

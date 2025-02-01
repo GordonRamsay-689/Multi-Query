@@ -47,6 +47,7 @@ class Master:
         self.configured_gemini = False
         self.configured_google = False
         self.configured_openai = False
+        self.configured_deepseek = False
 
         self.clients = []
         self.sessions = []
@@ -79,8 +80,14 @@ class Master:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
                                      color=DRED)
                         continue
-
-                    google.generativeai.configure(api_key=os.environ["GEMINI_API"])
+                    try:
+                        google.generativeai.configure(api_key=os.environ["GEMINI_API"])
+                    except KeyError:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
+                                    color=DRED)
+                        continue
                     self.configured_gemini = True
             
             elif client_type == TYPE_OPENAI:
@@ -93,6 +100,26 @@ class Master:
                         continue
                     
                     self.configured_openai = True
+
+            elif client_type == TYPE_DEEPSEEK:
+                if not self.configured_deepseek:
+                    if not openai_imported:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("Could not locate openai (necessary to use DeepSeek models), install with: ", 
+                                    color=DRED)
+                        continue
+                    
+                    try:
+                        os.environ["OPEN_ROUTER_API"]
+                    except KeyError:
+                        self.clients.remove(client_id)
+                        with self.cli_lock:
+                            ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPEN_ROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
+                                    color=DRED)
+                        continue
+
+                    self.configured_deepseek = True
 
             elif client_type == TYPE_GOOGLE:
                 if not self.configured_google:
