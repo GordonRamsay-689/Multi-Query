@@ -80,7 +80,7 @@ class OpenaiClient:
         self.api = openai
 
         if CLIENT_ID_TO_TYPE[client_id] == TYPE_DEEPSEEK:
-            self.model = openai.OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPEN_ROUTER_API"])   
+            self.model = openai.OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API"])   
         else:
             self.model = openai.OpenAI()
 

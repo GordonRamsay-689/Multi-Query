@@ -111,11 +111,11 @@ class Master:
                         continue
                     
                     try:
-                        os.environ["OPEN_ROUTER_API"]
+                        os.environ["OPENROUTER_API"]
                     except KeyError:
                         self.clients.remove(client_id)
                         with self.cli_lock:
-                            ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPEN_ROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
+                            ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPENROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
                                     color=DRED)
                         continue
 
