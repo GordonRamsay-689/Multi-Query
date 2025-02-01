@@ -1,4 +1,5 @@
 # TODO: 
+# - Remove \t from bullet list formatting
 # - Shared variables for non-unique regex patterns.
 # - Shared variables for non-unique regex replacements.
 
@@ -25,6 +26,15 @@ except ModuleNotFoundError:
 
 ## Global constants
 from constants import * 
+
+REGEX_MD_BOLD = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
+REGEX_MD_BOLD_SUB = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
+
+REGEX_MD_ITALIC = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
+REGEX_MD_ITALIC_SUB = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
+
+REGEX_MD_CODE_BLOCK = r'```(\S+)(.*?)```'
+REGEX_MD_CODE_BLOCK_SUB = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
 
 def format_response(client, response):
     parts = re.split(r'(```\S+.*?```)', response, flags=re.DOTALL)
@@ -155,25 +165,27 @@ class OpenaiClient:
         self.response = response
 
     def f_code_blocks(self, response):
-        pattern =  r'```(\S+)(.*?)```'
-        replacement = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
+        pattern =  REGEX_MD_CODE_BLOCK
+        replacement = REGEX_MD_CODE_BLOCK_SUB
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
     def f_numbered_lists(self, response):
         return response 
 
     def f_bold_text(self, response):
-        pattern = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
-        replacement = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
+        pattern = REGEX_MD_BOLD
+        replacement = REGEX_MD_BOLD_SUB
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        pattern = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
-        replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
+        pattern = REGEX_MD_ITALIC
+        replacement = REGEX_MD_ITALIC_SUB
         return re.sub(pattern, replacement, response)
 
     def f_header(self, response):
-        return response
+        pattern = r'### (.*?)\n'
+        replacement = r'\033[39;49;1m-- \1\033[22m\n'
+        return re.sub(pattern, replacement, response)
     
     def f_bullet(self, response):
         return response
@@ -235,8 +247,8 @@ class GeminiClient:
         self.response = response
 
     def f_code_blocks(self, response):
-        pattern =  r'```(\S+)(.*?)```'
-        replacement = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
+        pattern = REGEX_MD_CODE_BLOCK
+        replacement = REGEX_MD_CODE_BLOCK_SUB
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
     def f_numbered_lists(self, response):
@@ -251,13 +263,15 @@ class GeminiClient:
         return response 
 
     def f_bold_text(self, response):
-        pattern = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
-        replacement = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
+        pattern = REGEX_MD_BOLD
+        replacement = REGEX_MD_BOLD_SUB
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        pattern = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
-        replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
+        pass # write pattern for (rare) underscore enclosed italics
+
+        pattern = REGEX_MD_ITALIC
+        replacement = REGEX_MD_ITALIC_SUB
         return re.sub(pattern, replacement, response)
 
     def f_header(self, response):
