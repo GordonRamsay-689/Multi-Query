@@ -221,7 +221,7 @@ class GeminiClient:
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        pattern = r'(?!\*\s)\*(.+?\S)(?!\s\*)\*'
+        pattern = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
         replacement = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
         return re.sub(pattern, replacement, response)
 

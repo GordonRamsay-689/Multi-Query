@@ -348,7 +348,9 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
         'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
         'italicized_text-sentence': 'Hey *this is* italicized',
-        'italicized_text-sentence-with-asterisk': 'Hey *this is* also* italicized'
+        'italicized_text-sentence-with-asterisk': 'Hey *this is* also* italicized',
+        'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means *it can accept a variable number of positional arguments*.  These arguments are packed into a tuple named `*args` inside the function."
         }
     f_texts = {
         'bullet-complex': '- Text',
@@ -368,15 +370,15 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
         'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
         'italicized_text-sentence': 'Hey \033[39;49;3mthis is\033[23m italicized',
-        'italicized_text-sentence-with-asterisk': 'Hey \033[39;49;3mthis is\033[23m also* italicized'
+        'italicized_text-sentence-with-asterisk': 'Hey \033[39;49;3mthis is\033[23m also* italicized',
+        'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means \033[39;49;3mit can accept a variable number of positional arguments\033[23m.  These arguments are packed into a tuple named `*args` inside the function."
         }
 
     expected_failures = [
         ['f_bullet', 'numbered_lists-list'],
         ['f_bullet', 'bold_text-complex'],
         ['f_bold_text', 'bold_text-complex'], # AOI-1
-        ['f_italicized_text', 'simple_math-mult-C'],
-        ['f_italicized_text', 'bold_text-complex'],
         ['f_italicized_text', 'bold_text-simple']
         ]
 
