@@ -2,6 +2,9 @@ import threading
 import ui
 import time
 
+from openai import NotFoundError
+from google.api_core.exceptions import NotFound
+
 from constants import * ## Global constants
 
 class RequestHandler:
@@ -76,6 +79,13 @@ class Request:
     def main(self):
         try:
             successful_request = self.session.client.send_request()
+        except (NotFoundError, NotFound):
+            with self.parent.cli_lock:
+                ui.c_out("You do not have permission to use this model: ", color=DRED, endline='')
+                ui.c_out(f"{self.session.client.name}")
+                ui.c_out(f"You can remove it using --rm:{self.session.client.name} or try again.\n", color=DRED)
+                self.remove_from_requests()
+            return
         except Exception as e:
             pass # Log exception. 
             successful_request = False
