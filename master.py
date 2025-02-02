@@ -172,7 +172,7 @@ class Master:
 
         if not session:
             with self.cli_lock:
-                ui.c_out(f"No active session matches the alias provided ({alias}) with flag '--stream:'.", color=DRED)
+                ui.c_out(f"No active session matches the alias provided ({alias}) with flag '{STREAM_FLAG}'.", color=DRED)
             return
 
         if session.type in STREAM_SUPPORT:

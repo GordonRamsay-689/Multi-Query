@@ -289,6 +289,7 @@ class GeminiClient:
 
         response = response.replace("*   ", '- ') # New signature for flash 2.0
         
+        # Replace with regex ^\s
         response = response.replace("\n    *", '\n    -')
         response = response.replace("\n   *", '\n   -')
         response = response.replace("\t* ", '\t- ')
