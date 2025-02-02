@@ -24,6 +24,9 @@ SYSMSG_FLAG = '--sys:'
 VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG] 
 
 # Client IDs
+# Until o1 and o3-mini are available they have been commented out.
+# Use OpenAI.models.list() to view available clients.
+
 GOOGLE_ID = "google"
 GEMINI_FLASH_EXP_ID = "gemini-2.0-flash-exp"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
@@ -33,10 +36,10 @@ GPT_4_ID = "gpt-4"
 GPT_4_TURBO_ID = "gpt-4-turbo"
 GPT_4O_ID = "gpt-4o"
 GPT_4O_MINI_ID = "gpt-4o-mini"
-O1_ID = "o1"
+#O1_ID = "o1"
 O1_PREVIEW_ID = "o1-preview"
 O1_MINI_ID = "o1-mini"
-O3_MINI_ID = "o3-mini"
+#O3_MINI_ID = "o3-mini"
 DEEPSEEK_R1_FREE = "deepseek/deepseek-r1:free"
 
 TEST_ID = "test-client"
@@ -64,16 +67,16 @@ ALIAS_TO_CLIENT = {
     "4o": GPT_4O_ID,
     GPT_4O_MINI_ID: GPT_4O_MINI_ID,
     "mini": GPT_4O_MINI_ID,
-    O1_ID: O1_ID, # Verify functionality when fully launched by OpenAI
+    #O1_ID: O1_ID, 
     O1_PREVIEW_ID: O1_PREVIEW_ID,
     "o1p": O1_PREVIEW_ID,
     "o1preview": O1_PREVIEW_ID,
     O1_MINI_ID: O1_MINI_ID,
     "o1m": O1_MINI_ID,
     "o1mini": O1_MINI_ID,
-    O3_MINI_ID: O3_MINI_ID, # Verify functionality when fully launched by OpenAI
-    "o3m": O3_MINI_ID, # Verify functionality when fully launched by OpenAI
-    "o3mini": O3_MINI_ID, # Verify functionality when fully launched by OpenAI
+    #O3_MINI_ID: O3_MINI_ID, 
+    #"o3m": O3_MINI_ID, 
+    #"o3mini": O3_MINI_ID, 
     DEEPSEEK_R1_FREE: DEEPSEEK_R1_FREE,
     "r1": DEEPSEEK_R1_FREE,
     "deepseek": DEEPSEEK_R1_FREE,
@@ -103,8 +106,8 @@ CLIENT_ID_TO_TYPE = {
     GPT_4O_MINI_ID: TYPE_OPENAI,
     O1_PREVIEW_ID: TYPE_OPENAI,
     O1_MINI_ID: TYPE_OPENAI,
-    O1_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
-    O3_MINI_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
+    #O1_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
+    #O3_MINI_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
     DEEPSEEK_R1_FREE: TYPE_DEEPSEEK,
     TEST_ID: TYPE_TEST
 }
