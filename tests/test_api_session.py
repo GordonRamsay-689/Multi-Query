@@ -2,6 +2,7 @@ from init_tests import append_to_path
 append_to_path()
 import unittest
 import api_session
+import ui
 from constants import * 
 
 class TestSession(unittest.TestCase):
@@ -82,6 +83,12 @@ class TestOpenaiClient(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def test_header(self):
+        pre = '### Methods to Scroll Half a Page in VS Code:\nText'
+        expected =  '\033[39;49;1m-- Methods to Scroll Half a Page in VS Code:\033[22m\nText'
+        post = self.client.f_header(pre)
+        self.assertEqual(post, expected)
 
     def _create_message_and_compare(self, role, text, expected):
         message = self.client.create_message(role, text)
@@ -189,21 +196,20 @@ class TestGeminiFormatResponse(unittest.TestCase):
 * Salt to taste
 * Fresh cilantro, chopped (for garnish)'''
     f_bullet_list = '''
-\t- 1 cup red lentils, rinsed
-\t- 2 cups water or vegetable broth
-\t- 1 tbsp oil
-\t- 1 tsp ground cumin
-\t- 1 tsp ground coriander
-\t- ½ tsp turmeric powder
-\t- ½ tsp garam masala
-\t- ¼ tsp cayenne pepper (optional)
-\t- 1 small onion, chopped
-\t- 2 cloves garlic, minced
-\t- 1 inch ginger, grated
-\t- Salt to taste
-\t- Fresh cilantro, chopped (for garnish)'''
+- 1 cup red lentils, rinsed
+- 2 cups water or vegetable broth
+- 1 tbsp oil
+- 1 tsp ground cumin
+- 1 tsp ground coriander
+- ½ tsp turmeric powder
+- ½ tsp garam masala
+- ¼ tsp cayenne pepper (optional)
+- 1 small onion, chopped
+- 2 cloves garlic, minced
+- 1 inch ginger, grated
+- Salt to taste
+- Fresh cilantro, chopped (for garnish)'''
     
-
     indented_bullet_list = '''1. Test CMake Directly:
    * Install CMake independently of Homebrew (e.g., from the CMake website's official macOS distribution).  
    * Create a simple CMake project (e.g., `CMakeLists.txt` containing `cmake_minimum_required(VERSION 3.10) project(MyProject) add_executable(MyProject main.cpp)`, and `main.cpp` containing a basic "Hello, world!" program).
@@ -230,7 +236,10 @@ class TestGeminiFormatResponse(unittest.TestCase):
     def compare(self, pre, expected):
         ''' Compares output of function we are testing when 
         passed 'pre' with expected output '''
-        return self.assertEqual(self.func(pre), expected)
+        post = self.func(pre)
+        #print(repr(post))
+        #ui.c_out(post)
+        return self.assertEqual(post, expected)
 
     def test_format_response_indented_bullet_list(self):
         pre = self.indented_bullet_list
@@ -240,25 +249,25 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
     def test_format_response_bullet_item(self):
         pre = '\n* Large pot or Dutch oven'
-        expected = '\n\t- Large pot or Dutch oven'
+        expected = '\n- Large pot or Dutch oven'
 
         self.compare(pre, expected)
 
     def test_format_response_bullet_item_followed_by_boldened_text(self):
         pre = '\n* **Boldened Text** Unboldened text.'
-        expected = '\n\t- \033[39;49;1mBoldened Text\033[22m Unboldened text.'
+        expected = '\n- \033[39;49;1mBoldened Text\033[22m Unboldened text.'
 
         self.compare(pre, expected)
 
     def test_format_response_bullet_item_followed_by_boldened_italicized_text(self):
         pre = '\n* ***Boldened Italic.***'
-        expected = '\n\t- \033[39;49;1m\033[39;49;3mBoldened Italic.\033[22m\033[23m'
+        expected = '\n- \033[39;49;1m\033[39;49;3mBoldened Italic.\033[22m\033[23m'
 
         self.compare(pre, expected)
 
     def test_format_response_bullet_item_followed_by_boldened_text_and_asterisks(self):
         pre = '\n* * **Boldened NOT Italic.** *'
-        expected = '\n\t- * \033[39;49;1mBoldened NOT Italic.\033[22m *'
+        expected = '\n- * \033[39;49;1mBoldened NOT Italic.\033[22m *'
 
         self.compare(pre, expected)
 
@@ -276,7 +285,7 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
     def test_format_response_bullet_item_followed_by_asterisk(self):
         pre = '\n* Dial *555'
-        expected = '\n\t- Dial *555'
+        expected = '\n- Dial *555'
 
         self.compare(pre, expected)
    
@@ -327,20 +336,28 @@ class TestGeminiFormatResponse(unittest.TestCase):
 
         self.compare(pre, expected)
 
+    def test_format_response_boldened_italic_close(self):
+        pre = '***Hey***'
+        expected = '\033[39;49;1m\033[39;49;3mHey\033[22m\033[23m'
+
+        self.compare(pre, expected)
+
 class TestGeminiFormatHelperFunctions(unittest.TestCase):
     ''' Tests the formatting methods used by GeminiClient.format_response(). '''
     
     texts = {
         'bullet-complex': '* **Text',
         'bullet-streamed': '*\nText',
-        'bullet-streamed-multiline': '*\nText\n* Text\n*\n Text',
-        'bullet-indented': '\n    * Text',
+        'bullet-multiline': '* Text\n* Text',
+        'bullet-multiline-streamed': '*\nText\n*\nText',
+        'bullet-indented-tab': '\t* Text',
+        'bullet-indented-spaces': '\n    * Text',
         'numbered_lists-item': '**1.',
         'numbered_lists-list': '**1. Text\n**2. Text',
         'header-1': '\t# Header 1 #',
         'header-1-not': '\t # Header',
         'bold_text-simple': '**Text**',
-        'bold_text-complex': '** * Text * ***',
+        'bold_text-not': '** * Text ***',
         'simple_math-mult-A': '5 * 10 = 9',
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
@@ -354,15 +371,17 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         }
     f_texts = {
         'bullet-complex': '- Text',
-        'bullet-streamed': '\t- Text',
-        'bullet-streamed-multiline': '\t- Text\n\t- Text\n\t-\n Text',
-        'bullet-indented': '\n    - Text',
+        'bullet-streamed': '- Text',
+        'bullet-multiline': '- Text\n- Text',
+        'bullet-multiline-streamed': '- Text\n- Text',
+        'bullet-indented-spaces': '\n    - Text',
+        'bullet-indented-tab': '\t- Text',
         'numbered_lists-item': '\t1.',
         'numbered_lists-list': '\t1. Text\n\t2. Text',
         'header-1': '\t\t Header 1 #',
         'header-1-not': '\t # Header',
         'bold_text-simple': '\033[39;49;1mText\033[22m',
-        'bold_text-complex': '\033[39;49;1m* Text *\033[22m*',
+        'bold_text-not': '\033[39;49;1m * Text *\033[22m',
         'simple_math-mult-A': '5 * 10 = 9',
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
@@ -376,10 +395,8 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         }
 
     expected_failures = [
-        ['f_bullet', 'numbered_lists-list'],
-        ['f_bullet', 'bold_text-complex'],
-        ['f_bold_text', 'bold_text-complex'], # AOI-1
-        ['f_italicized_text', 'bold_text-simple']
+        ['f_bold_text', 'bold_text-not'],
+        ['f_italicized_text', 'bold_text-simple'],
         ]
 
     @classmethod

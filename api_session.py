@@ -281,19 +281,15 @@ class GeminiClient:
         return response.replace('\t#', '\t\t')
     
     def f_bullet(self, response):
-        response = response.replace("* **", '- ')
+        pattern = r'^\* \*\*'
+        replacement = r'- '
+        response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
 
-        # Streaming sometimes generates just the bullet and newline.
-        pattern = r'^\*\n'
-        response = re.sub(pattern, r"\t- ", response, re.MULTILINE)
-
-        response = response.replace("*   ", '- ') # New signature for flash 2.0
+        pattern = r'^(\s*)\*(\s)'
+        replacement = r'\1- '
+        response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
         
-        # Replace with regex ^\s
-        response = response.replace("\n    *", '\n    -')
-        response = response.replace("\n   *", '\n   -')
-        response = response.replace("\t* ", '\t- ')
-        return response.replace("\n*", '\n\t-')
+        return response
 
     def f_general(self, response):
         pass # remove "    " quad whitespace from gflash 2.0
