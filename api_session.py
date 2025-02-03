@@ -260,7 +260,7 @@ class GeminiClient:
         response = re.sub(pattern, replacement, response)
 
         pattern = r'\*\*(\d)'
-        replacement = r'\t\1' 
+        replacement = r'\1' 
         response = re.sub(pattern, replacement, response)
 
         return response 

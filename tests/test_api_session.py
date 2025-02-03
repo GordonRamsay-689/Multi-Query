@@ -303,8 +303,8 @@ class TestGeminiFormatResponse(unittest.TestCase):
         self.compare(pre, expected)
 
     def test_format_response_code_block_containing_numbered_list(self):
-        pre = "```python\n**1. Item\n```\n **2."
-        expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n \t2."
+        pre = "```python\n**1. Item\n```\n**2."
+        expected = "\tpython: - - - - -\n**1. Item\n\t- - - - - - - - - -\n2."
 
         self.compare(pre, expected)
 
@@ -376,8 +376,8 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'bullet-multiline-streamed': '- Text\n- Text',
         'bullet-indented-spaces': '\n    - Text',
         'bullet-indented-tab': '\t- Text',
-        'numbered_lists-item': '\t1.',
-        'numbered_lists-list': '\t1. Text\n\t2. Text',
+        'numbered_lists-item': '1.',
+        'numbered_lists-list': '1. Text\n2. Text',
         'header-1': '\t\t Header 1 #',
         'header-1-not': '\t # Header',
         'bold_text-simple': '\033[39;49;1mText\033[22m',
