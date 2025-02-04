@@ -36,6 +36,9 @@ REGEX_MD_ITALIC_SUB = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
 REGEX_MD_CODE_BLOCK = r'```(\S+)(.*?)```'
 REGEX_MD_CODE_BLOCK_SUB = r'\t\1: - - - - -\2\t- - - - - - - - - -' # tab, language name, separator, code, tab, separator
 
+REGEX_MD_BULLET_POINT = r'^(\s*)\*(\s)'
+REGEX_MD_BULLET_POINT_SUB = r'\1- '
+
 def format_response(client, response):
     parts = re.split(r'(```\S+.*?```)', response, flags=re.DOTALL)
 
@@ -192,6 +195,11 @@ class OpenaiClient:
         return re.sub(pattern, replacement, response)
     
     def f_bullet(self, response):
+        # May be redundant, have not seen a response that uses MD bullet points yet
+        # but I have not tested all of the models either.
+        pattern = REGEX_MD_BULLET_POINT 
+        replacement = REGEX_MD_BULLET_POINT_SUB
+        response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
         return response
 
     def f_general(self, response):
@@ -255,7 +263,7 @@ class GeminiClient:
         return re.sub(pattern, replacement, response, flags=re.DOTALL)
 
     def f_numbered_lists(self, response):
-        pattern = r'\*\*(\d)\s\s\s\s' # New signature for flash 2.0
+        pattern = r'\*\*(\d)    ' # New signature for flash 2.0
         replacement = r'\t\1 ' 
         response = re.sub(pattern, replacement, response)
 
@@ -285,15 +293,15 @@ class GeminiClient:
         replacement = r'- '
         response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
 
-        pattern = r'^(\s*)\*(\s)'
-        replacement = r'\1- '
+        pattern = REGEX_MD_BULLET_POINT 
+        replacement = REGEX_MD_BULLET_POINT_SUB
         response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
         
         return response
 
     def f_general(self, response):
-        pass # remove "    " quad whitespace from gflash 2.0
-        response = response.replace("**", '') # Odd unknown. Used for emphasis sometimes, doesn't seem to
+        pass # remove "    " quad whitespace from gflash 2.0 (if necessary)
+        response = response.replace("**", '') # Odd unknown. Used for emphasis sometimes, doesn't seem to do anything else
         return response
 
 class GoogleClient:
