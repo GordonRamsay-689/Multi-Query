@@ -372,17 +372,17 @@ def display_aliases():
 
 def execute_commands(commands, master):
     for command in commands:
-        if command == '-help':
+        if command == HELP_COMMAND:
             ui.c_out(CLI_HELP)
             sys.exit()
-        elif command == '-aliases':
+        elif command == ALIASES_COMMAND:
             display_aliases()
             sys.exit()
-        elif command == '-c':
+        elif command == CHAT_COMMAND:
             master.persistent_chat = True
-        elif command == '-s':
+        elif command == STREAM_COMMAND:
             master.stream_enabled = True
-        elif command == '-noformat':
+        elif command == NOFORMAT_COMMAND:
             master.format = False
 
 
@@ -406,14 +406,14 @@ def parse_arguments(args):
 
         if arg.startswith('-'):
             if arg in VALID_COMMANDS:
-                if arg == "-sys":
+                if arg == SYS_COMMAND:
                     try:
                         sys_message = args.pop(0)
                     except IndexError:
-                        fatal_error("No sys message provided after arg -sys.")
+                        fatal_error(f"No sys message provided after arg {SYS_COMMAND}.")
 
                     if sys_message in VALID_COMMANDS or sys_message in ALIAS_TO_CLIENT.keys():
-                        fatal_error("No sys message provided after arg -sys.")
+                        fatal_error(f"No sys message provided after arg {SYS_COMMAND}.")
                 else:
                     commands.append(arg)
             else:

@@ -11,8 +11,14 @@ RED = 52
 DRED = 1
 LRED = 196
 
-# Valid Commands
-VALID_COMMANDS = ["-c", "-help", "-aliases", "-s", "-sys", "-noformat"] 
+# Commands
+CHAT_COMMAND = '-c'
+HELP_COMMAND = '-help'
+ALIASES_COMMAND = '-aliases'
+STREAM_COMMAND = '-s'
+SYS_COMMAND = '-sys'
+NOFORMAT_COMMAND = '-noformat'
+VALID_COMMANDS = [CHAT_COMMAND, HELP_COMMAND, ALIASES_COMMAND, STREAM_COMMAND, SYS_COMMAND, NOFORMAT_COMMAND] 
 
 # Flags (during runtime, not args)
 # Flags include ':' to avoid conflating with flags the user may search for
@@ -115,10 +121,10 @@ CLIENT_ID_TO_TYPE = {
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
 Example Usage: 
-msearch "query" -command client
+search "query" -command client
 
 For more details:
-msearch -help'''
+search {HELP_COMMAND}'''
 
 CLI_HELP = f'''\
 Set enviroment variables in bash, sh or zsh with the following command:
@@ -137,19 +143,17 @@ will be assumed that you wish to start a persistent chat with selected
 clients.
 
 - To select a specific client use it's name or an alias as an argument.
-For a full list of aliases use the command '-aliases'.
+For a full list of aliases use the command '{ALIASES_COMMAND}'.
 
 If no client is provided the script will default to gemini-flash-1.5
     
 - Commands are prepended with '-'
 
 Some valid commands are:
-    'c' // Starts a persistent chat session with all clients.
-    'setup' // Update api keys.
-    'aliases' // Full list of aliases
+    '{CHAT_COMMAND}' // Starts a persistent chat session with all clients.
+    '{ALIASES_COMMAND}' // Full list of aliases
 
-msearch is a suggested enviroment alias, replace with python3 master.py
-if running directly from script directory.
+search is a suggested enviroment alias for running the script.
 '''
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
