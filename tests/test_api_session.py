@@ -362,11 +362,14 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
         'simple_math-mult-C': '5*10*3 = 9',
+        'italicized_text-one-char': 'The number *e*, approximately',
+        'italicized_text-asterisks': ' *** ',
         'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
         'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
         'italicized_text-sentence': 'Hey *this is* italicized',
         'italicized_text-sentence-with-asterisk': 'Hey *this is* also* italicized',
         'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-italicized-asterisk-inside-word': "**args* text '*args'.",
         'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means *it can accept a variable number of positional arguments*.  These arguments are packed into a tuple named `*args` inside the function."
         }
     f_texts = {
@@ -386,11 +389,14 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
         'simple_math-mult-B': '5*10 = 9',
         'simple_math-mult-B': '5*10 * 3 = 9',
         'simple_math-mult-C': '5*10*3 = 9',
+        'italicized_text-one-char': 'The number \033[39;49;3me\033[23m, approximately',
+        'italicized_text-asterisks': ' *** ',
         'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
         'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
         'italicized_text-sentence': 'Hey \033[39;49;3mthis is\033[23m italicized',
         'italicized_text-sentence-with-asterisk': 'Hey \033[39;49;3mthis is\033[23m also* italicized',
         'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-italicized-asterisk-inside-word': "*\033[39;49;3margs\033[23m text '*args'.",
         'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means \033[39;49;3mit can accept a variable number of positional arguments\033[23m.  These arguments are packed into a tuple named `*args` inside the function."
         }
 

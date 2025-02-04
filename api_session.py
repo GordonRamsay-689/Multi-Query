@@ -30,7 +30,7 @@ from constants import *
 REGEX_MD_BOLD = r'(?!\*\*\s)\*\*(.+?\S)(?!\s\*\*)\*\*'
 REGEX_MD_BOLD_SUB = r'\033[39;49;1m\1\033[22m' # ANSI: bold, \1, ANSI: reset
 
-REGEX_MD_ITALIC = r'(?!\*\s)\*([^*]+\S)\*(?![a-zA-Z0-9]+)'
+REGEX_MD_ITALIC = r'(?!\*\s)\*([^*]*?[^*\s}])\*(?![a-zA-Z0-9]+)'
 REGEX_MD_ITALIC_SUB = r'\033[39;49;3m\1\033[23m' # ANSI: italic, \1, ANSI: reset
 
 REGEX_MD_CODE_BLOCK = r'```(\S+)(.*?)```'
