@@ -134,15 +134,11 @@ class Master:
                     self.configured_google = True
                 
     def populate_clients(self, aliases):
-        while True:
-            for alias in aliases:
-                client_id = ALIAS_TO_CLIENT[alias]
+        for alias in aliases:
+            client_id = ALIAS_TO_CLIENT[alias]
 
-                if client_id not in self.clients:
-                    self.clients.append(client_id)
-            
-            if self.clients:
-                return
+            if client_id not in self.clients:
+                self.clients.append(client_id)
             
     def init_sessions(self, sys_message):
         for client_id in self.clients:
@@ -384,7 +380,6 @@ def execute_commands(commands, master):
             master.stream_enabled = True
         elif command == NOFORMAT_COMMAND:
             master.format = False
-
 
 def parse_arguments(args):
     commands = []
