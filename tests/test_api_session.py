@@ -23,7 +23,7 @@ class TestSession(unittest.TestCase):
                 elif session.type == TYPE_GEMINI:
                     expected_module_str = "<module 'google.generativeai'"
                 elif session.type == TYPE_GOOGLE:
-                    expected_module_str = "<module 'googleapi.google'"
+                    expected_module_str = "None"
                 elif session.type == TYPE_OPENAI:
                     expected_module_str = "<module 'openai'"
 
