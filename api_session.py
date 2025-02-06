@@ -8,12 +8,8 @@ import time
 import threading
 import ui
 import os
-## Optional
-try:
-    import googleapi.google
-except ModuleNotFoundError:
-    pass
 
+## Optional
 try:
     import google.generativeai
 except ModuleNotFoundError:
@@ -305,8 +301,9 @@ class GeminiClient:
         return response
 
 class GoogleClient:
+    # No longer supported
     def __init__(self, client_id, sys_message):
-        self.api = googleapi.google
+        self.api = None # googleapi.google
 
         self._stop_event = threading.Event()
 

@@ -14,12 +14,6 @@ except ModuleNotFoundError:
     google_generativeai_imported = False
 
 try:
-    import googleapi
-    googleapi_imported = True
-except ModuleNotFoundError:
-    googleapi_imported = False
-
-try:
     import openai
     openai_imported = True
 except ModuleNotFoundError:
@@ -45,7 +39,6 @@ class Master:
         self.handler = request_handler.RequestHandler(self.cli_lock, self)
 
         self.configured_gemini = False
-        self.configured_google = False
         self.configured_openai = False
         self.configured_deepseek = False
 
@@ -124,16 +117,16 @@ class Master:
                     self.configured_deepseek = True
 
             elif client_type == TYPE_GOOGLE:
-                if not self.configured_google:
-                    if not googleapi_imported:
-                        with self.cli_lock:
-                            ui.c_out("Could not locate googleapi, install with: ", 
-                                    color=DRED)
-                        self.remove_client(client_id)
-                        continue
-
-                    pass # Does not need to configure, just checks for import
-                    self.configured_google = True
+                with self.cli_lock:
+                    ui.c_out(f"Currently unsupported: ", 
+                            color=DRED, 
+                            endline='', 
+                            top_margin=True)
+                    ui.c_out(f"googleapi", 
+                             bottom_margin=True)
+                    
+                self.remove_client(client_id)
+                continue
                 
     def populate_clients(self, aliases):
         for alias in aliases:
@@ -219,7 +212,10 @@ class Master:
             self.clients.remove(client_id)
 
             with self.cli_lock:
-                ui.c_out(f"Removed {client_id} from active session", color=LBLUE)
+                ui.c_out(f"Removed {client_id} from active sessions", color=LBLUE)
+        else:
+            with self.cli_lock:
+                ui.c_out(f"{client_id} not an active session", color=DRED)
 
     def add_client(self, alias, sys_message):
         try:
@@ -236,7 +232,7 @@ class Master:
             self.sessions.append(session)
 
             with self.cli_lock:
-                ui.c_out(f"Added {session.client.name} to active session", color=LBLUE)
+                ui.c_out(f"Added {session.client.name} to active sessions", color=LBLUE)
             
             self.configure_clients() # If unable to configure, informs user and removes self
 
