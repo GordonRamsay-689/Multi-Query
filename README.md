@@ -1,22 +1,22 @@
 <h1>Multi-Search</h1>
 
-_Work in progress for personal use, use at your own discretion. Feel free to modify any way you like._
+This is a simple script that lets you query LLMs (Gemini, OpenAI, DeepSeek-R1) directly from the terminal, neatly displaying the results. You can query several models/engines at the same time, responses being printed as they are received. 
 
-This is a simple script that lets you search Google and query LLMs (Gemini, OpenAI) directly from the terminal, neatly displaying the results. You can query several models/engines at the same time, responses being printed as they are received.
+Multi-line queries, chat sessions and pasted content is supported. 
 
-Persistent chat sessions have now been added, as well as an input function that allows for multi-line queries 
-and pasted content (if no more than three newline chars **in sequence** inside the pasted content). 
+*In the past searching Google was possible as well, but the required API has stopped functioning. It will be repaired in the future if maintaining it is not unreasonably tasking.*
 
 **Disclaimers:** 
-- Google Search will sometimes fail to return responses, if you are using a VPN try disabling it. 
+- Google Search will currently not return responses.
 - Different shells handle pasting a bit differently, most seem to cap pasted content at around 4000 characters.
+- Pasting content with more than three sequential newline characters will send that content immediately.
 - There is currently no way to load conversations from previous sessions, but this will be implemented in the future.
 
 ### Prerequisites
-- Python 3.12.3 or later (tested on macOS. Linux compatibility is unconfirmed)
+- Python 3.12.3 or later
 
 Optional:
-- Google-Search-API by abenassi 
+- Google-Search-API by abenassi (currently not working)
 - Gemini API by Google
 - OpenAI API by OpenAI
 

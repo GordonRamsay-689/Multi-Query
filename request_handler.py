@@ -52,7 +52,9 @@ class RequestHandler:
                 self.stop_threads()
 
                 with self.cli_lock:
-                    ui.c_out("Requests timed out.", color=DRED, isolate=True)
+                    ui.c_out("Requests timed out.",
+                             color=DRED,
+                             isolate=True)
                 
                 return
 
@@ -81,10 +83,15 @@ class Request:
             successful_request = self.session.client.send_request()
         except (NotFoundError, NotFound):
             with self.parent.cli_lock:
-                ui.c_out("You do not have permission to use this model: ", color=DRED, endline='')
+                ui.c_out("You do not have permission to use this model: ", 
+                         color=DRED, 
+                         endline='')
                 ui.c_out(f"{self.session.client.name}")
-                ui.c_out(f"You can remove it using --rm:{self.session.client.name} or try again.\n", color=DRED)
-                self.remove_from_requests()
+                ui.c_out(f"You can remove it using --rm:{self.session.client.name} or try again.\n", 
+                         color=DRED,
+                         bottom_margin=True)
+                
+            self.remove_from_requests()
             return
         except Exception as e:
             pass # Log exception. 
@@ -92,12 +99,18 @@ class Request:
 
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.parent.cli_lock:
-                ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
+                ui.c_out(f"Client: {self.session.client.name}", 
+                         bottom_margin=True)
+                
                 try:
                     self.session.client.output_stream(self.master.format)
-                    ui.c_out("End of stream.", separator=True)
+                    ui.c_out("End of stream.",
+                             separator=True)
                 except TypeError:
-                    ui.c_out("Failed to stream response.", isolate=True, color=DRED, separator=True)
+                    ui.c_out("Failed to stream response.", 
+                             isolate=True, 
+                             color=DRED,
+                             separator=True)
                 
             self.remove_from_requests()
             return
@@ -105,8 +118,10 @@ class Request:
         if not successful_request:
             if not self.stopped():
                 with self.parent.cli_lock:
-                    ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
-                    ui.c_out("Failed to receive response.", separator=True)
+                    ui.c_out(f"Client: {self.session.client.name}",
+                             bottom_margin=True)
+                    ui.c_out("Failed to receive response.",
+                             separator=True)
         
             self.remove_from_requests()
             return
@@ -115,7 +130,9 @@ class Request:
 
         if not self.stopped():
             with self.parent.cli_lock:
-                ui.c_out(f"Client: {self.session.client.name}", bottom_margin=True)
-                ui.c_out(self.session.client.response, separator=True)
+                ui.c_out(f"Client: {self.session.client.name}",
+                         bottom_margin=True)
+                ui.c_out(self.session.client.response,
+                         separator=True)
         
         self.remove_from_requests()

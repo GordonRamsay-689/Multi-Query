@@ -14,12 +14,6 @@ except ModuleNotFoundError:
     google_generativeai_imported = False
 
 try:
-    import googleapi
-    googleapi_imported = True
-except ModuleNotFoundError:
-    googleapi_imported = False
-
-try:
     import openai
     openai_imported = True
 except ModuleNotFoundError:
@@ -45,7 +39,6 @@ class Master:
         self.handler = request_handler.RequestHandler(self.cli_lock, self)
 
         self.configured_gemini = False
-        self.configured_google = False
         self.configured_openai = False
         self.configured_deepseek = False
 
@@ -75,28 +68,36 @@ class Master:
             if client_type == TYPE_GEMINI:
                 if not self.configured_gemini:
                     if not google_generativeai_imported:
-                        self.clients.remove(client_id)
                         with self.cli_lock:
-                            ui.c_out("Could not locate google.generativeai, install with: ", 
-                                     color=DRED)
+                            ui.c_out("Could not locate google.generativeai.", 
+                                     color=DRED,
+                                     isolate=True)
+                        
+                        self.remove_client(client_id)
                         continue
+
                     try:
                         google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     except KeyError:
-                        self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
-                                    color=DRED)
+                                    color=DRED,
+                                    isolate=True)
+                            
+                        self.remove_client(client_id)
                         continue
+
                     self.configured_gemini = True
             
             elif client_type == TYPE_OPENAI:
                 if not self.configured_openai:
                     if not openai_imported:
-                        self.clients.remove(client_id)
                         with self.cli_lock:
-                            ui.c_out("Could not locate openai, install with: ", 
-                                    color=DRED)
+                            ui.c_out("Could not locate openai.", 
+                                    color=DRED,
+                                    isolate=True)
+                            
+                        self.remove_client(client_id)
                         continue
                     
                     self.configured_openai = True
@@ -104,34 +105,38 @@ class Master:
             elif client_type == TYPE_DEEPSEEK:
                 if not self.configured_deepseek:
                     if not openai_imported:
-                        self.clients.remove(client_id)
                         with self.cli_lock:
-                            ui.c_out("Could not locate openai (necessary to use DeepSeek models), install with: ", 
-                                    color=DRED)
+                            ui.c_out("Could not locate openai (necessary to use DeepSeek models).", 
+                                    color=DRED,
+                                    isolate=True)
+                            
+                        self.remove_client(client_id)
                         continue
                     
                     try:
                         os.environ["OPENROUTER_API"]
                     except KeyError:
-                        self.clients.remove(client_id)
                         with self.cli_lock:
                             ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPENROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
-                                    color=DRED)
+                                    color=DRED,
+                                    isolate=True)
+                            
+                        self.remove_client(client_id)
                         continue
 
                     self.configured_deepseek = True
 
             elif client_type == TYPE_GOOGLE:
-                if not self.configured_google:
-                    if not googleapi_imported:
-                        self.clients.remove(client_id)
-                        with self.cli_lock:
-                            ui.c_out("Could not locate googleapi, install with: ", 
-                                    color=DRED)
-                        continue
-
-                    pass # Does not need to configure, just checks for import
-                    self.configured_google = True
+                with self.cli_lock:
+                    ui.c_out(f"Currently unsupported: ", 
+                            color=DRED, 
+                            endline='', 
+                            top_margin=True)
+                    ui.c_out(f"googleapi", 
+                             bottom_margin=True)
+                    
+                self.remove_client(client_id)
+                continue
                 
     def populate_clients(self, aliases):
         for alias in aliases:
@@ -154,25 +159,31 @@ class Master:
     def alias_to_session(self, alias):
         if alias not in ALIAS_TO_CLIENT.keys():
             with self.cli_lock:
-                ui.c_out(f"Invalid alias provided: {alias}", color=DRED)
+                ui.c_out(f"Invalid alias provided: {alias}", 
+                         color=DRED,
+                         isolate=True)
+                
             return False
         
         for session in self.sessions:
             if session.client.name == ALIAS_TO_CLIENT[alias]:
                 return session  
         
-        return False
+        return ALIAS_TO_CLIENT[alias]
 
     def toggle_stream(self, alias):
         session = self.alias_to_session(alias)
 
-        if not session:
+        if not session or isinstance(session, str):
             with self.cli_lock:
-                ui.c_out(f"No active session matches the alias provided ({alias}) with flag '{STREAM_FLAG}'.", color=DRED)
+                ui.c_out(f"No active session matches the alias provided ('{alias}') with flag '{STREAM_FLAG}'.", 
+                         color=DRED,
+                         isolate=True)
+                
             return
 
         if session.type in STREAM_SUPPORT:
-            if self.active_stream and not session.client.stream_enabled:
+            if self.active_stream and not session.client.stream_enabled: # Disable stream for all other sessions.
                 self.stream_enabled = False
                 self.active_stream = False
 
@@ -181,7 +192,9 @@ class Master:
                         s.client.stream_enabled = False
                 
                         with self.cli_lock:
-                            ui.c_out(f"Stream disabled for {s.client.name}", color=LBLUE)
+                            ui.c_out(f"Stream disabled for {s.client.name}", 
+                                     color=LBLUE,
+                                     isolate=True)
 
             session.client.stream_enabled = not self.active_stream
             self.stream_enabled = not self.active_stream
@@ -190,10 +203,14 @@ class Master:
             state = "enabled" if self.active_stream else "disabled"
 
             with self.cli_lock:
-                ui.c_out(f"Stream {state} for {session.client.name}", color=LBLUE)
+                ui.c_out(f"Stream {state} for {session.client.name}", 
+                         color=LBLUE,
+                         isolate=True)
         else:
             with self.cli_lock:
-                ui.c_out(f"{session.client.name} does not support streamed responses.", color=DRED)
+                ui.c_out(f"{session.client.name} does not support streamed responses.", 
+                         color=DRED,
+                         isolate=True)
 
     def remove_client(self, alias):
         session = self.alias_to_session(alias)
@@ -201,9 +218,9 @@ class Master:
         if not session:
             return
 
-        if session.client.name in self.clients:
-            self.clients.remove(session.client.name)
-
+        if isinstance(session, str):
+            client_id = session
+        else:
             if self.active_stream and session.client.name in STREAM_SUPPORT:
                 if session.client.stream_enabled:
                     self.active_stream = False
@@ -211,15 +228,29 @@ class Master:
 
             self.sessions.remove(session)
             
+            client_id = session.client.name
+
+        if client_id in self.clients:
+            self.clients.remove(client_id)
+
             with self.cli_lock:
-                ui.c_out(f"Removed {session.client.name} from active session", color=LBLUE)
+                ui.c_out(f"Removed {client_id} from active sessions", 
+                         color=LBLUE,
+                         isolate=True)
+        else:
+            with self.cli_lock:
+                ui.c_out(f"{client_id} not an active session", 
+                         color=DRED,
+                         isolate=True)
 
     def add_client(self, alias, sys_message):
         try:
             client_id = ALIAS_TO_CLIENT[alias]
         except KeyError:
             with self.cli_lock:
-                ui.c_out(f"Invalid alias provided: {alias}", color=DRED)
+                ui.c_out(f"Invalid alias provided: {alias}",
+                         color=DRED,
+                         isolate=True)
             return
 
         if client_id not in self.clients:
@@ -229,7 +260,9 @@ class Master:
             self.sessions.append(session)
 
             with self.cli_lock:
-                ui.c_out(f"Added {session.client.name} to active session", color=LBLUE)
+                ui.c_out(f"Added {session.client.name} to active sessions",
+                         color=LBLUE,
+                         isolate=True)
             
             self.configure_clients() # If unable to configure, informs user and removes self
 
@@ -262,7 +295,8 @@ class Master:
                         if len(matches) > 1:
                             with self.cli_lock:
                                 ui.c_out("You can only provide one system message at a time. \nUsing first message provided.",
-                                        color=DRED)
+                                        color=DRED,
+                                        isolate=True)
                         break
 
             query = re.sub(pattern, '', query)
@@ -313,17 +347,19 @@ class Master:
 
                 with self.cli_lock:
                     ui.c_out(f"Active clients: {self.clients}")
-
+                
                 self.get_query()
                 self.extract_flags(flags)
                 self.execute_flags(flags)
 
             if self.sessions:
                 with self.cli_lock:
-                    ui.c_out("Submitting requests...", isolate=True)
+                    ui.c_out("Submitting requests...",
+                             isolate=True)
             else:
                 with self.cli_lock:
-                    ui.c_out("No active sessions.", isolate=True, indent=1)
+                    ui.c_out("No active sessions.",
+                             isolate=True)
             
             self.handler.submit_requests(self.query)
             self.handler.monitor_requests()
@@ -334,8 +370,11 @@ class Master:
                 sys.exit()
 
 def fatal_error(error_message):
-    ui.c_out("Error: ", color=DRED, endline=False)
-    ui.c_out(f"{error_message}", indent=1)
+    ui.c_out("Error: ",
+             color=DRED,
+             endline=False)
+    ui.c_out(f"{error_message}",
+             indent=1)
     sys.exit()
 
 def select_aliases():
@@ -356,12 +395,18 @@ def select_aliases():
 def display_aliases():
     l = max([len(key) for key in ALIAS_TO_CLIENT.keys()])
 
-    ui.c_out(f"{"Alias":^{l}}   {"Client":^{l}}", top_margin=True, indent=1)
-    ui.c_out("-"*(3+l*2), indent=1)
+    ui.c_out(f"{"Alias":^{l}}   {"Client":^{l}}",
+             top_margin=True,
+             indent=1)
+    ui.c_out("-"*(3+l*2),
+             indent=1)
 
     for alias in sorted(ALIAS_TO_CLIENT.keys()):
-        ui.c_out(f"{alias:{l}}", indent=1, endline=False)
-        ui.c_out(" > ", endline=False)
+        ui.c_out(f"{alias:{l}}",
+                 indent=1,
+                 endline=False)
+        ui.c_out(" > ",
+                 endline=False)
         ui.c_out(ALIAS_TO_CLIENT[alias])
     
     ui.c_out("")
