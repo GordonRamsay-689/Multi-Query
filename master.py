@@ -308,12 +308,12 @@ class Master:
 
     def main(self):
         while True:
-            with self.cli_lock:
-                ui.c_out(f"Active clients: {self.clients}")
-
-            flags = self.init_flags_dict()
-
             while not self.query:
+                flags = self.init_flags_dict()
+
+                with self.cli_lock:
+                    ui.c_out(f"Active clients: {self.clients}")
+                
                 self.get_query()
                 self.extract_flags(flags)
                 self.execute_flags(flags)
