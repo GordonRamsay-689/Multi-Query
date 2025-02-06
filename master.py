@@ -75,7 +75,7 @@ class Master:
             if client_type == TYPE_GEMINI:
                 if not self.configured_gemini:
                     if not google_generativeai_imported:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
                                      color=DRED)
@@ -83,7 +83,7 @@ class Master:
                     try:
                         google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     except KeyError:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
                                     color=DRED)
@@ -93,7 +93,7 @@ class Master:
             elif client_type == TYPE_OPENAI:
                 if not self.configured_openai:
                     if not openai_imported:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate openai, install with: ", 
                                     color=DRED)
@@ -104,7 +104,7 @@ class Master:
             elif client_type == TYPE_DEEPSEEK:
                 if not self.configured_deepseek:
                     if not openai_imported:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate openai (necessary to use DeepSeek models), install with: ", 
                                     color=DRED)
@@ -113,7 +113,7 @@ class Master:
                     try:
                         os.environ["OPENROUTER_API"]
                     except KeyError:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPENROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
                                     color=DRED)
@@ -124,7 +124,7 @@ class Master:
             elif client_type == TYPE_GOOGLE:
                 if not self.configured_google:
                     if not googleapi_imported:
-                        self.clients.remove(client_id)
+                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
                                     color=DRED)
@@ -161,12 +161,12 @@ class Master:
             if session.client.name == ALIAS_TO_CLIENT[alias]:
                 return session  
         
-        return False
+        return ALIAS_TO_CLIENT[alias]
 
     def toggle_stream(self, alias):
         session = self.alias_to_session(alias)
 
-        if not session:
+        if not session or isinstance(session, str):
             with self.cli_lock:
                 ui.c_out(f"No active session matches the alias provided ({alias}) with flag '{STREAM_FLAG}'.", color=DRED)
             return
@@ -201,9 +201,9 @@ class Master:
         if not session:
             return
 
-        if session.client.name in self.clients:
-            self.clients.remove(session.client.name)
-
+        if isinstance(session, str):
+            client_id = session
+        else:
             if self.active_stream and session.client.name in STREAM_SUPPORT:
                 if session.client.stream_enabled:
                     self.active_stream = False
@@ -211,8 +211,13 @@ class Master:
 
             self.sessions.remove(session)
             
+            client_id = session.client.name
+
+        if client_id in self.clients:
+            self.clients.remove(client_id)
+
             with self.cli_lock:
-                ui.c_out(f"Removed {session.client.name} from active session", color=LBLUE)
+                ui.c_out(f"Removed {client_id} from active session", color=LBLUE)
 
     def add_client(self, alias, sys_message):
         try:
