@@ -75,28 +75,30 @@ class Master:
             if client_type == TYPE_GEMINI:
                 if not self.configured_gemini:
                     if not google_generativeai_imported:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate google.generativeai, install with: ", 
                                      color=DRED)
+                        self.remove_client(client_id)
                         continue
+
                     try:
                         google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     except KeyError:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
                                     color=DRED)
+                        self.remove_client(client_id)
                         continue
+
                     self.configured_gemini = True
             
             elif client_type == TYPE_OPENAI:
                 if not self.configured_openai:
                     if not openai_imported:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate openai, install with: ", 
                                     color=DRED)
+                        self.remove_client(client_id)
                         continue
                     
                     self.configured_openai = True
@@ -104,19 +106,19 @@ class Master:
             elif client_type == TYPE_DEEPSEEK:
                 if not self.configured_deepseek:
                     if not openai_imported:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate openai (necessary to use DeepSeek models), install with: ", 
                                     color=DRED)
+                        self.remove_client(client_id)
                         continue
                     
                     try:
                         os.environ["OPENROUTER_API"]
                     except KeyError:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPENROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
                                     color=DRED)
+                        self.remove_client(client_id)
                         continue
 
                     self.configured_deepseek = True
@@ -124,10 +126,10 @@ class Master:
             elif client_type == TYPE_GOOGLE:
                 if not self.configured_google:
                     if not googleapi_imported:
-                        self.remove_client(client_id)
                         with self.cli_lock:
                             ui.c_out("Could not locate googleapi, install with: ", 
                                     color=DRED)
+                        self.remove_client(client_id)
                         continue
 
                     pass # Does not need to configure, just checks for import
