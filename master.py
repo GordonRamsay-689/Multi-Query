@@ -212,6 +212,21 @@ class Master:
                          color=DRED,
                          isolate=True)
 
+    def clear(self):
+        with self.cli_lock:
+            ui.c_out("Reinitializing all sessions...", 
+                     color=LBLUE,
+                     isolate=True)
+            
+        clients = []
+        while self.clients:
+            client_id = self.clients.pop(0)
+            self.remove_client(client_id)
+            clients.append(client_id)
+
+        for client_id in clients:
+            self.add_client(client_id, None)
+
     def remove_client(self, alias):
         session = self.alias_to_session(alias)
 
@@ -278,13 +293,18 @@ class Master:
         patterns[STREAM_FLAG] = rf"{STREAM_FLAG}(\S+)"
         patterns[DISPLAY_FLAG] = DISPLAY_FLAG
         patterns[SYSMSG_FLAG] = rf'{SYSMSG_FLAG}"(.*?)"'
+        patterns[CLEAR_FLAG] = CLEAR_FLAG
 
         for flag in patterns:
             pattern = patterns[flag]
             
+            # Display and clear flag handled first as they do not have any options
             if flag == DISPLAY_FLAG:
                 if DISPLAY_FLAG in query:
                     flags[DISPLAY_FLAG] = True
+            elif flag == CLEAR_FLAG:
+                if CLEAR_FLAG in query:
+                    flags[CLEAR_FLAG] = True
             else:
                 matches = re.findall(pattern, query)
 
@@ -304,6 +324,9 @@ class Master:
         self.query = query
 
     def execute_flags(self, flags):
+        if flags[CLEAR_FLAG]:
+            self.clear()
+
         if flags[DISPLAY_FLAG]:
             with self.cli_lock:
                 display_aliases()

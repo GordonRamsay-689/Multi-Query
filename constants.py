@@ -27,7 +27,8 @@ REMOVE_FLAG = '--rm:'
 STREAM_FLAG = '--stream:'
 DISPLAY_FLAG = '--aliases:'
 SYSMSG_FLAG = '--sys:'
-VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG] 
+CLEAR_FLAG = '--clear:'
+VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CLEAR_FLAG] 
 
 # Client IDs
 # Until o1 and o3-mini are available they have been commented out.
