@@ -1,7 +1,5 @@
 # TODO: 
-# - Remove \t from bullet list formatting
-# - Shared variables for non-unique regex patterns.
-# - Shared variables for non-unique regex replacements.
+# f_header for BOTH
 
 import re
 import time
