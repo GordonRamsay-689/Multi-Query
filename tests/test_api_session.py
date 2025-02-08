@@ -1,3 +1,7 @@
+# Todo:
+# - Change TestGeminiFormatResponse to simply TestFormatResponse
+# - Add Openai test f_header
+
 from init_tests import append_to_path
 append_to_path()
 import unittest
@@ -178,7 +182,38 @@ class TestOpenaiClient(unittest.TestCase):
         expected = [client.create_message("assistant", full_text)]
         self.assertEqual(context, expected)
 
+class TestFormatResponse(unittest.TestCase):
+
+    texts = {"code_block_containing_boldened_text": "```python\n**boldened**\n```**boldened**"}
+    f_texts = {"code_block_containing_boldened_text": "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m"}
+
+    def func(self, pre):
+        ''' The function we are testing. Returns relevant modified variable '''
+        self.format_response(text=pre)
+        return self.session.client.response
+
+    def compare(self, pre, expected):
+        ''' Compares output of function we are testing when 
+        passed 'pre' with expected output '''
+        post = self.func(pre)
+        return self.assertEqual(post, expected)
+
+    def test_format_response(self):
+        clients = [GPT_4_ID, GEMINI_FLASH_ID]
+
+        for client_id in clients:
+            self.session = api_session.Session(client_id)
+            self.format_response = self.session.client.format_response
+            for key in self.texts:
+               with self.subTest(client_id=client_id, key=key):
+                   pre = self.texts[key]
+                   expected = self.f_texts[key]
+
+                   self.compare(pre, expected)
+    
+# REWRITE AS GENERAL TEST FOR api_session.format_response() (results should not be client specific)
 class TestGeminiFormatResponse(unittest.TestCase):
+
     ''' Test GeminiClient.format_response(). '''  
 
     bullet_list = '''
@@ -453,6 +488,108 @@ class TestGeminiFormatHelperFunctions(unittest.TestCase):
 
     def test_f_header(self):
         function_name = 'f_header'
+
+        self.run_tests(function_name)
+
+    def test_f_bold_text(self):
+        function_name = 'f_bold_text'
+
+        self.run_tests(function_name)
+    
+    def test_f_italicized_text(self):
+        function_name = 'f_italicized_text'
+        
+        self.run_tests(function_name)
+
+class TestOpenaiFormatHelperFunctions(unittest.TestCase):
+    texts = {
+        'bullet-streamed': '*\nText',
+        'bullet-multiline': '* Text\n* Text',
+        'bullet-multiline-streamed': '*\nText\n*\nText',
+        'bullet-indented-tab': '\t* Text',
+        'bullet-indented-spaces': '\n    * Text',
+        'bold_text-simple': '**Text**',
+        'bold_text-not': '** * Text ***',
+        'simple_math-mult-A': '5 * 10 = 9',
+        'simple_math-mult-B': '5*10 = 9',
+        'simple_math-mult-B': '5*10 * 3 = 9',
+        'simple_math-mult-C': '5*10*3 = 9',
+        'italicized_text-one-char': 'The number *e*, approximately',
+        'italicized_text-asterisks': ' *** ',
+        'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
+        'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
+        'italicized_text-sentence': 'Hey *this is* italicized',
+        'italicized_text-sentence-with-asterisk': 'Hey *this is* also* italicized',
+        'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-italicized-asterisk-inside-word': "**args* text '*args'.",
+        'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means *it can accept a variable number of positional arguments*.  These arguments are packed into a tuple named `*args` inside the function."
+        }
+    f_texts = {
+        'bullet-streamed': '- Text',
+        'bullet-multiline': '- Text\n- Text',
+        'bullet-multiline-streamed': '- Text\n- Text',
+        'bullet-indented-spaces': '\n    - Text',
+        'bullet-indented-tab': '\t- Text',
+        'bold_text-simple': '\033[39;49;1mText\033[22m',
+        'bold_text-not': '\033[39;49;1m * Text *\033[22m',
+        'simple_math-mult-A': '5 * 10 = 9',
+        'simple_math-mult-B': '5*10 = 9',
+        'simple_math-mult-B': '5*10 * 3 = 9',
+        'simple_math-mult-C': '5*10*3 = 9',
+        'italicized_text-one-char': 'The number \033[39;49;3me\033[23m, approximately',
+        'italicized_text-asterisks': ' *** ',
+        'italicized_text-sentence-with-asterisks': 'Hey * this is not * italicized',
+        'italicized_text-sentence-with-asterisks-B': 'Hey *this is not * italicized',
+        'italicized_text-sentence': 'Hey \033[39;49;3mthis is\033[23m italicized',
+        'italicized_text-sentence-with-asterisk': 'Hey \033[39;49;3mthis is\033[23m also* italicized',
+        'italicized_text-asterisk-inside-word': "'*args' text '*args'.",
+        'italicized_text-italicized-asterisk-inside-word': "*\033[39;49;3margs\033[23m text '*args'.",
+        'italicized_text-asterisk-in-word-sentence': "`*args`: The `*args` syntax in your `calculate` function definition means \033[39;49;3mit can accept a variable number of positional arguments\033[23m.  These arguments are packed into a tuple named `*args` inside the function."
+        }
+
+    expected_failures = [
+        ['f_bold_text', 'bold_text-not'],
+        ['f_italicized_text', 'bold_text-simple']
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.session = api_session.Session(GPT_4_ID)
+        cls.format_response = cls.session.client.format_response
+
+    @classmethod
+    def tearDownClass(cls):
+        del cls.session
+
+    def run_tests(self, function_name):
+        func = getattr(self.session.client, function_name)
+
+        for key in self.texts:
+            with self.subTest(key=key):
+                expected = self.get_expected(function_name, key)
+                pre = self.texts[key]
+
+                post = func(pre)
+
+                pair = [function_name, key]
+                
+                if pair in self.expected_failures:
+                    self.assertNotEqual(post, expected)
+                else:
+                    self.assertEqual(post, expected)
+
+    def get_expected(self, function_name, current):
+        ''' Returns expected output for each function name. '''
+
+        function_name = function_name.strip('f_')
+
+        if current.startswith(function_name):
+            return self.f_texts[current]
+        else:
+            return self.texts[current]
+
+    def test_f_bullet(self):
+        function_name = 'f_bullet'
 
         self.run_tests(function_name)
 
