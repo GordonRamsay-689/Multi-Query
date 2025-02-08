@@ -7,16 +7,17 @@ Multi-line queries, chat sessions and pasted content is supported.
 *In the past searching Google was possible as well, but the required API has stopped functioning. It will be repaired in the future if maintaining it is not unreasonably tasking.*
 
 **Disclaimers:** 
-- Google Search will currently not return responses.
 - Different shells handle pasting a bit differently, most seem to cap pasted content at around 4000 characters.
 - Pasting content with more than three sequential newline characters will send that content immediately.
 - There is currently no way to load conversations from previous sessions, but this will be implemented in the future.
+
+- Currently, Google Search is unsupported as the API it relied on has stopped working. I am looking into alternatives, or the viability of fixing
+the original API. The code for Google Search (GoogleClient) has not been completely removed, but it is not possible to initiate a Google session.
 
 ### Prerequisites
 - Python 3.12.3 or later
 
 Optional:
-- Google-Search-API by abenassi (currently not working)
 - Gemini API by Google
 - OpenAI API by OpenAI
 
@@ -42,17 +43,6 @@ Install at least one of the following libraries (you only need the ones you plan
 
 2. Create a project and generate and API key at https://platform.openai.com/docs/api-reference/authentication. You may need to provide payment information and purchase tokens at least once.
 
-<h3>Google Web Search</h3>
-
-1. Install [Google Search API](https://github.com/abenassi/Google-Search-API):
-```
-    pip3 install git+https://github.com/abenassi/Google-Search-API
-```
-
-2. After installing googleapi you need to patch it, as it no longer works out of the box.
-3. Navigate to python site-packages, on MacOS default location is ```/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/```
-4. Replace ```../site-packages/googleapi/modules/standard_search.py``` with ```multi_search/for_googleapi/standard_search.py```, provided in this repo.
-
 <h2>Usage</h2>
 
 If using any of the APIs, export your API keys as environment variables. For bash, sh, zsh:
@@ -63,7 +53,7 @@ If using any of the APIs, export your API keys as environment variables. For bas
 
 Running the script with no arguments will prompt you for necessary information, but providing information as arguments is often more efficient.
 
-If you start a persistent chat session (default if no query is provided) an interface which allows for multi-line input is presented. To send a message, enter three newline characters in a row (press enter four times). Pasted content is supported as long as it does not include three sequential newline characters, which is unusual.
+If you start a chat session (default if no query is provided) an interface which allows for multi-line input is presented. To send a message, enter three newline characters in a row (press enter four times). Pasted content is supported as long as it does not include three sequential newline characters, which is unusual.
 
 I recommend setting an environment alias for easy access: 
 ```
@@ -142,7 +132,6 @@ gemini | gemini-1.5-flash
 gflash | gemini-1.5-flash
 gpro | gemini-1.5-pro
 gexp, gflash2 | gemini-2.0-flash-exp
-google | google
 turbo3.5 | gpt-3.5-turbo
 gpt4 | gpt-4
 turbo | gpt-4-turbo

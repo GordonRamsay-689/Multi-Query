@@ -34,7 +34,7 @@ VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CL
 # Until o1 and o3-mini are available they have been commented out.
 # Use OpenAI.models.list() to view available clients.
 
-GOOGLE_ID = "google"
+GOOGLE_ID = "google" # Unsupported
 GEMINI_FLASH_EXP_ID = "gemini-2.0-flash-exp"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
 GEMINI_PRO_ID = "gemini-1.5-pro"
