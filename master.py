@@ -489,7 +489,7 @@ def parse_arguments(args):
     return query, commands, client_aliases, sys_message
 
 if __name__ == '__main__':
-    script_dir = get_script_dir()
+    script_dir = get_script_dir() # Currently not in use. For logging/chat history
 
     master = Master()
 
