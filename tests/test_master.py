@@ -61,6 +61,7 @@ class TestParseArgs(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # Potentially move inside test_parse_arguments()
         cls.arg_pairs = {
         "no_args": [
                 [''], {'query': '',
@@ -72,11 +73,11 @@ class TestParseArgs(unittest.TestCase):
         }
 
     def test_parse_arguments(self):
-        for key, item in self.arg_pairs.items():
+        for case, item in self.arg_pairs.items():
             args = item[0]
             expected = item[1]
 
-            with self.subTest(args=args, expected=expected):
+            with self.subTest(case=case, args=args, expected=expected):
                 self.compare(args, expected)
 
     def compare(self, args, expected):
