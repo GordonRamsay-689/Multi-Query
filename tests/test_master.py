@@ -73,9 +73,9 @@ class TestParseArgs(unittest.TestCase):
         }
 
     def test_parse_arguments(self):
-        for case, item in self.arg_pairs.items():
-            args = item[0]
-            expected = item[1]
+        for case, pair in self.arg_pairs.items():
+            args = pair[0]
+            expected = pair[1]
 
             with self.subTest(case=case, args=args, expected=expected):
                 self.compare(args, expected)
