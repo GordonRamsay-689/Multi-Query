@@ -10,3 +10,4 @@ gemini/
 tests/escape_codes.txt
 *.code-workspace
 .vscode/
+_*.*
