@@ -56,7 +56,13 @@ class TestConfigure(unittest.TestCase):
 class TestParseArgs(unittest.TestCase):
     ''' Test Master.parse_args(). 
     
-    e_x = expected_x
+    Each item in cls.arg_pairs dict contains a list 
+    of arguments (equivalent to sys.argv[1:]) and a
+    dict containing the expected values for each value
+    returned by Master.parse_arguments().
+
+    The list is passed to Master.parse_arguments() and 
+    the return values are compared to the expected values.
     '''
 
     @classmethod
