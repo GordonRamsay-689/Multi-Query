@@ -484,7 +484,7 @@ def parse_arguments(args):
         elif arg.lower() in ALIAS_TO_CLIENT.keys():
             client_aliases.append(arg)
         else:
-            fatal_error(f"Unknown command: {arg}")
+            fatal_error(f"Unknown argument: {arg}")
 
     return query, commands, client_aliases, sys_message
 
