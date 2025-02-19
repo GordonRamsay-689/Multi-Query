@@ -39,15 +39,27 @@ def format_response(client, response):
     result = []
 
     for part in parts:
-        if part.startswith('```'):
+        sub_result = []
+        if part.startswith('```') and part[-3:] == '```':
             part = client.f_code_blocks(part)
-        else:
-            part = client.f_numbered_lists(part)
-            part = client.f_bold_text(part)
-            part = client.f_italicized_text(part)
-            part = client.f_header(part)
-            part = client.f_bullet(part)
-            part = client.f_general(part)
+        else:   
+            part = re.split(r'(`[^\`\n]+`)', part)
+
+            for sub_part in part:
+                if sub_part.startswith('`') and sub_part[-1] == '`':
+                    pass
+                else:
+                    sub_part = client.f_numbered_lists(sub_part)
+                    sub_part = client.f_bold_text(sub_part)
+                    sub_part = client.f_italicized_text(sub_part)
+                    sub_part = client.f_header(sub_part)
+                    sub_part = client.f_bullet(sub_part)
+                    sub_part = client.f_general(sub_part)
+
+                sub_result.append(sub_part)
+        
+            part = ''.join(sub_result)
+        
         result.append(part)
 
     response = ''.join(result)
