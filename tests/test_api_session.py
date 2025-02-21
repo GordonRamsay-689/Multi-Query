@@ -184,19 +184,35 @@ class TestOpenaiClient(unittest.TestCase):
 
 class TestFormatResponse(unittest.TestCase):
 
-    texts = {"code_block_containing_boldened_text": "```python\n**boldened**\n```**boldened**"}
-    f_texts = {"code_block_containing_boldened_text": "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m"}
+    texts = {"code_block_containing_boldened_text": "```python\n**boldened**\n```**boldened**",
+             "inline_code_single": "text`**not bold**` text",
+             "inline_code_multiple": "text`**not bold**` text `*not italic*`",
+             "inline_code_multi_line_single": "text `text \n**bold**`",
+             "inline_code_multi_line_multiple": "text `code \n**bold**`\n`**notbold**`"
+             }
+    f_texts = {"code_block_containing_boldened_text": "\tpython: - - - - -\n**boldened**\n\t- - - - - - - - - -\033[39;49;1mboldened\033[22m",
+                "inline_code_single": "text`**not bold**` text",
+                "inline_code_multiple": "text`**not bold**` text `*not italic*`",
+                "inline_code_multi_line_single": "text `text \n\033[39;49;1mbold\033[22m`",
+                "inline_code_multi_line_multiple": "text `code \n\033[39;49;1mbold\033[22m`\n`**notbold**`"
+               }
+
+    expected_failures = []
 
     def func(self, pre):
         ''' The function we are testing. Returns relevant modified variable '''
         self.format_response(text=pre)
         return self.session.client.response
 
-    def compare(self, pre, expected):
-        ''' Compares output of function we are testing when 
-        passed 'pre' with expected output '''
+    def compare(self, pre, expected, key): 
+        ''' Assers equality if key is not in self.expected_failures else inequality. '''
+
         post = self.func(pre)
-        return self.assertEqual(post, expected)
+
+        if key in self.expected_failures:
+            self.assertNotEqual(post, expected)
+        else:
+            self.assertEqual(post, expected)
 
     def test_format_response(self):
         clients = [GPT_4_ID, GEMINI_FLASH_ID]
@@ -206,10 +222,10 @@ class TestFormatResponse(unittest.TestCase):
             self.format_response = self.session.client.format_response
             for key in self.texts:
                with self.subTest(client_id=client_id, key=key):
-                   pre = self.texts[key]
-                   expected = self.f_texts[key]
+                    pre = self.texts[key]
+                    expected = self.f_texts[key]
 
-                   self.compare(pre, expected)
+                    self.compare(pre, expected, key)
     
 # REWRITE AS GENERAL TEST FOR api_session.format_response() (results should not be client specific)
 class TestGeminiFormatResponse(unittest.TestCase):
