@@ -11,3 +11,4 @@ tests/escape_codes.txt
 *.code-workspace
 .vscode/
 _*.*
+Debug-*
