@@ -230,7 +230,7 @@ class Master:
     def remove_client(self, alias):
         session = self.alias_to_session(alias)
 
-        if not session:
+        if not session: # User is informed of invalid alias by self.alias_to_session
             return
 
         if isinstance(session, str):
