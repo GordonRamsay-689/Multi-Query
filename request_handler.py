@@ -2,8 +2,15 @@ import threading
 import ui
 import time
 
-from openai import NotFoundError
-from google.api_core.exceptions import NotFound
+try:
+    from openai import NotFoundError
+except ModuleNotFoundError:
+    pass
+
+try:
+    from google.api_core.exceptions import NotFound
+except ModuleNotFoundError:
+    pass
 
 from constants import * ## Global constants
 

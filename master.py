@@ -271,15 +271,16 @@ class Master:
         if client_id not in self.clients:
             self.clients.append(client_id)
 
-            session = api_session.Session(client_id, sys_message=sys_message)
-            self.sessions.append(session)
-
             with self.cli_lock:
-                ui.c_out(f"Added {session.client.name} to active sessions",
+                ui.c_out(f"Adding {client_id} to active sessions..",
                          color=LBLUE,
                          isolate=True)
             
-            self.configure_clients() # If unable to configure, informs user and removes self
+            self.configure_clients() # If unable to configure, informs user and removes client_id from self.clients
+
+            if client_id in self.clients:
+                session = api_session.Session(client_id, sys_message=sys_message)
+                self.sessions.append(session)
 
     def extract_flags(self, flags): # split into functions, lots of repetition here
         if not self.query:
