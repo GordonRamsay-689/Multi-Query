@@ -338,7 +338,10 @@ class Master:
                 display_aliases()
 
         for match in flags[REMOVE_FLAG]:
-            self.remove_client(match)
+            if match == "all":
+                self.remove_all_clients()
+            else:
+                self.remove_client(match)
 
         sys_message = flags[SYSMSG_FLAG][0] if flags[SYSMSG_FLAG] else None
 
