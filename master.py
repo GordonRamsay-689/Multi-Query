@@ -200,8 +200,7 @@ class Master:
                 
                         with self.cli_lock:
                             ui.c_out(f"Stream disabled for {s.client.name}", 
-                                     color=LBLUE,
-                                     isolate=True)
+                                     color=LBLUE)
 
             session.client.stream_enabled = not self.active_stream
             self.stream_enabled = not self.active_stream
@@ -225,14 +224,16 @@ class Master:
                      color=LBLUE,
                      isolate=True)
             
-        clients = []
-        while self.clients:
-            client_id = self.clients.pop(0)
-            self.remove_client(client_id)
-            clients.append(client_id)
+        clients = self.clients.copy()
+
+        self.remove_all_clients()
 
         for client_id in clients:
             self.add_client(client_id, None)
+
+    def remove_all_clients(self):
+        for client_id in self.clients.copy():
+            self.remove_client(client_id)
 
     def remove_client(self, alias):
         session = self.alias_to_session(alias)
@@ -257,13 +258,11 @@ class Master:
 
             with self.cli_lock:
                 ui.c_out(f"Removed {client_id} from active sessions", 
-                         color=LBLUE,
-                         isolate=True)
+                         color=LBLUE)
         else:
             with self.cli_lock:
                 ui.c_out(f"{client_id} not an active session", 
-                         color=DRED,
-                         isolate=True)
+                         color=DRED)
 
     def add_client(self, alias, sys_message):
         try:
@@ -280,8 +279,7 @@ class Master:
 
             with self.cli_lock:
                 ui.c_out(f"Adding {client_id} to active sessions..",
-                         color=LBLUE,
-                         isolate=True)
+                         color=LBLUE)
             
             self.configure_clients() # If unable to configure, informs user and removes client_id from self.clients
 
