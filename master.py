@@ -80,7 +80,7 @@ class Master:
                         google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     except KeyError:
                         with self.cli_lock:
-                            ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
+                            ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\nPlease set an environment variable containing your Gemini api key in order to use Gemini models.", 
                                     color=DRED,
                                     isolate=True)
                             
