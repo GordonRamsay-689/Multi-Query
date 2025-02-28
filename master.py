@@ -62,7 +62,7 @@ class Master:
         self.handler.sessions = self.sessions
 
     def configure_clients(self):
-        for client_id in self.clients:
+        for client_id in self.clients.copy():
             client_type = CLIENT_ID_TO_TYPE[client_id]
 
             if client_type == TYPE_GEMINI:
