@@ -61,71 +61,78 @@ class Master:
         self.init_sessions(sys_message)
         self.handler.sessions = self.sessions
 
+    def api_key_exists(self, type, client_id):
+        if type == TYPE_OPENAI:
+            name = "OpenAI"
+            key = "OPENAI_API_KEY"
+        elif type == TYPE_GEMINI:
+            name = "Gemini"
+            key = "GEMINI_API"
+        elif type == TYPE_DEEPSEEK:
+            name = "OpenRouter"
+            key = "OPENROUTER_API"
+
+        try:
+            os.environ[key]
+        except KeyError:
+            with self.cli_lock:
+                ui.c_out(f"No {name} API key found when trying to acces environment variable '{key}'.\nPlease set an environment variable with 'export {key}=YOUR_KEY' in order to use {name} models.", 
+                        color=DRED,
+                        isolate=True)
+            self.remove_client(client_id)
+            
+            return False    
+        return True
+
+    def is_imported(self, type, client_id):
+        if type == TYPE_OPENAI:
+            imported = openai_imported
+            module = "openai"
+        elif type == TYPE_GEMINI:
+            imported = google_generativeai_imported
+            module = "google.generativeai"
+        elif type == TYPE_DEEPSEEK:
+            imported = openai_imported
+            module = "openai"
+        
+        if not imported:
+            with self.cli_lock:
+                ui.c_out(f"Could not locate module '{module}'.", 
+                            color=DRED,
+                            isolate=True)
+            
+            self.remove_client(client_id)
+            return False
+        return True
+
     def configure_clients(self):
         for client_id in self.clients.copy():
             client_type = CLIENT_ID_TO_TYPE[client_id]
 
+            args = (client_type, client_id)
+
             if client_type == TYPE_GEMINI:
                 if not self.configured_gemini:
-                    if not google_generativeai_imported:
-                        with self.cli_lock:
-                            ui.c_out("Could not locate google.generativeai.", 
-                                     color=DRED,
-                                     isolate=True)
-                        
-                        self.remove_client(client_id)
-                        continue
 
-                    try:
-                        google.generativeai.configure(api_key=os.environ["GEMINI_API"])
-                    except KeyError:
-                        with self.cli_lock:
-                            ui.c_out("No Gemini API key found when trying to acces environment variable 'GEMINI_API'.\n Please set an environment variable containing your Gemini api key in order to use Gemini models.", 
-                                    color=DRED,
-                                    isolate=True)
-                            
-                        self.remove_client(client_id)
+                    if not self.is_imported(*args) or not self.api_key_exists(*args):
                         continue
-
+                
+                    google.generativeai.configure(api_key=os.environ["GEMINI_API"])
                     self.configured_gemini = True
-            
             elif client_type == TYPE_OPENAI:
                 if not self.configured_openai:
-                    if not openai_imported:
-                        with self.cli_lock:
-                            ui.c_out("Could not locate openai.", 
-                                    color=DRED,
-                                    isolate=True)
-                            
-                        self.remove_client(client_id)
-                        continue
-                    
-                    self.configured_openai = True
 
+                    if not self.is_imported(*args) or not self.api_key_exists(*args):
+                        continue
+
+                    self.configured_openai = True
             elif client_type == TYPE_DEEPSEEK:
                 if not self.configured_deepseek:
-                    if not openai_imported:
-                        with self.cli_lock:
-                            ui.c_out("Could not locate openai (necessary to use DeepSeek models).", 
-                                    color=DRED,
-                                    isolate=True)
-                            
-                        self.remove_client(client_id)
-                        continue
                     
-                    try:
-                        os.environ["OPENROUTER_API"]
-                    except KeyError:
-                        with self.cli_lock:
-                            ui.c_out("No OpenRouter API key found when trying to acces environment variable 'OPENROUTER_API'.\nPlease set an environment variable containing your OpenRouter DeepSeek API key in order to use DeepSeek models.", 
-                                    color=DRED,
-                                    isolate=True)
-                            
-                        self.remove_client(client_id)
+                    if not self.is_imported(*args) or not self.api_key_exists(*args):
                         continue
 
                     self.configured_deepseek = True
-
             elif client_type == TYPE_GOOGLE:
                 with self.cli_lock:
                     ui.c_out(f"Currently unsupported: ", 
@@ -193,8 +200,7 @@ class Master:
                 
                         with self.cli_lock:
                             ui.c_out(f"Stream disabled for {s.client.name}", 
-                                     color=LBLUE,
-                                     isolate=True)
+                                     color=LBLUE)
 
             session.client.stream_enabled = not self.active_stream
             self.stream_enabled = not self.active_stream
@@ -218,14 +224,16 @@ class Master:
                      color=LBLUE,
                      isolate=True)
             
-        clients = []
-        while self.clients:
-            client_id = self.clients.pop(0)
-            self.remove_client(client_id)
-            clients.append(client_id)
+        clients = self.clients.copy()
+
+        self.remove_all_clients()
 
         for client_id in clients:
             self.add_client(client_id, None)
+
+    def remove_all_clients(self):
+        for client_id in self.clients.copy():
+            self.remove_client(client_id)
 
     def remove_client(self, alias):
         session = self.alias_to_session(alias)
@@ -250,13 +258,11 @@ class Master:
 
             with self.cli_lock:
                 ui.c_out(f"Removed {client_id} from active sessions", 
-                         color=LBLUE,
-                         isolate=True)
+                         color=LBLUE)
         else:
             with self.cli_lock:
                 ui.c_out(f"{client_id} not an active session", 
-                         color=DRED,
-                         isolate=True)
+                         color=DRED)
 
     def add_client(self, alias, sys_message):
         try:
@@ -273,8 +279,7 @@ class Master:
 
             with self.cli_lock:
                 ui.c_out(f"Adding {client_id} to active sessions..",
-                         color=LBLUE,
-                         isolate=True)
+                         color=LBLUE)
             
             self.configure_clients() # If unable to configure, informs user and removes client_id from self.clients
 
@@ -333,7 +338,10 @@ class Master:
                 display_aliases()
 
         for match in flags[REMOVE_FLAG]:
-            self.remove_client(match)
+            if match == "all":
+                self.remove_all_clients()
+            else:
+                self.remove_client(match)
 
         sys_message = flags[SYSMSG_FLAG][0] if flags[SYSMSG_FLAG] else None
 
@@ -391,7 +399,7 @@ class Master:
             if self.persistent_chat:
                 self.reset()
             else:
-                sys.exit()
+                sys.exit() 
 
 def fatal_error(error_message):
     ui.c_out("Error: ",
