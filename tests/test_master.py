@@ -59,8 +59,26 @@ class TestConfigure(unittest.TestCase):
         self.assertEqual(False, self.master.configured_openai)
         self.assertEqual(False, self.master.configured_deepseek)
         
+    @patch('os.environ', {})
     def test_configure_clients_no_api_key_google_generativeai(self):
-        pass
+        self.master.clients = [GEMINI_FLASH_ID]
+
+        self.master.configure_clients()
+        self.assertCountEqual(self.master.clients, [])
+
+    @patch('os.environ', {})
+    def test_configure_clients_no_api_key_openai(self):
+        self.master.clients = [GPT_4_ID]
+
+        self.master.configure_clients()
+        self.assertCountEqual(self.master.clients, [])
+
+    @patch('os.environ', {})
+    def test_configure_clients_no_api_key_deepseek(self):
+        self.master.clients = [DEEPSEEK_R1_FREE]
+
+        self.master.configure_clients()
+        self.assertCountEqual(self.master.clients, [])
 
     def test_populate_clients(self):
         with self.subTest(n=0, aliases=[]):
