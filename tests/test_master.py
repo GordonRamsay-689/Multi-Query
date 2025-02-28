@@ -1,8 +1,10 @@
 from init_tests import append_to_path
 append_to_path()
+
 import unittest
+from unittest.mock import patch
+
 import io
-import os
 import sys
 
 import master
@@ -40,22 +42,80 @@ class TestConfigure(unittest.TestCase):
     def tearDown(self):
         del self.master
 
-    def test_configure(self):
-        # subtest with different combination of args
-        pass # aliases_to_test = [[], []]
-        pass # sys_messages_to_test = ['']
-        pass # for aliases in aliases_to_test:
-        pass #  for sys_message in sys_messages_to_test
-        # idk maybe a lot of unnecessary tests this way..
+    @patch('master.google_generativeai_imported', False)
+    def test_configure_clients_google_generativeai_not_imported(self):
+        self.master.clients = [GEMINI_FLASH_ID]
 
-    def test_configure_clients(self):
-        pass # probably goes here AND in TestMain.
+        self.master.configure_clients()
+        self.assertCountEqual([], self.master.clients)
+        self.assertEqual(False, self.master.configured_gemini)
+
+    @patch('master.openai_imported', False)
+    def test_configure_clients_openai_not_imported(self):
+        self.master.clients = [GPT_4O_MINI_ID, DEEPSEEK_R1_FREE]
+
+        self.master.configure_clients()
+        self.assertCountEqual([], self.master.clients)
+        self.assertEqual(False, self.master.configured_openai)
+        self.assertEqual(False, self.master.configured_deepseek)
+        
+    def test_configure_clients_no_api_key_google_generativeai(self):
+        pass
 
     def test_populate_clients(self):
-        pass
+        with self.subTest(n=0, aliases=[]):
+            self.master.populate_clients([])
+            self.assertCountEqual([], self.master.clients)
 
-    def test_init_sessions(self):
-        pass
+        for n in [1, 2, 3]:
+            aliases_to_test = list(ALIAS_TO_CLIENT.keys())
+            while aliases_to_test:
+                self.master.clients = []
+                aliases = []
+
+                for i in range(n):
+                    if aliases_to_test:
+                        alias = aliases_to_test.pop()
+                        aliases.append(alias)
+                    else:
+                        break
+
+                client_id = ALIAS_TO_CLIENT[alias]
+                client_type = CLIENT_ID_TO_TYPE[client_id]
+                if client_type == TYPE_GOOGLE:
+                    continue
+
+                expected = set()
+                for alias in aliases:
+                    expected.add(ALIAS_TO_CLIENT[alias])
+
+                with self.subTest(n=n, aliaess=aliases):
+                    self.master.populate_clients(aliases)
+                    self.assertCountEqual(expected, self.master.clients)
+        
+    def test_init_sessions_stream_enabled_active_stream(self):
+        ''' Tests Master.init_session() toggling of client.stream_enabled 
+        when Master.active_stream is either True of False.
+        
+        Only one stream can be active at a time. '''
+        
+        self.master.stream_enabled = True
+
+        for state in [True, False]:
+            self.master.active_stream = state
+            self.master.sessions = []
+            self.master.clients = [GEMINI_FLASH_ID, GPT_4_ID]
+
+            with self.subTest(active_stream=state):
+                self.master.init_sessions(sys_message=None)
+                
+                states = []
+                for session in self.master.sessions:
+                    states.append(session.client.stream_enabled)
+
+                expected = [False, False] if state == True else [True, False]
+
+                self.assertCountEqual(expected, states)
 
 class TestParseArgs(unittest.TestCase):
     ''' Test Master.parse_args(). 
@@ -146,19 +206,15 @@ class TestParseArgs(unittest.TestCase):
 
             self.arg_pairs[key] = pair
 
-    def compare_fatal_error_output(self, args, unformatted_e_out):
-        captured_out = io.StringIO()
-        sys.stdout = captured_out
-
+    @patch("sys.stdout", new_callable=io.StringIO)
+    def compare_fatal_error_output(self, args, unformatted_e_out, mock_stdout):        
         try:
             master.parse_arguments(args)
         except SystemExit:
             pass
         
         expected = f"\x1b[38;5;1mError: \x1b[0m\t{unformatted_e_out}\x1b[0m\n"
-        self.assertEqual(captured_out.getvalue(), expected)
-
-        sys.stdout = sys.__stdout__
+        self.assertEqual(mock_stdout.getvalue(), expected)
 
     def compare(self, args, expected):
         ''' Helper function for test_general_combination() '''
@@ -194,8 +250,8 @@ class TestParseArgs(unittest.TestCase):
 
         unformatted_e_out = "Duplicate arguments provided."
 
-        self.compare_fatal_error_output(args, unformatted_e_out)
-                
+        self.compare_fatal_error_output(args, unformatted_e_out)                
+
     def test_unknown_command(self):
         unknown_command = '-unknown_command'
         
@@ -203,6 +259,7 @@ class TestParseArgs(unittest.TestCase):
 
         unformatted_e_out = f"Unknown command: {unknown_command}"
 
+        
         self.compare_fatal_error_output(args, unformatted_e_out)
 
     def test_unknown_argument(self):
@@ -212,8 +269,8 @@ class TestParseArgs(unittest.TestCase):
 
         unformatted_e_out = f'Unknown argument: {unknown_arg}'
 
-        self.compare_fatal_error_output(args, unformatted_e_out)
-        
+        self.compare_fatal_error_output(args, unformatted_e_out)        
+
 # Helper classes
 class ArgPair:
     def __init__(self):
