@@ -1,0 +1,77 @@
+Current:
+------------------------------------
+WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
+BEING REMOVED.
+
+- remove tabs from code blocks in README.md
+
+- Write tests for adding flags [new_branch-test_main]
+- Write tests for removal of and addition of clients and sessions, separately [new_branch-test_main]
+
+
+Misc:
+------------------------------------
+
+- research better deepseek implementation than OpenRouter.
+
+- informative handling of wrong api key? at the moment, no issues arise but user
+is not informed past "failed to receive response" message. This is only checked when a message is sent. 
+A possibility is attempting to send an empty message in Master.configure after setting up sessions.
+
+- get several raw responses (from gpro, gpt4mini, deepseekr1) with: # THERE ARE TONS IN OLD GEMINI PROJECT DEBUG LOGS 
+    * numbered lists
+    * bold 
+    * Italics
+    * Underline? if exists
+    * code blocks !! 
+    * math
+    
+- Handle Gemini's underscore enclosed italics (rare output). Might not be worth it
+- Add --noformat: flag. Command already implemented.
+- display google search results in descending order to get most relevant (1st) at 
+bottom of window.
+- Investigate this thing (appears when two cl, one which is OpenAI):
+"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1738419740.527122  530374 fork_posix.cc:77] Other threads are currently calling into gRPC, skipping fork() handlers"
+
+
+
+Fix Googleapi (or find other API):
+------------------------------------
+- store html, soup
+- parse somehow
+        
+
+Chat history across sessions:
+------------------------------------
+!!! Memory should be stored in different ways, one for the queries, and one for
+the responses of each model. But, we should be able to load the responses of one model
+into the context of another, effectively continuing a conversation with a new model 
+or client entirely !!
+
+
+First draft without taking into account the above consideration:
+    - OpenAI needs manual management of conversation history, stored
+            locally using loggers for example, and then loaded and provided as
+            context for the openai model. Potentially design history system
+            for all models, basically a "update_chat_history()" function for
+            each Client, called from request handler.
+
+            - RESEARCH FIRST: accessing previous chats from Gemini.
+            
+            We would need:
+                - Each session must keep track of which conversation filename
+                it needs to update.
+                - Each session can store it's own current session history (with 
+                the loaded history from the hist_file)
+                - RequestHandler needs function for updating history which calls: 
+                    * message = Session.format_log_msg(role, text) 
+                    # callable from Request at start (with the query) and 
+                    after printing? response. Either, pass the text
+                    or use role argument to determine if we should be looking 
+                    at the session.client.query or session.client.response variable.
+                    * Session.update_history(message)
+                    * Request.log_history(message)
+                    * We need A LOCK (hist_file_lock) for this to not result in 
+                    serious race conditions, I have no idea how multithreaded logging
+                    works or doesn't work.
