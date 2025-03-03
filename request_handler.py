@@ -4,12 +4,12 @@ import time
 
 try:
     from openai import NotFoundError
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     pass
 
 try:
     from google.api_core.exceptions import NotFound
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     pass
 
 from constants import * ## Global constants
