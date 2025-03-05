@@ -84,7 +84,13 @@ class Session:
     def reset(self):
         self.client.reset()
 
-class OpenaiClient:
+class ClientBaseClass():
+    def __init__(self, client_id, sys_message):    
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+class OpenaiClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
         self.api = openai
 
@@ -102,11 +108,8 @@ class OpenaiClient:
 
         self.current_sys_message = None
         self.context = []
-
+        
         self.name = client_id
-        self.api_response = None
-        self.query = ''
-        self.response = ''
 
     def reset(self):
         self.api_response = None
@@ -211,7 +214,7 @@ class OpenaiClient:
     def f_general(self, response):
         return response
   
-class GeminiClient:
+class GeminiClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
         self.api = google.generativeai
 
@@ -223,9 +226,6 @@ class GeminiClient:
         self.stream_enabled = False
 
         self.name = client_id
-        self.api_response = None
-        self.query = ''
-        self.response = ''
 
     def reset(self):
         self.api_response = None
@@ -318,9 +318,6 @@ class GoogleClient:
         self._stop_event = threading.Event()
 
         self.name = client_id
-        self.api_response = None
-        self.query = ''
-        self.response = ''
 
     def reset(self):
         self._stop_event.clear()
@@ -433,9 +430,6 @@ class TestClient:
         self._stop_event = threading.Event()
         
         self.name = client_id
-        self.api_response = None
-        self.query = ''
-        self.response = ''
 
     def reset(self):
         self._stop_event.clear()
