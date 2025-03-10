@@ -84,14 +84,28 @@ class Session:
     def reset(self):
         self.client.reset()
 
-class ClientBaseClass():
-    def __init__(self, client_id, sys_message):    
+class ClientBaseClass:
+    def __init__(self, client_id):    
+        self.name = client_id
         self.api_response = None
         self.query = ''
         self.response = ''
 
+    def reset(self):
+        self.api_response = None
+        self.query = ''
+        self.response = ''
+
+    def stop(self):
+        pass
+    
+    def stopped(self):
+        pass
+
 class OpenaiClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
+        super().__init__(client_id)
+
         self.api = openai
 
         if CLIENT_ID_TO_TYPE[client_id] == TYPE_DEEPSEEK:
@@ -109,19 +123,6 @@ class OpenaiClient(ClientBaseClass):
         self.current_sys_message = None
         self.context = []
         
-        self.name = client_id
-
-    def reset(self):
-        self.api_response = None
-        self.query = ''
-        self.response = ''
-
-    def stop(self):
-        pass
-
-    def stopped(self):
-        pass
-
     def create_message(self, role, text):
         return {"role": role, "content": text}
 
@@ -216,6 +217,8 @@ class OpenaiClient(ClientBaseClass):
   
 class GeminiClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
+        super().__init__(client_id)
+
         self.api = google.generativeai
 
         self.sys_message = sys_message
@@ -224,19 +227,6 @@ class GeminiClient(ClientBaseClass):
         self.chat = self.model.start_chat()
 
         self.stream_enabled = False
-
-        self.name = client_id
-
-    def reset(self):
-        self.api_response = None
-        self.query = ''
-        self.response = ''
-
-    def stop(self):
-        pass
-    
-    def stopped(self):
-        pass
 
     def set_query(self, query):
         self.query = query
@@ -310,20 +300,18 @@ class GeminiClient(ClientBaseClass):
         response = response.replace("**", '') # Odd unknown. Used for emphasis sometimes, doesn't seem to do anything else
         return response
 
-class GoogleClient:
-    # No longer supported
+# No longer supported
+class GoogleClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
+        super().__init__(client_id)
+
         self.api = None # googleapi.google
 
         self._stop_event = threading.Event()
 
-        self.name = client_id
-
     def reset(self):
+        super().reset()
         self._stop_event.clear()
-        self.api_response = None
-        self.query = ''
-        self.response = ''
         
     def stop(self):
         self._stop_event.set()
@@ -423,19 +411,17 @@ class GoogleClient:
 
         self.response = response
 
-class TestClient:
+class TestClient(ClientBaseClass):
     def __init__(self, client_id, sys_message):
+        super().__init__(client_id)
+
         self.api = None
 
         self._stop_event = threading.Event()
-        
-        self.name = client_id
 
     def reset(self):
+        super().reset()
         self._stop_event.clear()
-        self.api_response = None
-        self.query = ''
-        self.response = ''
         
     def stop(self):
         self._stop_event.set()
