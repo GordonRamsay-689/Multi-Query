@@ -205,8 +205,7 @@ class OpenaiClient(ClientBaseClass):
         return re.sub(pattern, replacement, response)
     
     def f_bullet(self, response):
-        # May be redundant, have not seen a response that uses MD bullet points yet
-        # but I have not tested all of the models either.
+        # May be redundant, have not seen a response that uses MD bullet points yet.
         pattern = REGEX_MD_BULLET_POINT 
         replacement = REGEX_MD_BULLET_POINT_SUB
         response = re.sub(pattern, replacement, response, flags=re.MULTILINE)
