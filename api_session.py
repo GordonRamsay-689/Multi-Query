@@ -240,7 +240,7 @@ class GeminiClient(ClientBaseClass):
     def send_request(self):
         self.api_response = self.chat.send_message(self.query, stream=self.stream_enabled)
 
-        if self.stream_enabled: # Shoddy error handling. Without this trying to access self.api_response throws error if stream_enabled
+        if self.stream_enabled: # Trying to access self.api_response throws error if streaming is enabled.
             return True
 
         return True if self.api_response else False
@@ -275,8 +275,6 @@ class GeminiClient(ClientBaseClass):
         return re.sub(pattern, replacement, response)
 
     def f_italicized_text(self, response):
-        pass # write pattern for (rare) underscore enclosed italics
-
         pattern = REGEX_MD_ITALIC
         replacement = REGEX_MD_ITALIC_SUB
         return re.sub(pattern, replacement, response)
@@ -296,8 +294,7 @@ class GeminiClient(ClientBaseClass):
         return response
 
     def f_general(self, response):
-        pass # remove "    " quad whitespace from gflash 2.0 (if necessary)
-        response = response.replace("**", '') # Odd unknown. Used for emphasis sometimes, doesn't seem to do anything else
+        response = response.replace("**", '') # Odd custom MD used for emphasis sometimes.
         return response
 
 # No longer supported
