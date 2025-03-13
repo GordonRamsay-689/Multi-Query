@@ -2,8 +2,6 @@ TIMEOUT = 45
 
 SCRIPT_NAME = "search"
 
-DEFAULT_SYS_MSG = {"role": "system", "content": "You are efficient, to the point and helpful"}
-
 # 256-Color Codes
 GREEN = 34
 LBLUE = 26
