@@ -294,35 +294,32 @@ class Master:
         query = self.query
 
         patterns = {}
+        patterns[DISPLAY_FLAG] = DISPLAY_FLAG
+        patterns[CLEAR_FLAG] = CLEAR_FLAG
+        patterns[FORMAT_FLAG] = FORMAT_FLAG
         patterns[ADD_FLAG] = rf"{ADD_FLAG}(\S+)"
         patterns[REMOVE_FLAG] = rf"{REMOVE_FLAG}(\S+)"
         patterns[STREAM_FLAG] = rf"{STREAM_FLAG}(\S+)"
-        patterns[DISPLAY_FLAG] = DISPLAY_FLAG
         patterns[SYSMSG_FLAG] = rf'{SYSMSG_FLAG}"(.*?)"'
-        patterns[CLEAR_FLAG] = CLEAR_FLAG
-
+        
         for flag in patterns:
             pattern = patterns[flag]
             
-            # Display and clear flag handled first as they do not have any options
-            if flag == DISPLAY_FLAG:
-                if DISPLAY_FLAG in query:
-                    flags[DISPLAY_FLAG] = True
-            elif flag == CLEAR_FLAG:
-                if CLEAR_FLAG in query:
-                    flags[CLEAR_FLAG] = True
+            # Toggleable flags handled first as they do not have any options
+            if flag in TOGGLEABLE_FLAGS:
+                if flag in query:
+                    flags[flag] = True
             else:
                 matches = re.findall(pattern, query)
 
                 for match in matches:
                     flags[flag].append(match)
 
-                    if flag == SYSMSG_FLAG:
-                        if len(matches) > 1:
-                            with self.cli_lock:
-                                ui.c_out("You can only provide one system message at a time. \nUsing first message provided.",
-                                        color=DRED,
-                                        isolate=True)
+                    if flag == SYSMSG_FLAG and len(matches) > 1:
+                        with self.cli_lock:
+                            ui.c_out(ERROR_MULTIPLE_SYS_MESSAGES,
+                                    color=DRED,
+                                    isolate=True)
                         break
 
             query = re.sub(pattern, '', query)
@@ -332,6 +329,9 @@ class Master:
     def execute_flags(self, flags):
         if flags[CLEAR_FLAG]:
             self.clear()
+
+        if flags[FORMAT_FLAG]:
+            self.format = not self.format
 
         if flags[DISPLAY_FLAG]:
             with self.cli_lock:

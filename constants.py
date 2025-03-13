@@ -26,7 +26,9 @@ STREAM_FLAG = '--stream:'
 DISPLAY_FLAG = '--aliases:'
 SYSMSG_FLAG = '--sys:'
 CLEAR_FLAG = '--clear:'
-VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CLEAR_FLAG] 
+FORMAT_FLAG = '--format:'
+VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CLEAR_FLAG, FORMAT_FLAG] 
+TOGGLEABLE_FLAGS = [DISPLAY_FLAG, CLEAR_FLAG, FORMAT_FLAG]
 
 # Client IDs
 # Until o1 and o3-mini are available they have been commented out.
@@ -156,6 +158,8 @@ search is a suggested enviroment alias for running the script.
 '''
 
 ERROR_SCRIPT_DIR = "Failed to get script directory."
+
+ERROR_MULTIPLE_SYS_MESSAGES = "You can only provide one system message at a time. \nUsing first message provided."
 
 TEST_RESPONSE = "This is a test response for TestClient.\n\
 This is line 2 of the test response\n\

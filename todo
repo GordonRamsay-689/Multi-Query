@@ -2,16 +2,13 @@ Current:
 ------------------------------------
 WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
 BEING REMOVED.
-
-- remove tabs from code blocks in README.md
-
-- Write tests for adding flags [new_branch-test_main]
+### PRIORITY
+- Write tests for adding, executing flags [new_branch-test_main]
 - Write tests for removal of and addition of clients and sessions, separately [new_branch-test_main]
-
 
 Misc:
 ------------------------------------
-
+- remove tabs from code blocks in README.md
 - research better deepseek implementation than OpenRouter.
 
 - informative handling of wrong api key? at the moment, no issues arise but user
