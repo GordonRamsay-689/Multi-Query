@@ -110,7 +110,7 @@ class Request:
                          bottom_margin=True)
                 
                 try:
-                    self.session.client.output_stream(self.master.format)
+                    self.session.client.output_stream(format=self.master.format)
                     ui.c_out("End of stream.",
                              separator=True)
                 except TypeError:

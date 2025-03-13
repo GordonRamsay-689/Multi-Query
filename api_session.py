@@ -131,7 +131,7 @@ class OpenaiClient(ClientBaseClass):
         message = self.create_message("user", query)
         self.update_context(message)
 
-    def output_stream(self, format):
+    def output_stream(self, format=True):
         full_response = ''
 
         for chunk in self.api_response:
@@ -230,7 +230,7 @@ class GeminiClient(ClientBaseClass):
     def set_query(self, query):
         self.query = query
 
-    def output_stream(self, format):
+    def output_stream(self, format=True):
         for chunk in self.api_response:
             self.format_response(text=chunk.text, format=format)
             ui.c_out(self.response, endline=False)
