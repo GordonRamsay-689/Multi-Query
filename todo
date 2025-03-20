@@ -2,9 +2,13 @@ Current:
 ------------------------------------
 WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
 BEING REMOVED.
-### PRIORITY
-- Write tests for adding, executing flags [new_branch-test_main]
-- Write tests for removal of and addition of clients and sessions, separately [new_branch-test_main]
+
+### format flag: [new_branch-format_flag]
+- Write tests for adding, executing flags 
+- Add format flag to README.md 
+
+### Tests
+- Write tests for removal of and addition of clients and sessions, separately
 
 Misc:
 ------------------------------------
