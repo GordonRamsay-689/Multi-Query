@@ -18,15 +18,6 @@ Misc:
 - informative handling of wrong api key? at the moment, no issues arise but user
 is not informed past "failed to receive response" message. This is only checked when a message is sent. 
 A possibility is attempting to send an empty message in Master.configure after setting up sessions.
-
-- get several raw responses (from gpro, gpt4mini, deepseekr1) with: # THERE ARE TONS IN OLD GEMINI PROJECT DEBUG LOGS 
-    * numbered lists
-    * bold 
-    * Italics
-    * Underline? if exists
-    * code blocks !! 
-    * math
-    
 - Handle Gemini's underscore enclosed italics (rare output). Might not be worth it
 - Add --noformat: flag. Command already implemented.
 - display google search results in descending order to get most relevant (1st) at 
@@ -35,14 +26,11 @@ bottom of window.
 "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
 I0000 00:00:1738419740.527122  530374 fork_posix.cc:77] Other threads are currently calling into gRPC, skipping fork() handlers"
 
-
-
 Fix Googleapi (or find other API):
 ------------------------------------
 - store html, soup
 - parse somehow
         
-
 Chat history across sessions:
 ------------------------------------
 !!! Memory should be stored in different ways, one for the queries, and one for
