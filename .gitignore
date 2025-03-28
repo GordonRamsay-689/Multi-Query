@@ -11,3 +11,4 @@ tests/escape_codes.txt
 .vscode/
 _*.*
 Debug-*
+.venv/
