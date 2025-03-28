@@ -99,12 +99,12 @@ Option | Function
 
 Flags are used during runtime, prefixed with two dashes, followed by a colon and any necessary information. For example, to add Gemini 1.5 Pro to the conversation:
 ```
-    --add:gpro 
+--add:gpro 
 ```
 
 Flags will be extracted from the query before sending it, so this is also valid:
 ```
-    This is a --add:gpro --rm:gpt4 query.
+This is a --add:gpro --rm:gpt4 query.
 ```
 The client would recieve "This is a query." and nothing else.
 
