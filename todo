@@ -13,15 +13,12 @@ BEING REMOVED.
 Misc:
 ------------------------------------
 - remove tabs from code blocks in README.md
-- research better deepseek implementation than OpenRouter.
+- research better deepseek implementation than OpenRouter or remove for now. 
 
 - informative handling of wrong api key? at the moment, no issues arise but user
 is not informed past "failed to receive response" message. This is only checked when a message is sent. 
 A possibility is attempting to send an empty message in Master.configure after setting up sessions.
 - Handle Gemini's underscore enclosed italics (rare output). Might not be worth it
-- Add --noformat: flag. Command already implemented.
-- display google search results in descending order to get most relevant (1st) at 
-bottom of window.
 - Investigate this thing (appears when two cl, one which is OpenAI):
 "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
 I0000 00:00:1738419740.527122  530374 fork_posix.cc:77] Other threads are currently calling into gRPC, skipping fork() handlers"
@@ -30,6 +27,8 @@ Fix Googleapi (or find other API):
 ------------------------------------
 - store html, soup
 - parse somehow
+- display google search results in descending order to get most relevant (1st) at 
+bottom of window.
         
 Chat history across sessions:
 ------------------------------------
