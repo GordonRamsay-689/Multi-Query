@@ -24,7 +24,7 @@ Install at least one of the following libraries (you only need the ones you plan
 
 1. Install [Gemini API](https://ai.google.dev/):
 ```zsh
-    pip3 install google-generativeai
+pip3 install google-generativeai
 ```
 
 2. Create a free API key at https://aistudio.google.com/apikey.
@@ -33,7 +33,7 @@ Install at least one of the following libraries (you only need the ones you plan
 
 1. Install [OpenAI API](https://platform.openai.com/docs)
 ```zsh
-    pip3 install openai
+pip3 install openai
 ```
 
 2. Create a project and generate and API key at https://platform.openai.com/docs/api-reference/authentication. You may need to provide payment information and purchase tokens at least once.
@@ -42,9 +42,9 @@ Install at least one of the following libraries (you only need the ones you plan
 
 Set environment variables with the API keys for the APIs you plan to use. For bash, sh, zsh:
 ```zsh
-    export GEMINI_API=*
-    export OPENAI_API_KEY=*
-    export OPENROUTER_API=*
+export GEMINI_API=*
+export OPENAI_API_KEY=*
+export OPENROUTER_API=*
 ```
 
 Running the script with no arguments will prompt you for necessary information,
@@ -54,31 +54,31 @@ If you start a chat session (default if no query is provided) an interface which
 
 Create an alias for easy access: 
 ```zsh
-    alias search="python3 ../multi_search/master.py"
+alias search="python3 ../multi_search/master.py"
 ```
 
 For detailed help, use:
 ```zsh
-    search -help
+search -help
 ```
 
 To query one or more clients, enter your query enclosed in double quotes followed by one or more client aliases:
 ```
-    search "query" gflash
+search "query" gflash
 ```
 or just:
 ```zsh
-    search "query" # Defaults to gemini-1.5-flash
+search "query" # Defaults to gemini-1.5-flash
 ```
 
 You can add any number of clients to query:
 ```zsh
-    search gflash gpt4o ...
+search gflash gpt4o ...
 ```
 
 The query is signified by double quotes, and must be the first argument provided **if** provided. Other arguments do not rely on position, and can be mixed freely:
 ```zsh
-    search "query" -option CLIENT_A -option CLIENT_B ...
+search "query" -option CLIENT_A -option CLIENT_B ...
 ```
 
 <h3>Options</h3>
@@ -137,10 +137,10 @@ will omit said client.
 
 Upload file contents with your initial prompt:
 ```zsh
-    search "$(cat path/to/file)"
+search "$(cat path/to/file)"
 ```
 
 You can submit multiple files like this, including comments:
 ```zsh
-     search "Extract key ideas from this article: $(cat article.txt) and insert into this essay: $(cat essay.txt)."
+search "Extract key ideas from this article: $(cat article.txt) and insert into this essay: $(cat essay.txt)."
 ```
