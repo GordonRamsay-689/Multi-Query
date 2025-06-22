@@ -3,6 +3,8 @@ Current:
 WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
 BEING REMOVED.
 
+- Make OpenAI throw an API error to test latest error output
+
 ### format flag: [new_branch-format_flag]
 - Write tests for adding, executing flags 
 - Add format flag to README.md 
