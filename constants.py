@@ -116,9 +116,25 @@ CLIENT_ID_TO_TYPE = {
     TEST_ID: TYPE_TEST
 }
 
+def get_openai_models():
+    try:
+        from openai import OpenAI
+        import os
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    except:
+        # ? some error message about failed get. resort to cached clients?
+        return []
+    model_names = []
+    for model in client.models.list():
+        model_names.append(model.id)
+    return model_names
+
 for id in get_gemini_models():
     CLIENT_ID_TO_TYPE[id] = TYPE_GEMINI
     ALIAS_TO_CLIENT[id] = id # set full name as valid alias
+for id in get_openai_models():
+    CLIENT_ID_TO_TYPE[id] = TYPE_OPENAI
+    ALIAS_TO_CLIENT[id] = id
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
