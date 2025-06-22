@@ -2,16 +2,6 @@ import threading
 import ui
 import time
 
-try:
-    from openai import NotFoundError
-except (ModuleNotFoundError, ImportError):
-    pass
-
-try:
-    from google.api_core.exceptions import NotFound
-except (ModuleNotFoundError, ImportError):
-    pass
-
 from constants import * ## Global constants
 
 class RequestHandler:
@@ -19,6 +9,7 @@ class RequestHandler:
         self.master = parent
         self.cli_lock = cli_lock
         self.requests_lock = threading.Lock()
+        self.timer_active = True
 
         self.sessions = []
         self.requests = []
@@ -55,14 +46,15 @@ class RequestHandler:
                 
             time.sleep(0.2)
 
-            if (time.time() - start_time) > TIMEOUT:
-                self.stop_threads()
+            if self.timer_active:
+                if (time.time() - start_time) > TIMEOUT:
+                    self.stop_threads()
 
-                with self.cli_lock:
-                    ui.c_out("Requests timed out.",
-                             color=DRED,
-                             isolate=True)
-                return
+                    with self.cli_lock:
+                        ui.c_out("Requests timed out.",
+                                color=DRED,
+                                isolate=True)
+                    return
 
 class Request:
     def __init__(self, session, parent):
@@ -84,24 +76,39 @@ class Request:
             except ValueError:
                 pass
 
+    def ask_to_remove_client(self):
+        self.handler.timer_active = False
+        
+        # ! Lock does not encapsulate entire function since remove_client also requests lock.
+        with self.handler.cli_lock:
+            u_in = input(f"Do you wish to remove {self.session.client.name} from active sessions? (y/n)\n> ")
+        
+        if u_in.lower() in ['y', 'yes']:
+            self.master.remove_client(self.session.client.name)
+            
+        self.handler.timer_active = True
+
+    def print_removal_instructions(self):
+        alias = self.master.client_to_alias(self.session.client.name)
+        ui.c_out(f"You can remove '{self.session.client.name}' from active sessions using --rm:{alias} in your prompt, or try again.\n", 
+                 bottom_margin=True)
+
     def main(self):
         try:
             successful_request = self.session.client.send_request()
-        except (NotFoundError, NotFound):
+        except Exception as e:
             with self.handler.cli_lock:
-                ui.c_out("You do not have permission to use this model: ", 
-                         color=DRED, 
-                         endline='')
-                ui.c_out(f"{self.session.client.name}")
-                ui.c_out(f"You can remove it using --rm:{self.session.client.name} or try again.\n", 
-                         color=DRED,
-                         bottom_margin=True)
-                
+                ui.c_out("EXTERNAL ERROR: ",
+                            color=DRED,
+                            endline='')
+                ui.c_out(e, 
+                         color=YELLOW,
+                         bottom_margin=True) # ! DEBUG
+
+            self.ask_to_remove_client()
+        
             self.remove_from_requests()
             return
-        except Exception as e:
-            pass # Log exception.
-            successful_request = False
 
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
             with self.handler.cli_lock:
@@ -113,10 +120,11 @@ class Request:
                     ui.c_out("End of stream.",
                              separator=True)
                 except TypeError:
-                    ui.c_out("Failed to stream response.", 
+                    ui.c_out(f"Error encountered during streaming of response from {self.session.client.name}.", 
                              isolate=True, 
                              color=DRED,
                              separator=True)
+                    self.print_removal_instructions()
                 
             self.remove_from_requests()
             return
@@ -126,9 +134,10 @@ class Request:
                 with self.handler.cli_lock:
                     ui.c_out(f"Client: {self.session.client.name}",
                              bottom_margin=True)
-                    ui.c_out("Failed to receive response.",
+                    ui.c_out(f"No response received for '{self.sesion.client.name}'.",
                              separator=True)
-        
+                    self.print_removal_instructions()
+
             self.remove_from_requests()
             return
         
