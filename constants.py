@@ -1,3 +1,5 @@
+MODELS_CACHE_FILE = "models.json"
+
 TIMEOUT = 45
 
 SCRIPT_NAME = "search"
@@ -87,7 +89,7 @@ If no client is provided the script will default to gemini-flash-1.5
 
 Some valid commands are:
     '{CHAT_COMMAND}' // Starts a persistent chat session with all clients.
-    '{ALIASES_COMMAND}' // Updates and displays list of aliases > models.
+    '{ALIASES_COMMAND}' // Updates and displays list of aliases > models. Cached in {MODELS_CACHE_FILE}
 
 search is a suggested enviroment alias for running the script.
 '''

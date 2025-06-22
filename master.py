@@ -5,6 +5,8 @@ import threading
 import os 
 import sys
 import ui
+import time
+import json
 
 ## Optional
 try:
@@ -490,6 +492,15 @@ def execute_commands(commands, master):
             ui.c_out(CLI_HELP)
             sys.exit()
         elif command == ALIASES_COMMAND:
+
+            ALIAS_TO_CLIENT.clear()
+            CLIENT_ID_TO_TYPE.clear()
+            ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
+            CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST}
+            
+            get_models_info()
+            cache_models_info()
+            
             display_aliases()
             sys.exit()
         elif command == CHAT_COMMAND:
@@ -540,12 +551,10 @@ def parse_arguments(args):
 
 def get_openai_models():
     try:
-        from openai import OpenAI
-        import os
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     except:
-        # ? some error message about failed get. resort to cached clients?
         return []
+    
     model_names = []
     for model in client.models.list():
         model_names.append(model.id)
@@ -553,13 +562,16 @@ def get_openai_models():
 
 def get_gemini_models():
     try:
-        from google import generativeai as genai
+        models = google.generativeai.list_models()
     except:
         return []
+    
     model_names = []
-    for model in genai.list_models():
+
+    for model in models:
         if 'generateContent' in model.supported_generation_methods:
             model_names.append(model.name.lstrip('models/'))
+        
     return model_names
 
 def create_aliases():
@@ -570,31 +582,73 @@ def create_aliases():
         parts = id.split('-')
         # First char in each part. If (mostly) numerical part select the first 4 chars (accomodates for date, YYYY)
         # Not using isdigit() to accomodate for ids like o1
-        for i, part in enumerate([part[0] if part.isalpha() else part[:4] for part in parts]):
+        for part in [part[0] if part.isalpha() else part[:4] for part in parts]:
             alias += part
 
         if len(alias) < 3:
             alias = id[:3]
+            if len(parts) > 1:
+                alias += parts[1]
         
         if alias in ALIAS_TO_CLIENT.keys(): 
             continue
 
         ALIAS_TO_CLIENT[alias] = id
 
-def populate_constants():
+def load_models_info():
+    ''' Load models from local cache, and if long enough since cache written 
+    get models and cache them. '''
+
+    try:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE), mode='r') as f:
+            content = json.loads(f.read())
+    except:
+        content = False
+
+    if not content or time.time() - int(content["timestamp"]) >= 604800: # 1 week
+        get_models_info()
+        cache_models_info()
+    else:
+        for alias, id, client_type in content["models"]:
+            ALIAS_TO_CLIENT[alias] = id
+            CLIENT_ID_TO_TYPE[id] = client_type
+    
+def get_models_info():
+    ''' Gets models and populates constants CLIENT_ID_TO_TYPE and ALIAS_TO_CLIENT '''
     for id in get_gemini_models():
         CLIENT_ID_TO_TYPE[id] = TYPE_GEMINI
-        ALIAS_TO_CLIENT[id] = id # set full name as valid alias
+        ALIAS_TO_CLIENT[id] = id
     for id in get_openai_models():
         CLIENT_ID_TO_TYPE[id] = TYPE_OPENAI
         ALIAS_TO_CLIENT[id] = id
 
     create_aliases()
 
-if __name__ == '__main__':
-    script_dir = get_script_dir() # Currently not in use. For logging/chat history
+def cache_models_info():
+    models = []
+    for alias, id in ALIAS_TO_CLIENT.items():
+        entry = []
+        entry.append(alias)
+        entry.append(id)
+        entry.append(CLIENT_ID_TO_TYPE[id])
+        models.append(entry)
+
+    to_write = {"timestamp": time.time(),
+                "models": models}
     
-    populate_constants()
+    try:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE), mode='w') as f:
+            f.write(json.dumps(to_write))
+    except PermissionError:
+        ui.c_out("PermissionError: ", color=DRED, endline=False)
+        ui.c_out("Unable to cache list of models. This can result in slower execution in the future. Consider running with elevated permissions.")
+    except:
+        pass # log
+
+if __name__ == '__main__':
+    SCRIPT_DIR = get_script_dir()
+
+    load_models_info()
 
     master = Master()
 
