@@ -13,7 +13,7 @@ YELLOW = 11
 # Commands
 CHAT_COMMAND = '-c'
 HELP_COMMAND = '-help'
-ALIASES_COMMAND = '-aliases'
+ALIASES_COMMAND = '-models'
 STREAM_COMMAND = '-s'
 SYS_COMMAND = '-sys'
 NOFORMAT_COMMAND = '-noformat'
@@ -32,21 +32,10 @@ VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CL
 TOGGLEABLE_FLAGS = [DISPLAY_FLAG, CLEAR_FLAG, FORMAT_FLAG]
 
 # Client IDs
-GOOGLE_ID = "google" # Unsupported
 GEMINI_FLASH_ID = "gemini-1.5-flash"
-GEMINI_PRO_ID = "gemini-1.5-pro"
-GPT_3_5_TURBO_ID = "gpt-3.5-turbo"
-GPT_4_ID = "gpt-4"
-GPT_4_TURBO_ID = "gpt-4-turbo"
-GPT_4O_ID = "gpt-4o"
-GPT_4O_MINI_ID = "gpt-4o-mini"
-O1_MINI_ID = "o1-mini"
-DEEPSEEK_R1_FREE = "deepseek/deepseek-r1:free"
-
 TEST_ID = "test-client"
 
-# Client Aliases
-ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
+DEFAULT_MODEL = GEMINI_FLASH_ID
 
 # Client TYPES
 TYPE_GEMINI = "type_gemini"
@@ -55,12 +44,15 @@ TYPE_OPENAI = "type_openai"
 TYPE_DEEPSEEK = "type_deepseek"
 TYPE_TEST = "type_test"
 
-TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI, TYPE_DEEPSEEK]
+DEFAULT_TYPE = TYPE_GEMINI
+
+TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI, TYPE_DEEPSEEK, TYPE_TEST]
 
 # TODO: use client directly instead of types
 STREAM_SUPPORT = [TYPE_GEMINI, TYPE_OPENAI, TYPE_DEEPSEEK]
 
-CLIENT_ID_TO_TYPE = {}
+ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
+CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST}
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
@@ -95,7 +87,7 @@ If no client is provided the script will default to gemini-flash-1.5
 
 Some valid commands are:
     '{CHAT_COMMAND}' // Starts a persistent chat session with all clients.
-    '{ALIASES_COMMAND}' // Full list of aliases
+    '{ALIASES_COMMAND}' // Updates and displays list of aliases > models.
 
 search is a suggested enviroment alias for running the script.
 '''
