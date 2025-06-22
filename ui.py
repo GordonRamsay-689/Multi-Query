@@ -4,16 +4,6 @@ import sys
 import termios
 import subprocess
 
-def main():
-    c_out("hi, my name is michael", isolate=True, color=5)
-    c_out("I like veggies", isolate=True, bottom_margin=False)
-    c_out("and sake", isolate=False, indent=1, highlight=False, color=34, bottom_margin=True, endline=False)
-    c_out("Error!", error=True, separator=True)
-    
-    c_out("Input: ")
-    x = c_in()
-    c_out(x)
-
 def c_in():
     ''' (None) -> str
 
@@ -100,7 +90,7 @@ def c_out(text, *, bottom_margin=False, top_margin=False, color=None, endline=Tr
         print('-' * 50, '\n')
     
     if focus:
-        bring_terminal_to_front()
+        pass # Check if on MacOS # bring_terminal_to_front()
 
 
 def bring_terminal_to_front():
