@@ -16,7 +16,7 @@ from constants import * ## Global constants
 
 class RequestHandler:
     def __init__(self, cli_lock, parent):
-        self.parent = parent
+        self.master = parent
         self.cli_lock = cli_lock
         self.requests_lock = threading.Lock()
 
@@ -62,15 +62,14 @@ class RequestHandler:
                     ui.c_out("Requests timed out.",
                              color=DRED,
                              isolate=True)
-                
                 return
 
 class Request:
     def __init__(self, session, parent):
         self._stop_event = threading.Event()
         self.session = session
-        self.parent = parent
-        self.master = parent.parent
+        self.handler = parent
+        self.master = self.handler.master
 
     def stop(self):
         self._stop_event.set()
@@ -79,9 +78,9 @@ class Request:
         return self._stop_event.is_set()
 
     def remove_from_requests(self):
-        with self.parent.requests_lock:
+        with self.handler.requests_lock:
             try:
-                self.parent.requests.remove(self)
+                self.handler.requests.remove(self)
             except ValueError:
                 pass
 
@@ -89,7 +88,7 @@ class Request:
         try:
             successful_request = self.session.client.send_request()
         except (NotFoundError, NotFound):
-            with self.parent.cli_lock:
+            with self.handler.cli_lock:
                 ui.c_out("You do not have permission to use this model: ", 
                          color=DRED, 
                          endline='')
@@ -101,11 +100,11 @@ class Request:
             self.remove_from_requests()
             return
         except Exception as e:
-            pass # Log exception. 
+            pass # Log exception.
             successful_request = False
 
         if self.session.type in STREAM_SUPPORT and self.session.client.stream_enabled:
-            with self.parent.cli_lock:
+            with self.handler.cli_lock:
                 ui.c_out(f"Client: {self.session.client.name}", 
                          bottom_margin=True)
                 
@@ -124,7 +123,7 @@ class Request:
 
         if not successful_request:
             if not self.stopped():
-                with self.parent.cli_lock:
+                with self.handler.cli_lock:
                     ui.c_out(f"Client: {self.session.client.name}",
                              bottom_margin=True)
                     ui.c_out("Failed to receive response.",
@@ -136,7 +135,7 @@ class Request:
         self.session.client.format_response(format=self.master.format)
 
         if not self.stopped():
-            with self.parent.cli_lock:
+            with self.handler.cli_lock:
                 ui.c_out(f"Client: {self.session.client.name}",
                          bottom_margin=True)
                 ui.c_out(self.session.client.response,
