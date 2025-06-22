@@ -44,17 +44,24 @@ GPT_4_ID = "gpt-4"
 GPT_4_TURBO_ID = "gpt-4-turbo"
 GPT_4O_ID = "gpt-4o"
 GPT_4O_MINI_ID = "gpt-4o-mini"
-#O1_ID = "o1"
-O1_PREVIEW_ID = "o1-preview"
 O1_MINI_ID = "o1-mini"
-#O3_MINI_ID = "o3-mini"
 DEEPSEEK_R1_FREE = "deepseek/deepseek-r1:free"
 
 TEST_ID = "test-client"
 
+def get_gemini_models():
+    try:
+        from google import generativeai as genai
+    except:
+        return []
+    model_names = []
+    for model in genai.list_models():
+        if 'generateContent' in model.supported_generation_methods:
+            model_names.append(model.name.lstrip('models/'))
+    return model_names
+
 # Client Aliases
 ALIAS_TO_CLIENT = {
-    GEMINI_FLASH_ID: GEMINI_FLASH_ID,
     "gemini": GEMINI_FLASH_ID,
     "gflash": GEMINI_FLASH_ID,
     GEMINI_FLASH_EXP_ID: GEMINI_FLASH_EXP_ID,
@@ -75,16 +82,8 @@ ALIAS_TO_CLIENT = {
     "4o": GPT_4O_ID,
     GPT_4O_MINI_ID: GPT_4O_MINI_ID,
     "mini": GPT_4O_MINI_ID,
-    #O1_ID: O1_ID, 
-    O1_PREVIEW_ID: O1_PREVIEW_ID,
-    "o1p": O1_PREVIEW_ID,
-    "o1preview": O1_PREVIEW_ID,
-    O1_MINI_ID: O1_MINI_ID,
     "o1m": O1_MINI_ID,
     "o1mini": O1_MINI_ID,
-    #O3_MINI_ID: O3_MINI_ID, 
-    #"o3m": O3_MINI_ID, 
-    #"o3mini": O3_MINI_ID, 
     DEEPSEEK_R1_FREE: DEEPSEEK_R1_FREE,
     "r1": DEEPSEEK_R1_FREE,
     "deepseek": DEEPSEEK_R1_FREE,
@@ -112,13 +111,14 @@ CLIENT_ID_TO_TYPE = {
     GPT_4_TURBO_ID: TYPE_OPENAI,
     GPT_4O_ID: TYPE_OPENAI,
     GPT_4O_MINI_ID: TYPE_OPENAI,
-    O1_PREVIEW_ID: TYPE_OPENAI,
     O1_MINI_ID: TYPE_OPENAI,
-    #O1_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
-    #O3_MINI_ID: TYPE_OPENAI, # Verify functionality when fully launched by OpenAI
     DEEPSEEK_R1_FREE: TYPE_DEEPSEEK,
     TEST_ID: TYPE_TEST
 }
+
+for id in get_gemini_models():
+    CLIENT_ID_TO_TYPE[id] = TYPE_GEMINI
+    ALIAS_TO_CLIENT[id] = id # set full name as valid alias
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
