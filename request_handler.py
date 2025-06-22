@@ -103,7 +103,7 @@ class Request:
                             endline='')
                 ui.c_out(e, 
                          color=YELLOW,
-                         bottom_margin=True) # ! DEBUG
+                         bottom_margin=True)
 
             self.ask_to_remove_client()
         
