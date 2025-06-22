@@ -1,7 +1,5 @@
 Current:
 ------------------------------------
-WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
-BEING REMOVED.
 
 - Make OpenAI throw an API error to test latest error output
 
@@ -10,6 +8,9 @@ BEING REMOVED.
 - Add format flag to README.md 
 
 ### Tests
+WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
+BEING REMOVED.
+
 - Write tests for removal of and addition of clients and sessions, separately
 
 Misc:
