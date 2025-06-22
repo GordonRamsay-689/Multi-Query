@@ -8,6 +8,7 @@ LBLUE = 26
 RED = 52
 DRED = 1
 LRED = 196
+YELLOW = 11
 
 # Commands
 CHAT_COMMAND = '-c'
