@@ -178,6 +178,23 @@ class Master:
         
         return ALIAS_TO_CLIENT[alias]
 
+    def client_to_alias(self, given_client_id):
+        ''' Finds shortest alias for given client id '''
+        aliases = []
+        for alias, client_id in ALIAS_TO_CLIENT.items():
+            if given_client_id == client_id:
+                aliases.append(alias)
+
+        if not aliases:
+            return given_client_id
+        
+        shortest_alias = aliases[0]
+        for i in range(len(aliases)):
+            if len(aliases[i]) < shortest_alias:
+                shortest_alias = aliases[i]
+        
+        return shortest_alias
+                
     def toggle_stream(self, alias):
         session = self.alias_to_session(alias)
 
