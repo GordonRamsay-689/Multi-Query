@@ -12,3 +12,4 @@ tests/escape_codes.txt
 _*.*
 Debug-*
 .venv/
+*.json
