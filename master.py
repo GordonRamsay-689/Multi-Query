@@ -430,14 +430,27 @@ def select_aliases():
     aliases = []
 
     while not aliases:
-        ui.c_out("Please enter the clients you wish to use:")
-
         display_aliases()
 
+        ui.c_out("Select one or more clients separated by a space:")
         user_in = input("> ")
-        
-        if user_in in sorted(ALIAS_TO_CLIENT.keys()):
-            aliases.append(user_in)
+
+        for alias in user_in.split(' '):
+            if alias == ' ' or not alias:
+                continue
+
+            if not alias in sorted(ALIAS_TO_CLIENT.keys()):
+                ui.c_out("INVALID ALIAS: ", 
+                         color=DRED,
+                         endline=False)
+                ui.c_out(f"{alias}")
+            elif alias in aliases:
+                ui.c_out("DUPLICATE ALIAS: ", 
+                         color=DRED,
+                         endline=False)
+                ui.c_out(f"{alias}")   
+            else:
+                aliases.append(alias)
 
     return aliases
 
@@ -450,7 +463,18 @@ def display_aliases():
     ui.c_out("-"*(3+l*2),
              indent=1)
 
-    for alias in sorted(ALIAS_TO_CLIENT.keys()):
+    for alias, id in dict(sorted(ALIAS_TO_CLIENT.items(), key=lambda item: item[1])).items():
+        
+        n = 0
+        for _, v in ALIAS_TO_CLIENT.items():
+            if id == v:
+                n += 1
+                if n >= 2:
+                    break
+
+        if alias == id and n >= 2:
+            continue
+
         ui.c_out(f"{alias:{l}}",
                  indent=1,
                  endline=False)
@@ -514,8 +538,63 @@ def parse_arguments(args):
 
     return query, commands, client_aliases, sys_message
 
+def get_openai_models():
+    try:
+        from openai import OpenAI
+        import os
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    except:
+        # ? some error message about failed get. resort to cached clients?
+        return []
+    model_names = []
+    for model in client.models.list():
+        model_names.append(model.id)
+    return model_names
+
+def get_gemini_models():
+    try:
+        from google import generativeai as genai
+    except:
+        return []
+    model_names = []
+    for model in genai.list_models():
+        if 'generateContent' in model.supported_generation_methods:
+            model_names.append(model.name.lstrip('models/'))
+    return model_names
+
+def create_aliases():
+    alias_to_client = ALIAS_TO_CLIENT.copy()
+    for _, id in alias_to_client.items():
+        alias = ""
+        
+        parts = id.split('-')
+        # First char in each part. If (mostly) numerical part select the first 4 chars (accomodates for date, YYYY)
+        # Not using isdigit() to accomodate for ids like o1
+        for i, part in enumerate([part[0] if part.isalpha() else part[:4] for part in parts]):
+            alias += part
+
+        if len(alias) < 3:
+            alias = id[:3]
+        
+        if alias in ALIAS_TO_CLIENT.keys(): 
+            continue
+
+        ALIAS_TO_CLIENT[alias] = id
+
+def populate_constants():
+    for id in get_gemini_models():
+        CLIENT_ID_TO_TYPE[id] = TYPE_GEMINI
+        ALIAS_TO_CLIENT[id] = id # set full name as valid alias
+    for id in get_openai_models():
+        CLIENT_ID_TO_TYPE[id] = TYPE_OPENAI
+        ALIAS_TO_CLIENT[id] = id
+
+    create_aliases()
+
 if __name__ == '__main__':
     script_dir = get_script_dir() # Currently not in use. For logging/chat history
+    
+    populate_constants()
 
     master = Master()
 
@@ -531,7 +610,7 @@ if __name__ == '__main__':
         if not client_aliases:
             ui.c_out("No client alias provided.")
             ui.c_out(f"\nDefaulting to {GEMINI_FLASH_ID}.")
-            client_aliases.append("gflash")   
+            client_aliases.append(GEMINI_FLASH_ID)   
 
         if not query:
             master.persistent_chat = True

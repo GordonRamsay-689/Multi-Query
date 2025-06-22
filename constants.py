@@ -32,11 +32,7 @@ VALID_FLAGS = [ADD_FLAG, REMOVE_FLAG, STREAM_FLAG, DISPLAY_FLAG, SYSMSG_FLAG, CL
 TOGGLEABLE_FLAGS = [DISPLAY_FLAG, CLEAR_FLAG, FORMAT_FLAG]
 
 # Client IDs
-# Until o1 and o3-mini are available they have been commented out.
-# Use OpenAI.models.list() to view available clients.
-
 GOOGLE_ID = "google" # Unsupported
-GEMINI_FLASH_EXP_ID = "gemini-2.0-flash-exp"
 GEMINI_FLASH_ID = "gemini-1.5-flash"
 GEMINI_PRO_ID = "gemini-1.5-pro"
 GPT_3_5_TURBO_ID = "gpt-3.5-turbo"
@@ -49,46 +45,8 @@ DEEPSEEK_R1_FREE = "deepseek/deepseek-r1:free"
 
 TEST_ID = "test-client"
 
-def get_gemini_models():
-    try:
-        from google import generativeai as genai
-    except:
-        return []
-    model_names = []
-    for model in genai.list_models():
-        if 'generateContent' in model.supported_generation_methods:
-            model_names.append(model.name.lstrip('models/'))
-    return model_names
-
 # Client Aliases
-ALIAS_TO_CLIENT = {
-    "gemini": GEMINI_FLASH_ID,
-    "gflash": GEMINI_FLASH_ID,
-    GEMINI_FLASH_EXP_ID: GEMINI_FLASH_EXP_ID,
-    "gflash2": GEMINI_FLASH_EXP_ID,
-    "gexp": GEMINI_FLASH_EXP_ID,
-    GEMINI_PRO_ID: GEMINI_PRO_ID,
-    "gpro": GEMINI_PRO_ID,
-    GOOGLE_ID: GOOGLE_ID,
-    "google": GOOGLE_ID,
-    GPT_3_5_TURBO_ID: GPT_3_5_TURBO_ID,
-    "turbo3.5": GPT_3_5_TURBO_ID,
-    GPT_4_ID: GPT_4_ID,
-    "gpt4": GPT_4_ID,
-    GPT_4_TURBO_ID: GPT_4_TURBO_ID,
-    "turbo": GPT_4_TURBO_ID,
-    GPT_4O_ID: GPT_4O_ID,
-    "gpt4o": GPT_4O_ID,
-    "4o": GPT_4O_ID,
-    GPT_4O_MINI_ID: GPT_4O_MINI_ID,
-    "mini": GPT_4O_MINI_ID,
-    "o1m": O1_MINI_ID,
-    "o1mini": O1_MINI_ID,
-    DEEPSEEK_R1_FREE: DEEPSEEK_R1_FREE,
-    "r1": DEEPSEEK_R1_FREE,
-    "deepseek": DEEPSEEK_R1_FREE,
-    TEST_ID: TEST_ID
-}
+ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
 
 # Client TYPES
 TYPE_GEMINI = "type_gemini"
@@ -99,42 +57,10 @@ TYPE_TEST = "type_test"
 
 TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI, TYPE_DEEPSEEK]
 
+# TODO: use client directly instead of types
 STREAM_SUPPORT = [TYPE_GEMINI, TYPE_OPENAI, TYPE_DEEPSEEK]
 
-CLIENT_ID_TO_TYPE = {
-    GEMINI_PRO_ID: TYPE_GEMINI,
-    GEMINI_FLASH_ID: TYPE_GEMINI,
-    GEMINI_FLASH_EXP_ID: TYPE_GEMINI,
-    GOOGLE_ID: TYPE_GOOGLE,
-    GPT_3_5_TURBO_ID: TYPE_OPENAI,
-    GPT_4_ID: TYPE_OPENAI,
-    GPT_4_TURBO_ID: TYPE_OPENAI,
-    GPT_4O_ID: TYPE_OPENAI,
-    GPT_4O_MINI_ID: TYPE_OPENAI,
-    O1_MINI_ID: TYPE_OPENAI,
-    DEEPSEEK_R1_FREE: TYPE_DEEPSEEK,
-    TEST_ID: TYPE_TEST
-}
-
-def get_openai_models():
-    try:
-        from openai import OpenAI
-        import os
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-    except:
-        # ? some error message about failed get. resort to cached clients?
-        return []
-    model_names = []
-    for model in client.models.list():
-        model_names.append(model.id)
-    return model_names
-
-for id in get_gemini_models():
-    CLIENT_ID_TO_TYPE[id] = TYPE_GEMINI
-    ALIAS_TO_CLIENT[id] = id # set full name as valid alias
-for id in get_openai_models():
-    CLIENT_ID_TO_TYPE[id] = TYPE_OPENAI
-    ALIAS_TO_CLIENT[id] = id
+CLIENT_ID_TO_TYPE = {}
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
