@@ -488,10 +488,10 @@ def display_aliases():
 
 def execute_commands(commands, master):
     for command in commands:
-        if command == HELP_COMMAND:
+        if command == HELP_RUNFLAG:
             ui.c_out(CLI_HELP)
             sys.exit()
-        elif command == ALIASES_COMMAND:
+        elif command == ALIASES_RUNFLAG:
 
             ALIAS_TO_CLIENT.clear()
             CLIENT_ID_TO_TYPE.clear()
@@ -503,11 +503,11 @@ def execute_commands(commands, master):
             
             display_aliases()
             sys.exit()
-        elif command == CHAT_COMMAND:
+        elif command == CHAT_RUNFLAG:
             master.persistent_chat = True
-        elif command == STREAM_COMMAND:
+        elif command == STREAM_RUNFLAG:
             master.stream_enabled = True
-        elif command == NOFORMAT_COMMAND:
+        elif command == NOFORMAT_RUNFLAG:
             master.format = False
 
 def parse_arguments(args):
@@ -516,7 +516,7 @@ def parse_arguments(args):
     sys_message = None
 
     # If first argument is not a client or command, assume it is a query.
-    if args[0] not in VALID_COMMANDS and args[0] not in ALIAS_TO_CLIENT.keys():
+    if args[0] not in VALID_RUNFLAGS and args[0] not in ALIAS_TO_CLIENT.keys():
         query = args.pop(0)
     else:
         query = None
@@ -526,26 +526,28 @@ def parse_arguments(args):
 
     while args:
         arg = args.pop(0)
-        arg = arg.lower()
 
         if arg.startswith('-'):
-            if arg in VALID_COMMANDS:
-                if arg == SYS_COMMAND:
+            if arg in SHORTHAND_TO_RUNFLAG.keys():
+                arg = SHORTHAND_TO_RUNFLAG[arg]
+
+            if arg in VALID_RUNFLAGS:
+                if arg == SYS_RUNFLAG:
                     try:
                         sys_message = args.pop(0)
                     except IndexError:
-                        fatal_error(f"No sys message provided after arg {SYS_COMMAND}.")
+                        fatal_error(f"No sys message provided after arg '{SYS_RUNFLAG}'.")
 
-                    if sys_message in VALID_COMMANDS or sys_message in ALIAS_TO_CLIENT.keys():
-                        fatal_error(f"No sys message provided after arg {SYS_COMMAND}.")
+                    if sys_message in VALID_RUNFLAGS or sys_message in ALIAS_TO_CLIENT.keys():
+                        fatal_error(f"No sys message provided after arg '{SYS_RUNFLAG}'.")
                 else:
                     commands.append(arg)
             else:
-                fatal_error(f"Unknown command: {arg}")          
-        elif arg.lower() in ALIAS_TO_CLIENT.keys():
+                fatal_error(f"Unknown runtime flag: '{arg}'")          
+        elif arg in ALIAS_TO_CLIENT.keys():
             client_aliases.append(arg)
         else:
-            fatal_error(f"Unknown argument: {arg}")
+            fatal_error(f"Unknown argument: '{arg}'")
 
     return query, commands, client_aliases, sys_message
 
@@ -589,6 +591,9 @@ def create_aliases():
             alias = id[:3]
             if len(parts) > 1:
                 alias += parts[1]
+
+        if alias[0] == '-': # To avoid conflating with a runtime flag
+            alias = alias[1:]
         
         if alias in ALIAS_TO_CLIENT.keys(): 
             continue
