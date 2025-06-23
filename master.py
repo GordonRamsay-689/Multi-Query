@@ -600,7 +600,7 @@ def load_models_info():
     get models and cache them. '''
 
     try:
-        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE), mode='r') as f:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_REL_PATH), mode='r') as f:
             content = json.loads(f.read())
     except:
         content = False
@@ -637,7 +637,7 @@ def cache_models_info():
                 "models": models}
     
     try:
-        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE), mode='w') as f:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_REL_PATH), mode='w') as f:
             f.write(json.dumps(to_write))
     except PermissionError:
         ui.c_out("PermissionError: ", color=DRED, endline=False)
