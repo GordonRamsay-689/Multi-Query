@@ -1,5 +1,3 @@
-
-
 import sys
 import termios
 import subprocess
@@ -97,6 +95,3 @@ def bring_terminal_to_front():
     ''' AppleScript command, focus terminal window '''
     script = 'tell application "Terminal" to activate'
     subprocess.run(['osascript', '-e', script])
-
-if __name__ == '__main__':
-    main()
