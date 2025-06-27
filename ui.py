@@ -2,6 +2,8 @@ import sys
 import termios
 import subprocess
 
+transcript = []
+
 def c_in():
     ''' (None) -> str
 
@@ -33,6 +35,8 @@ def c_in():
 
     termios.tcflush(sys.stdin, termios.TCIFLUSH)
     # Adjust for whitespace at end of input, remove it.    
+    
+    transcript.append(string[:-5])
     return string[:-5]
 
 def c_out(text, *, bottom_margin=False, top_margin=False, color=None, endline=True, error=False, focus=False,
@@ -83,9 +87,12 @@ def c_out(text, *, bottom_margin=False, top_margin=False, color=None, endline=Tr
         text = f"\n{text}"
 
     # PRINT text
+    transcript.append(text+endchar)
     print(text, end=endchar)
     if separator:
-        print('-' * 50, '\n')
+        sep = ('-' * 50) + '\n'
+        transcript.append(sep)
+        print(sep)
     
     if focus:
         pass # Check if on MacOS # bring_terminal_to_front()
