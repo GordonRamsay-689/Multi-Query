@@ -57,7 +57,7 @@ class Master:
             session.client.reset()
         self.query = ''
 
-    def configure(self, aliases, sys_message):        
+    def configure(self, aliases, sys_message):
         self.populate_clients(aliases)
         self.configure_clients()
         self.init_sessions(sys_message)
@@ -250,6 +250,29 @@ class Master:
         for client_id in clients:
             self.add_client(client_id, None)
 
+    def dump(self):
+        file_name = "dump_" + time.strftime("%m_%d_%Y_%H:%M:%S") + ".txt"
+        file_path = ensure_path(os.path.join('dumps', file_name))
+
+        sep = '-' * 50
+        transcript = file_name + '\n' + sep + '\n'
+        for text in ui.transcript:
+            transcript += text
+
+        with self.cli_lock:
+            ui.c_out(f"Dumping conversation to file..")
+
+        # Todo: try
+        with open(file_path, mode='w') as f:
+            f.write(transcript)
+
+        # Potential check for write?
+        #with open(file_path, mode='r') as f:
+        #    if 0 <= len(f.read()) - len(transcript) <= 5:
+
+        with self.cli_lock:
+            ui.c_out(f"Conversation dumped to file: {file_path}")
+
     def remove_all_clients(self):
         for client_id in self.clients.copy():
             self.remove_client(client_id)
@@ -316,16 +339,17 @@ class Master:
         patterns[DISPLAY_FLAG] = DISPLAY_FLAG
         patterns[CLEAR_FLAG] = CLEAR_FLAG
         patterns[FORMAT_FLAG] = FORMAT_FLAG
+        patterns[DUMP_FLAG] = DUMP_FLAG
         patterns[ADD_FLAG] = rf"{ADD_FLAG}(\S+)"
         patterns[REMOVE_FLAG] = rf"{REMOVE_FLAG}(\S+)"
         patterns[STREAM_FLAG] = rf"{STREAM_FLAG}(\S+)"
         patterns[SYSMSG_FLAG] = rf'{SYSMSG_FLAG}"(.*?)"'
-        
+
         for flag in patterns:
             pattern = patterns[flag]
             
             # Toggleable flags handled first as they do not have any options
-            if flag in TOGGLEABLE_FLAGS:
+            if flag in NO_ARGS_FLAGS:
                 if flag in query:
                     flags[flag] = True
             else:
@@ -348,6 +372,9 @@ class Master:
     def execute_flags(self, flags):
         if flags[CLEAR_FLAG]:
             self.clear()
+
+        if flags[DUMP_FLAG]:
+            self.dump()
 
         if flags[FORMAT_FLAG]:
             self.format = not self.format
@@ -605,7 +632,7 @@ def load_models_info():
     get models and cache them. '''
 
     try:
-        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_REL_PATH), mode='r') as f:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE_PATH), mode='r') as f:
             content = json.loads(f.read())
     except:
         content = False
@@ -642,7 +669,7 @@ def cache_models_info():
                 "models": models}
     
     try:
-        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_REL_PATH), mode='w') as f:
+        with open(os.path.join(SCRIPT_DIR, MODELS_CACHE_FILE_PATH), mode='w') as f:
             f.write(json.dumps(to_write))
     except PermissionError:
         ui.c_out("PermissionError: ", color=DRED, endline=False)
@@ -650,8 +677,27 @@ def cache_models_info():
     except:
         pass # log
 
+def ensure_path(rel_path):
+    ''' Constructs a path from a path relative to 
+    the script directory and ensures it exists, creating
+    directories if necessary.  '''
+
+    path = SCRIPT_DIR
+
+    for subdir in rel_path.split('/'):
+        path = os.path.join(path, subdir)
+
+        if '.' in subdir:
+            break
+        
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+    return path
+
 if __name__ == '__main__':
     SCRIPT_DIR = get_script_dir()
+    MODELS_CACHE_FILE_PATH = ensure_path("data/cache/models.json")
 
     load_models_info()
 

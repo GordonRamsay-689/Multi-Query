@@ -8,6 +8,8 @@ Current:
 - Add format flag to README.md 
 
 ### Tests
+# ! Tests are broken due to remove of harcoded clients
+
 WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
 BEING REMOVED.
 
@@ -15,6 +17,8 @@ BEING REMOVED.
 
 Misc:
 ------------------------------------
+- Clealry separate user and program data
+
 - remove tabs from code blocks in README.md
 
 - research better deepseek implementation than OpenRouter or remove for now. 
