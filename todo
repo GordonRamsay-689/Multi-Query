@@ -1,34 +1,21 @@
 Current:
 ------------------------------------
 
+- CONSIDER: Hardcode (ish) one or two aliases like 'gpt' or 'gpro' that just maps to latest model of that type. easy too remember.
+
+- Cleanup project, write tests. Test stability.
+
 - Make OpenAI throw an API error to test latest error output
-
-### format flag: [new_branch-format_flag]
-- Write tests for adding, executing flags 
-- Add format flag to README.md 
-
-### Tests
-# ! Tests are broken due to remove of harcoded clients
-
-WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
-BEING REMOVED.
-
-- Write tests for removal of and addition of clients and sessions, separately
 
 Misc:
 ------------------------------------
-- Clealry separate user and program data
+- update README.md
 
-- remove tabs from code blocks in README.md
+- Clealry separate user and program data. Decide on structure.
 
 - research better deepseek implementation than OpenRouter or remove for now. 
 
-- informative handling of wrong api key? at the moment, no issues arise but user
-is not informed past "failed to receive response" message. This is only checked when a message is sent. A possibility is attempting to send an empty message in Master.configure after setting up sessions.
-
-- Handle Gemini's underscore enclosed italics (rare output). Might not be worth it
-
-- Investigate this thing (appears when two cl, one which is OpenAI):
+- Investigate this thing (appears when two clients, one which is OpenAI):
 "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
 I0000 00:00:1738419740.527122  530374 fork_posix.cc:77] Other threads are currently calling into gRPC, skipping fork() handlers"
 
@@ -41,7 +28,6 @@ Fix Googleapi (or find other API):
 bottom of window.
         
 Chat history across sessions:
-------------------------------------
 !!! Memory should be stored in different ways, one for the queries, and one for
 the responses of each model. But, we should be able to load the responses of one model
 into the context of another, effectively continuing a conversation with a new model 
@@ -73,3 +59,16 @@ First draft without taking into account the above consideration:
                     * We need A LOCK (hist_file_lock) for this to not result in 
                     serious race conditions, I have no idea how multithreaded logging
                     works or doesn't work.
+
+Tests:
+------------------------------------
+### Tests
+# ! Tests are broken due to remove of harcoded clients
+
+WHEN CRETAING TESTS FOR ADD, REMOVE, CLEAR ETC ALSO CHECK IF SESSIONS ARE
+BEING REMOVED.
+
+- Repair tests, remove hardcoded results. 
+- Write tests for removal of and addition of clients and sessions, separately
+- Write tests for adding, executing flags 
+
