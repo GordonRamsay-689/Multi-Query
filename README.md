@@ -1,5 +1,7 @@
 <h1>Multi-Search</h1>
 
+*Readme is outdated, pending rewrite. Software itself works however.* 
+
 Query LLMs from the command line. You can query several models/engines at the same time, responses being printed as they are received. Multi-line queries, chat sessions and pasted content is supported. 
 
 *Google Search integration, previously available, is currently unavailable due to a defunct API. Restoration is planned if feasible.*
