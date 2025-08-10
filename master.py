@@ -69,7 +69,7 @@ class Master:
             key = "OPENAI_API_KEY"
         elif type == TYPE_GEMINI:
             name = "Gemini"
-            key = "GEMINI_API"
+            key = "GOOGLE_API_KEY"
         elif type == TYPE_DEEPSEEK:
             name = "OpenRouter"
             key = "OPENROUTER_API"
@@ -119,7 +119,7 @@ class Master:
                     if not self.is_imported(*args) or not self.api_key_exists(*args):
                         continue
                 
-                    google.generativeai.configure(api_key=os.environ["GEMINI_API"])
+                    google.generativeai.configure(api_key=os.environ["GOOGLE_API_KEY"])
                     self.configured_gemini = True
             elif client_type == TYPE_OPENAI:
                 if not self.configured_openai:
