@@ -42,7 +42,6 @@ class Master:
 
         self.configured_gemini = False
         self.configured_openai = False
-        self.configured_deepseek = False
 
         self.clients = []
         self.sessions = []
@@ -70,9 +69,6 @@ class Master:
         elif type == TYPE_GEMINI:
             name = "Gemini"
             key = "GOOGLE_API_KEY"
-        elif type == TYPE_DEEPSEEK:
-            name = "OpenRouter"
-            key = "OPENROUTER_API"
 
         try:
             os.environ[key]
@@ -93,9 +89,6 @@ class Master:
         elif type == TYPE_GEMINI:
             imported = google_generativeai_imported
             module = "google.generativeai"
-        elif type == TYPE_DEEPSEEK:
-            imported = openai_imported
-            module = "openai"
         
         if not imported:
             with self.cli_lock:
@@ -128,13 +121,6 @@ class Master:
                         continue
 
                     self.configured_openai = True
-            elif client_type == TYPE_DEEPSEEK:
-                if not self.configured_deepseek:
-                    
-                    if not self.is_imported(*args) or not self.api_key_exists(*args):
-                        continue
-
-                    self.configured_deepseek = True
             elif client_type == TYPE_GOOGLE:
                 with self.cli_lock:
                     ui.c_out(f"Currently unsupported: ", 

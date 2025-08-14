@@ -73,7 +73,7 @@ class Session:
             self.client = GeminiClient(client_id, sys_message)
         elif self.type == TYPE_GOOGLE:
             self.client = GoogleClient(client_id, sys_message)
-        elif self.type == TYPE_OPENAI or self.type == TYPE_DEEPSEEK:
+        elif self.type == TYPE_OPENAI:
             self.client = OpenaiClient(client_id, sys_message)
         elif self.type == TYPE_TEST:
             self.client = TestClient(client_id, sys_message)
@@ -108,10 +108,7 @@ class OpenaiClient(ClientBaseClass):
 
         self.api = openai
 
-        if CLIENT_ID_TO_TYPE[client_id] == TYPE_DEEPSEEK:
-            self.model = openai.OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API"])   
-        else:
-            self.model = openai.OpenAI()
+        self.model = openai.OpenAI()
 
         self.stream_enabled = False
 
