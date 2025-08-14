@@ -40,8 +40,11 @@ class Master:
 
         self.handler = request_handler.RequestHandler(self.cli_lock, self)
 
-        self.configured_gemini = False
-        self.configured_openai = False
+        self.configured = {TYPE_GEMINI: False,
+                           TYPE_OPENAI: False,
+                           TYPE_TEST: True,
+                           TYPE_GOOGLE: False
+                           }
 
         self.clients = []
         self.sessions = []
@@ -62,7 +65,7 @@ class Master:
         self.init_sessions(sys_message)
         self.handler.sessions = self.sessions
 
-    def api_key_exists(self, type, client_id):
+    def api_key_exists(self, type):
         if type == TYPE_OPENAI:
             name = "OpenAI"
             key = "OPENAI_API_KEY"
@@ -77,12 +80,11 @@ class Master:
                 ui.c_out(f"No {name} API key found when trying to acces environment variable '{key}'.\nPlease set an environment variable with 'export {key}=YOUR_KEY' in order to use {name} models.", 
                         color=DRED,
                         isolate=True)
-            self.remove_client(client_id)
             
             return False    
         return True
 
-    def is_imported(self, type, client_id):
+    def is_imported(self, type):
         if type == TYPE_OPENAI:
             imported = openai_imported
             module = "openai"
@@ -96,43 +98,37 @@ class Master:
                             color=DRED,
                             isolate=True)
             
-            self.remove_client(client_id)
             return False
         return True
 
     def configure_clients(self):
-        for client_id in self.clients.copy():
+        client_types = set()
+
+        for client_id in self.clients:
             client_type = CLIENT_ID_TO_TYPE[client_id]
+            client_types.add(client_type)
+        
+        for client_type in client_types:
+            self.configure_client(client_type)
 
-            args = (client_type, client_id)
+    def configure_client(self, client_type):
+        if self.configured[client_type]:
+            return
+        
+        if not self.is_imported(client_type) or not self.api_key_exists(client_type):
+            self.remove_type(client_type)
+            return
+        
+        # Special handling
+        if client_type == TYPE_GEMINI:
+            google.generativeai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+        
+        self.configured[client_type] = True
 
-            if client_type == TYPE_GEMINI:
-                if not self.configured_gemini:
+    def remove_type(self, client_type):
+        for client_id in [client_id for client_id in self.clients if CLIENT_ID_TO_TYPE[client_id] == client_type]:
+            self.remove_client(client_id)
 
-                    if not self.is_imported(*args) or not self.api_key_exists(*args):
-                        continue
-                
-                    google.generativeai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-                    self.configured_gemini = True
-            elif client_type == TYPE_OPENAI:
-                if not self.configured_openai:
-
-                    if not self.is_imported(*args) or not self.api_key_exists(*args):
-                        continue
-
-                    self.configured_openai = True
-            elif client_type == TYPE_GOOGLE:
-                with self.cli_lock:
-                    ui.c_out(f"Currently unsupported: ", 
-                            color=DRED, 
-                            endline='', 
-                            top_margin=True)
-                    ui.c_out(f"googleapi", 
-                             bottom_margin=True)
-                    
-                self.remove_client(client_id)
-                continue
-                
     def populate_clients(self, aliases):
         for alias in aliases:
             client_id = ALIAS_TO_CLIENT[alias]
