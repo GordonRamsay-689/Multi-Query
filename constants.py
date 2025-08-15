@@ -61,8 +61,8 @@ TYPES = [TYPE_GEMINI, TYPE_GOOGLE, TYPE_OPENAI, TYPE_TEST]
 # TODO: use client directly instead of types
 STREAM_SUPPORT = [TYPE_GEMINI, TYPE_OPENAI]
 
-ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
-CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST}
+ALIAS_TO_CLIENT = {TEST_ID: TEST_ID, DEFAULT_MODEL: DEFAULT_MODEL} # Is later populated by dynamic fetch of models
+CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST} # Is later populated by dynamic fetch of models
 
 # OUTPUT STRINGS (instructions, warnings, information..)
 CLI_EXAMPLE_USAGE = f'''\
