@@ -368,6 +368,7 @@ class Master:
         for match in flags[REMOVE_FLAG]:
             if match == "all":
                 self.remove_all_clients()
+                break
             else:
                 self.remove_client(match)
 
