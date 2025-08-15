@@ -696,9 +696,7 @@ if __name__ == '__main__':
     else: 
         query, commands, client_aliases, sys_message = parse_arguments(sys.argv[1:])
 
-        print(ALIAS_TO_CLIENT) #!DEBUG
         execute_commands(commands, master)
-        print(ALIAS_TO_CLIENT) #!DEBUG
         
         if not client_aliases:
             ui.c_out("No client alias provided.")
