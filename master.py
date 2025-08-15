@@ -503,9 +503,11 @@ def execute_commands(commands, master):
         elif command == ALIASES_RUNFLAG:
 
             ALIAS_TO_CLIENT.clear()
+            ALIAS_TO_CLIENT[TEST_ID] = TEST_ID
+            
             CLIENT_ID_TO_TYPE.clear()
-            ALIAS_TO_CLIENT = {TEST_ID: TEST_ID}
-            CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST}
+            CLIENT_ID_TO_TYPE[DEFAULT_MODEL] = DEFAULT_TYPE
+            CLIENT_ID_TO_TYPE[TEST_ID] = TYPE_TEST
             
             get_models_info()
             cache_models_info()
@@ -693,8 +695,10 @@ if __name__ == '__main__':
     else: 
         query, commands, client_aliases, sys_message = parse_arguments(sys.argv[1:])
 
+        print(ALIAS_TO_CLIENT) #!DEBUG
         execute_commands(commands, master)
-
+        print(ALIAS_TO_CLIENT) #!DEBUG
+        
         if not client_aliases:
             ui.c_out("No client alias provided.")
             ui.c_out(f"\nDefaulting to {GEMINI_FLASH_ID}.")
