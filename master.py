@@ -656,8 +656,9 @@ def cache_models_info():
     except PermissionError:
         ui.c_out("PermissionError: ", color=DRED, endline=False)
         ui.c_out("Unable to cache list of models. This can result in slower execution in the future. Consider running with elevated permissions.")
-    except:
-        pass # log
+    except Exception:
+        ui.c_out("An unexpected error has occured while attempting to update cache of model names.")
+        raise
 
 def ensure_path(rel_path):
     ''' Constructs a path from a path relative to 
