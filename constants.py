@@ -65,20 +65,17 @@ ALIAS_TO_CLIENT = {TEST_ID: TEST_ID, DEFAULT_MODEL: DEFAULT_MODEL} # Is later po
 CLIENT_ID_TO_TYPE = {DEFAULT_MODEL: DEFAULT_TYPE, TEST_ID: TYPE_TEST} # Is later populated by dynamic fetch of models
 
 # OUTPUT STRINGS (instructions, warnings, information..)
-CLI_EXAMPLE_USAGE = f'''\
-Example Usage: 
-search "query" --flag model
-
-For more details:
-search {HELP_RUNFLAG}'''
-
-CLI_HELP = f'''\
-NOT IMPLEMENTED
-'''
-
 ERROR_SCRIPT_DIR = "Failed to get script directory."
 
 ERROR_MULTIPLE_SYS_MESSAGES = "You can only provide one system message at a time. \nUsing first message provided."
+
+CLI_USAGE = 'ms ["QUERY"] [MODEL NAME | MODEL ALIAS] [--FLAG | -FLAG SHORTHAND]\nExcept for the query no arguments are positional.'
+
+CLI_HELP = f'''\
+{CLI_USAGE}
+
+Not implemented.
+'''
 
 TEST_RESPONSE = "This is a test response for TestClient.\n\
 This is line 2 of the test response\n\
